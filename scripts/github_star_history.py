@@ -236,6 +236,15 @@ def _format_date_tick(value: date, span_days: int) -> str:
     return value.strftime("%m-%d")
 
 
+def _format_star_tick(value: int) -> str:
+    if value < 1000:
+        return str(value)
+    scaled = value / 1000
+    if scaled.is_integer():
+        return "{}k".format(int(scaled))
+    return "{:.1f}k".format(scaled)
+
+
 def _cumulative_points(snapshot: StarSnapshot) -> Tuple[List[Tuple[date, int]], date, date]:
     counts = Counter(snapshot.star_dates)
     start = min([snapshot.created_on] + list(counts.keys()))
@@ -253,28 +262,24 @@ def render_svg(snapshot: StarSnapshot, theme: str) -> str:
     palettes = {
         "light": {
             "background": "#ffffff",
-            "panel": "#f6f8fa",
-            "grid": "#d8dee4",
-            "text": "#1f2328",
+            "ink": "#111111",
             "muted": "#59636e",
-            "line": "#1f883d",
-            "fill": "#2da44e",
+            "line": "#f2380f",
+            "accent": "#00a83f",
         },
         "dark": {
             "background": "#0d1117",
-            "panel": "#161b22",
-            "grid": "#30363d",
-            "text": "#f0f6fc",
-            "muted": "#8b949e",
-            "line": "#3fb950",
-            "fill": "#238636",
+            "ink": "#f0f6fc",
+            "muted": "#9da7b3",
+            "line": "#ff5a36",
+            "accent": "#39d353",
         },
     }
     if theme not in palettes:
         raise ValueError("theme must be 'light' or 'dark'")
     colors = palettes[theme]
-    width, height = 880, 520
-    left, right, top, bottom = 78, 32, 82, 62
+    width, height = 1000, 650
+    left, right, top, bottom = 105, 40, 105, 90
     plot_width = width - left - right
     plot_height = height - top - bottom
     points, start, end = _cumulative_points(snapshot)
@@ -291,12 +296,12 @@ def render_svg(snapshot: StarSnapshot, theme: str) -> str:
         "M {:.2f} {:.2f}".format(x_position(points[0][0]), y_position(points[0][1]))
     ]
     for day, count in points[1:]:
-        path_parts.append("H {:.2f} V {:.2f}".format(x_position(day), y_position(count)))
-    path_parts.append("H {:.2f}".format(left + plot_width))
+        path_parts.append("L {:.2f} {:.2f}".format(x_position(day), y_position(count)))
+    if points[-1][0] != end:
+        path_parts.append(
+            "L {:.2f} {:.2f}".format(left + plot_width, y_position(points[-1][1]))
+        )
     line_path = " ".join(path_parts)
-    fill_path = "{} V {:.2f} H {:.2f} Z".format(
-        line_path, top + plot_height, left
-    )
 
     y_ticks = sorted(set(round(index * y_max / 4) for index in range(5)))
     x_dates = []
@@ -306,7 +311,67 @@ def render_svg(snapshot: StarSnapshot, theme: str) -> str:
             x_dates.append(candidate)
 
     repository_label = escape(snapshot.repository)
-    through_label = end if snapshot.star_count == 0 else max(snapshot.star_dates)
+    through_label = snapshot.created_on if snapshot.star_count == 0 else max(snapshot.star_dates)
+    legend_width = min(390, max(220, 58 + len(snapshot.repository) * 11))
+    axis_bottom = top + plot_height
+    axis_right = left + plot_width
+    vertical_axis = (
+        "M {0:.2f} {1:.2f} "
+        "C {2:.2f} {3:.2f}, {4:.2f} {5:.2f}, {6:.2f} {7:.2f} "
+        "C {8:.2f} {9:.2f}, {10:.2f} {11:.2f}, {12:.2f} {13:.2f}"
+    ).format(
+        left,
+        axis_bottom,
+        left - 3,
+        axis_bottom - plot_height * 0.25,
+        left + 2,
+        axis_bottom - plot_height * 0.42,
+        left - 1,
+        axis_bottom - plot_height * 0.58,
+        left - 4,
+        axis_bottom - plot_height * 0.75,
+        left + 3,
+        top + plot_height * 0.18,
+        left,
+        top,
+    )
+    horizontal_axis = (
+        "M {0:.2f} {1:.2f} "
+        "C {2:.2f} {3:.2f}, {4:.2f} {5:.2f}, {6:.2f} {7:.2f} "
+        "C {8:.2f} {9:.2f}, {10:.2f} {11:.2f}, {12:.2f} {13:.2f}"
+    ).format(
+        left,
+        axis_bottom,
+        left + plot_width * 0.17,
+        axis_bottom - 3,
+        left + plot_width * 0.31,
+        axis_bottom + 3,
+        left + plot_width * 0.48,
+        axis_bottom,
+        left + plot_width * 0.65,
+        axis_bottom - 2,
+        left + plot_width * 0.82,
+        axis_bottom + 2,
+        axis_right,
+        axis_bottom,
+    )
+    legend_x, legend_y, legend_height = left + 14, top + 14, 48
+    legend_box = (
+        "M {0} {1} Q {2} {1}, {2} {3} "
+        "L {2} {4} Q {2} {5}, {6} {5} "
+        "L {7} {5} Q {8} {5}, {8} {4} "
+        "L {8} {3} Q {8} {1}, {7} {1} Z"
+    ).format(
+        legend_x + 9,
+        legend_y,
+        legend_x,
+        legend_y + 9,
+        legend_y + legend_height - 9,
+        legend_y + legend_height,
+        legend_x + 9,
+        legend_x + legend_width - 9,
+        legend_x + legend_width,
+    )
     elements = [
         '<svg xmlns="http://www.w3.org/2000/svg" width="{}" height="{}" viewBox="0 0 {} {}" role="img" aria-labelledby="title description">'.format(
             width, height, width, height
@@ -318,66 +383,79 @@ def render_svg(snapshot: StarSnapshot, theme: str) -> str:
         '  <rect width="100%" height="100%" rx="12" fill="{}"/>'.format(
             colors["background"]
         ),
-        '  <rect x="{}" y="{}" width="{}" height="{}" rx="8" fill="{}"/>'.format(
-            left, top, plot_width, plot_height, colors["panel"]
+        '  <g data-style="hand-drawn" font-family="Comic Sans MS,Segoe Print,Bradley Hand,cursive" fill="{}">'.format(
+            colors["ink"]
         ),
-        '  <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif">',
-        '    <text x="{}" y="36" fill="{}" font-size="20" font-weight="600">GitHub Star History</text>'.format(
-            left, colors["text"]
+        '    <text x="{}" y="58" text-anchor="middle" font-size="34" font-weight="700">Star History</text>'.format(
+            width / 2
         ),
-        '    <text x="{}" y="60" fill="{}" font-size="13">{}</text>'.format(
-            left, colors["muted"], repository_label
+        '    <path data-role="y-axis" d="{}" fill="none" stroke="{}" stroke-width="4" stroke-linecap="round"/>'.format(
+            vertical_axis, colors["ink"]
         ),
-        '    <text x="{}" y="39" text-anchor="end" fill="{}" font-size="26" font-weight="700">{}</text>'.format(
-            left + plot_width, colors["text"], snapshot.star_count
+        '    <path data-role="x-axis" d="{}" fill="none" stroke="{}" stroke-width="4" stroke-linecap="round"/>'.format(
+            horizontal_axis, colors["ink"]
         ),
-        '    <text x="{}" y="60" text-anchor="end" fill="{}" font-size="12">stars</text>'.format(
-            left + plot_width, colors["muted"]
+        '    <text x="42" y="{}" text-anchor="middle" font-size="22" font-weight="600" transform="rotate(-90 42 {})">GitHub Stars</text>'.format(
+            top + plot_height / 2, top + plot_height / 2
+        ),
+        '    <text x="{}" y="{}" text-anchor="middle" font-size="22" font-weight="600">Date</text>'.format(
+            left + plot_width / 2, axis_bottom + 65
+        ),
+        '    <path data-role="legend-box" d="{}" fill="{}" stroke="{}" stroke-width="3" stroke-linejoin="round"/>'.format(
+            legend_box, colors["background"], colors["ink"]
+        ),
+        '    <rect x="{}" y="{}" width="17" height="17" rx="4" fill="{}"/>'.format(
+            legend_x + 17, legend_y + 16, colors["line"]
+        ),
+        '    <text x="{}" y="{}" dominant-baseline="middle" font-size="19" font-weight="600">{}</text>'.format(
+            legend_x + 44, legend_y + legend_height / 2 + 1, repository_label
         ),
     ]
-    for tick in y_ticks:
+    for tick in y_ticks[1:]:
         y = y_position(tick)
         elements.append(
-            '    <line x1="{}" y1="{:.2f}" x2="{}" y2="{:.2f}" stroke="{}" stroke-width="1"/>'.format(
-                left, y, left + plot_width, y, colors["grid"]
+            '    <path d="M {} {:.2f} L {} {:.2f}" fill="none" stroke="{}" stroke-width="2.5" stroke-linecap="round"/>'.format(
+                left - 7, y + 1, left + 4, y, colors["ink"]
             )
         )
         elements.append(
-            '    <text x="{}" y="{:.2f}" text-anchor="end" dominant-baseline="middle" fill="{}" font-size="11">{}</text>'.format(
-                left - 10, y, colors["muted"], tick
+            '    <text x="{}" y="{:.2f}" text-anchor="end" dominant-baseline="middle" font-size="17">{}</text>'.format(
+                left - 14, y, _format_star_tick(tick)
             )
         )
     for index, tick_date in enumerate(x_dates):
         x = x_position(tick_date)
         anchor = "start" if index == 0 else "end" if index == len(x_dates) - 1 else "middle"
         elements.append(
-            '    <text x="{:.2f}" y="{}" text-anchor="{}" fill="{}" font-size="11">{}</text>'.format(
+            '    <path d="M {:.2f} {} L {:.2f} {}" fill="none" stroke="{}" stroke-width="2.5" stroke-linecap="round"/>'.format(
+                x, axis_bottom - 3, x + 1, axis_bottom + 7, colors["ink"]
+            )
+        )
+        elements.append(
+            '    <text x="{:.2f}" y="{}" text-anchor="{}" font-size="17">{}</text>'.format(
                 x,
-                top + plot_height + 28,
+                axis_bottom + 34,
                 anchor,
-                colors["muted"],
                 _format_date_tick(tick_date, span_days),
             )
         )
     elements.extend(
         [
-            '    <path d="{}" fill="{}" opacity="0.14"/>'.format(
-                fill_path, colors["fill"]
-            ),
-            '    <path d="{}" fill="none" stroke="{}" stroke-width="3" stroke-linejoin="round"/>'.format(
+            '    <path data-role="star-line" d="{}" fill="none" stroke="{}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>'.format(
                 line_path, colors["line"]
             ),
+            '    <g data-role="signature" transform="translate({} {})">'.format(
+                axis_right - 174, height - 42
+            ),
+            '      <path d="M 12 0 L 15 9 L 25 6 L 18 14 L 26 21 L 16 18 L 12 28 L 9 18 L 0 22 L 7 14 L 0 7 L 9 10 Z" fill="none" stroke="{}" stroke-width="2.5" stroke-linejoin="round"/>'.format(
+                colors["accent"]
+            ),
+            '      <text x="34" y="18" fill="{}" font-size="15">project-steward</text>'.format(
+                colors["muted"]
+            ),
+            "    </g>",
         ]
     )
-    if snapshot.star_count:
-        elements.append(
-            '    <circle cx="{:.2f}" cy="{:.2f}" r="4.5" fill="{}" stroke="{}" stroke-width="2"/>'.format(
-                left + plot_width,
-                y_position(snapshot.star_count),
-                colors["line"],
-                colors["background"],
-            )
-        )
     elements.extend(["  </g>", "</svg>", ""])
     return "\n".join(elements)
 

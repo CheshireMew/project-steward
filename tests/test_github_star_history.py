@@ -70,11 +70,24 @@ class GitHubStarHistoryTests(unittest.TestCase):
         dark = STAR_HISTORY.render_svg(snapshot, "dark")
 
         self.assertEqual(light, STAR_HISTORY.render_svg(snapshot, "light"))
-        ET.fromstring(light)
+        light_root = ET.fromstring(light)
         ET.fromstring(dark)
         self.assertIn("Total: 3", light)
         self.assertIn("#ffffff", light)
         self.assertIn("#0d1117", dark)
+        self.assertIn('data-style="hand-drawn"', light)
+        self.assertIn("Comic Sans MS", light)
+        self.assertIn("GitHub Stars", light)
+        self.assertIn("project-steward", light)
+        self.assertIn("#f2380f", light)
+        star_line = next(
+            element
+            for element in light_root.iter()
+            if element.attrib.get("data-role") == "star-line"
+        )
+        self.assertIn(" L ", star_line.attrib["d"])
+        self.assertNotIn(" H ", star_line.attrib["d"])
+        self.assertNotIn(" V ", star_line.attrib["d"])
         self.assertNotEqual(light, dark)
 
     def test_zero_star_repository_still_has_a_complete_chart(self) -> None:
@@ -85,9 +98,15 @@ class GitHubStarHistoryTests(unittest.TestCase):
         )
         rendered = STAR_HISTORY.render_svg(snapshot, "light")
 
-        ET.fromstring(rendered)
+        root = ET.fromstring(rendered)
         self.assertIn("Total: 0", rendered)
-        self.assertIn(">0</text>", rendered)
+        star_line = next(
+            element
+            for element in root.iter()
+            if element.attrib.get("data-role") == "star-line"
+        )
+        path_parts = star_line.attrib["d"].split()
+        self.assertEqual(path_parts[2], path_parts[5])
         self.assertNotIn("<circle", rendered)
 
     def test_matching_outputs_do_not_create_a_commit(self) -> None:
