@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "id": "local-file-workspace",
+  "version": "1.0.0",
+  "layer": "capability",
+  "name": "Local file workspace",
+  "description": "Folder-first content truth, directory tree, file operations, source fidelity, and optional exact-root version-control contracts.",
+  "requires": [
+    "product-ui"
+  ],
+  "detection": {
+    "explicit_only": true
+  },
+  "defaults": {
+    "decisions": {
+      "workspace_content_truth": "selected-folder-files",
+      "workspace_entry_model": "files-and-directories",
+      "workspace_version_control": "optional-exact-root-capability",
+      "workspace_file_operations": "save-conflict-operate-migrate-refresh",
+      "workspace_deletion": "recoverable-by-default",
+      "workspace_tree_indent": "semantic-depth-single-owner"
+    }
+  },
+  "invariants": [
+    {
+      "id": "workspace-folder-content-truth",
+      "title": "The selected folder owns content truth",
+      "statement": "Files inside the selected workspace root are the only active content truth; recent paths, tabs, indexes, recovery copies, previews, and optional version-control state do not become independently editable mirrors.",
+      "preflight": [
+        "Name the selected root and every state object that only references it.",
+        "Define supported content and internal directories that never enter the content tree."
+      ],
+      "evidence": [
+        "A real plain folder opens and edits without version-control metadata.",
+        "Restart and a second file consumer read the content written to the selected root.",
+        "Removing a recent-workspace record does not delete disk content."
+      ]
+    },
+    {
+      "id": "workspace-optional-exact-root-version-control",
+      "title": "Version control is an exact-root optional capability",
+      "statement": "Version control is enabled only for the workspace root itself and never discovered from a parent; nested repositories remain ordinary content until opened as their own roots.",
+      "preflight": [
+        "Separate workspace identity from optional capability state.",
+        "Define how nested metadata is hidden without hiding ordinary child content."
+      ],
+      "evidence": [
+        "A plain parent folder containing repositories still has no version-control UI or change manifest.",
+        "Opening a nested repository as its own root exposes the capability.",
+        "The core file workflow succeeds when the capability is null."
+      ]
+    },
+    {
+      "id": "workspace-entry-tree",
+      "title": "The workspace model contains files and directories",
+      "statement": "The formal workspace entry model uses root-relative paths and represents both files and directories with the metadata required by the tree, search, preview, and file-operation consumers.",
+      "preflight": [
+        "Define entry identity, type, supported file kind, size, modification time, and optional capability state.",
+        "Assign ignore rules and internal-directory exclusions to one backend boundary."
+      ],
+      "evidence": [
+        "The visible tree is built from formal producer output rather than hand-written consumer data.",
+        "Directories expand through the same root-relative identity used by file operations.",
+        "Internal metadata and trash never appear as editable content."
+      ]
+    },
+    {
+      "id": "workspace-file-operation-transaction",
+      "title": "File operations migrate all path state",
+      "statement": "Create, rename, move, delete, and restore enter one workspace-bound operation chain that resolves dirty content and external conflicts before mutation, then migrates tabs, recent paths, selection, search, recovery, and optional capability state.",
+      "preflight": [
+        "Inventory every consumer of file and directory paths.",
+        "Define boundary escape, symlink, collision, overwrite, cancellation, and partial-failure behavior."
+      ],
+      "evidence": [
+        "Unresolved save or external conflict blocks destructive mutation.",
+        "A successful move leaves no active consumer on the old path.",
+        "Directory moves expand to the exact affected file set."
+      ]
+    },
+    {
+      "id": "workspace-recoverable-deletion",
+      "title": "Ordinary deletion is recoverable",
+      "statement": "User deletion is confirmed and recoverable by default through the platform's system trash or an application-owned trash; permanent clearing is a separate confirmed action.",
+      "preflight": [
+        "Separate deleting disk content from forgetting a recent workspace.",
+        "Define restore identity, collision handling, and platform-specific ownership."
+      ],
+      "evidence": [
+        "A deleted item can be restored and is read again by the formal tree consumer.",
+        "Forgetting a workspace changes only application state.",
+        "Permanent clearing cannot occur through the ordinary delete path."
+      ]
+    },
+    {
+      "id": "workspace-source-fidelity",
+      "title": "Unchanged source files remain byte-faithful",
+      "statement": "Opening and saving a supported source file without a semantic edit does not rewrite its bytes, encoding, or line endings.",
+      "preflight": [
+        "Define supported formats and encodings.",
+        "Keep editor state, preview state, and recovery copies outside the source-of-truth boundary."
+      ],
+      "evidence": [
+        "A real unchanged file is byte-identical after the normal open and save chain.",
+        "A real edit changes only the intended content.",
+        "External modifications enter the formal conflict path instead of being overwritten."
+      ]
+    },
+    {
+      "id": "workspace-tree-spatial-contract",
+      "title": "Tree depth and region boundaries have one owner",
+      "statement": "Tree indentation comes from one semantic depth rule, while navigation and content separators are drawn only by their owning region.",
+      "preflight": [
+        "Budget disclosure control, icon, label, action, and indentation at the narrowest promised width.",
+        "Remove duplicate child-container, row, and icon-slot offsets."
+      ],
+      "evidence": [
+        "Long names remain identifiable and actionable at supported depths and zoom levels.",
+        "Sibling rows align and child rows do not accumulate unrelated padding.",
+        "Content borders do not protrude into navigation."
+      ]
+    },
+    {
+      "id": "workspace-version-control-baseline",
+      "title": "Optional history starts with an explicit baseline",
+      "statement": "When the product offers version-control enablement, the user previews and confirms the visible unignored baseline, and later automation includes only exact paths successfully changed through the application.",
+      "preflight": [
+        "Show file count, total size, and ignore summary before initialization.",
+        "Define the application-owned change operations and keep unrelated external changes outside automatic staging."
+      ],
+      "evidence": [
+        "Initialization creates a complete local baseline without silently adding a remote.",
+        "Application edits, moves, and deletes become exact changes.",
+        "Unrelated external modifications are not automatically committed."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "workspace-content-truth-decision",
+      "type": "profile_value",
+      "path": "decisions.workspace_content_truth",
+      "allowed": [
+        "selected-folder-files"
+      ],
+      "severity": "error",
+      "message": "Selected workspace files must remain the active content truth."
+    },
+    {
+      "id": "workspace-entry-model-decision",
+      "type": "profile_value",
+      "path": "decisions.workspace_entry_model",
+      "allowed": [
+        "files-and-directories"
+      ],
+      "severity": "error",
+      "message": "The formal workspace model must represent files and directories."
+    },
+    {
+      "id": "workspace-version-control-decision",
+      "type": "profile_value",
+      "path": "decisions.workspace_version_control",
+      "allowed": [
+        "optional-exact-root-capability"
+      ],
+      "severity": "error",
+      "message": "Version control must remain an optional exact-root capability."
+    },
+    {
+      "id": "workspace-file-operations-decision",
+      "type": "profile_value",
+      "path": "decisions.workspace_file_operations",
+      "allowed": [
+        "save-conflict-operate-migrate-refresh"
+      ],
+      "severity": "error",
+      "message": "File operations must coordinate document state and migrate path consumers."
+    },
+    {
+      "id": "workspace-deletion-decision",
+      "type": "profile_value",
+      "path": "decisions.workspace_deletion",
+      "allowed": [
+        "recoverable-by-default"
+      ],
+      "severity": "error",
+      "message": "Ordinary deletion must remain recoverable by default."
+    },
+    {
+      "id": "workspace-tree-indent-decision",
+      "type": "profile_value",
+      "path": "decisions.workspace_tree_indent",
+      "allowed": [
+        "semantic-depth-single-owner"
+      ],
+      "severity": "error",
+      "message": "Tree indentation must have one semantic-depth owner."
+    }
+  ],
+  "manual_verification": [
+    {
+      "id": "workspace-plain-folder-chain",
+      "title": "Plain folder core chain",
+      "steps": [
+        "Create a real temporary directory without version-control metadata.",
+        "Open, expand, search, edit, save, create, rename, move, delete, and restore through the formal application entry.",
+        "Confirm no version-control command or change manifest was produced and no related UI appeared."
+      ]
+    },
+    {
+      "id": "workspace-nested-repository-chain",
+      "title": "Nested repositories remain ordinary folders",
+      "steps": [
+        "Create a plain parent folder containing two child repositories.",
+        "Open the parent and confirm child content is visible, internal metadata is hidden, and version-control capability is absent.",
+        "Open one child root separately and confirm the capability appears only there."
+      ]
+    },
+    {
+      "id": "workspace-file-state-migration-chain",
+      "title": "Dirty, conflict, operation, and path migration",
+      "steps": [
+        "Create real dirty and externally modified files with open tabs and recent-path consumers.",
+        "Exercise rename, move, delete, cancellation, and collision behavior through the application.",
+        "Confirm conflicts block mutation and successful operations migrate every active path consumer."
+      ]
+    },
+    {
+      "id": "workspace-source-fidelity-chain",
+      "title": "Source-faithful save",
+      "steps": [
+        "Open and save representative supported encodings and line endings without editing.",
+        "Compare exact bytes before and after, then make one real edit and compare the intended difference.",
+        "Repeat with an external modification and confirm the conflict path prevents silent overwrite."
+      ]
+    },
+    {
+      "id": "workspace-tree-visible-chain",
+      "title": "Directory tree hierarchy and boundaries",
+      "steps": [
+        "Render formal producer output containing long names and several supported nesting depths.",
+        "Inspect the narrowest width, promised zoom levels, themes, expansion states, focus, and action hit targets.",
+        "Confirm one depth rule owns indentation and navigation or content separators never cross regions."
+      ]
+    },
+    {
+      "id": "workspace-optional-version-control-chain",
+      "title": "Optional version-control baseline and exact changes",
+      "steps": [
+        "If the product offers version control, preview and confirm a real unignored baseline.",
+        "Exercise application edits, moves, and deletes through a real repository and independent remote consumer.",
+        "Confirm exact application-owned changes arrive while unrelated external modifications remain outside automatic history."
+      ]
+    }
+  ]
+}

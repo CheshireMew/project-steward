@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-steward.local/schemas/user-environment-profile-v1.json",
+  "title": "Project Steward user environment profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_kind",
+    "updated_at",
+    "preferences",
+    "machine",
+    "shells",
+    "tools",
+    "package_locations",
+    "caches",
+    "environment_requirements",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "profile_kind": {
+      "const": "project-steward-user-environment"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preferred_shell",
+        "install_roots",
+        "download_root",
+        "temp_root",
+        "default_tools"
+      ],
+      "properties": {
+        "preferred_shell": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "install_roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "download_root": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "temp_root": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "default_tools": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "machine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hostname",
+        "system",
+        "release",
+        "version",
+        "architecture"
+      ],
+      "properties": {
+        "hostname": {
+          "type": "string"
+        },
+        "system": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "architecture": {
+          "type": "string"
+        }
+      }
+    },
+    "shells": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/toolRecord"
+      }
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/toolRecord"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/toolRecord"
+            }
+          }
+        ]
+      }
+    },
+    "package_locations": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "caches": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "environment_requirements": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "detector_version",
+        "detected_at"
+      ],
+      "properties": {
+        "detector_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "detected_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "toolRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executable",
+        "version",
+        "available"
+      ],
+      "properties": {
+        "executable": {
+          "type": "string"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "details": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

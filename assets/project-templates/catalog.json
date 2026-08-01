@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "catalog_version": "2.2.0",
+  "profile_path": ".project-steward/project.json",
+  "layer_order": [
+    "base",
+    "surface",
+    "archetype",
+    "stack",
+    "capability"
+  ],
+  "default_templates": [
+    "base"
+  ],
+  "templates": {
+    "base": {
+      "version": "1.1.0",
+      "layer": "base",
+      "path": "templates/base.json",
+      "sha256": "a42635dee95b576c75a1eb2b0429cd2d794449edf615f26c8afd0f4d15a03cab"
+    },
+    "product-ui": {
+      "version": "1.2.0",
+      "layer": "surface",
+      "path": "templates/product-ui.json",
+      "sha256": "14239f18e738840c1c375863a1bfc238fdd97cd7435767a8dafc9727339ad9fc"
+    },
+    "desktop-app": {
+      "version": "2.0.0",
+      "layer": "archetype",
+      "path": "templates/desktop-app.json",
+      "sha256": "7f2c2f06faf1a524aac668a50f1e5960e4e33e014418bcffa135ee6cf2574afa"
+    },
+    "tauri-vue": {
+      "version": "1.0.0",
+      "layer": "stack",
+      "path": "templates/tauri-vue.json",
+      "sha256": "0be4e1d1be6e51f7a67fa8e75b88fea7d949da6a5d5be3fab770a8170c7260ad"
+    },
+    "local-file-workspace": {
+      "version": "1.0.0",
+      "layer": "capability",
+      "path": "templates/local-file-workspace.json",
+      "sha256": "583c18a5e12ce1f3a20d71ebb15e8d741eac09aae36621f1a2c444e55ed27dec"
+    }
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "id": "tauri-vue",
+  "version": "1.0.0",
+  "layer": "stack",
+  "name": "Tauri v2 with Vue",
+  "description": "Tauri configuration, Vue window shell, capability permissions, and Windows runtime verification.",
+  "requires": [
+    "desktop-app"
+  ],
+  "detection": {
+    "all": [
+      {
+        "type": "any_path_exists",
+        "paths": [
+          "src-tauri/tauri.conf.json",
+          "src-tauri/tauri.conf.json5"
+        ]
+      },
+      {
+        "type": "package_dependency",
+        "name": "vue"
+      }
+    ]
+  },
+  "defaults": {
+    "decisions": {
+      "tauri_generation": "v2",
+      "tauri_window_boundary": "single-frontend-window-service",
+      "tauri_normal_close_api": "close",
+      "tauri_capability_scope": "target-window"
+    }
+  },
+  "evidence_sources": [
+    "https://v2.tauri.app/learn/window-customization/",
+    "https://v2.tauri.app/security/capabilities/",
+    "https://v2.tauri.app/reference/acl/core-permissions/",
+    "https://v2.tauri.app/reference/javascript/api/namespacewindow/"
+  ],
+  "invariants": [
+    {
+      "id": "tauri-integrated-titlebar",
+      "title": "Tauri and Vue implement one titlebar strategy",
+      "statement": "Integrated mode disables native decorations and provides one Vue titlebar with a non-interactive drag region and working window controls; native-explicit mode keeps decorations and removes duplicate controls.",
+      "preflight": [
+        "Set the project window shell decision before styling the application.",
+        "Keep content-header borders inside the content region."
+      ],
+      "evidence": [
+        "The Windows Tauri window has no unintended native white titlebar.",
+        "Drag, double-click, minimize, maximize, restore, and close work.",
+        "The titlebar and sidebar meet without a protruding content border."
+      ]
+    },
+    {
+      "id": "tauri-command-permission-match",
+      "title": "Window method and ACL permission match",
+      "statement": "Each invoked Tauri window method has its matching v2 core permission on the target capability; close and destroy remain different contracts.",
+      "preflight": [
+        "Scan actual frontend calls before choosing capability entries.",
+        "Use close for normal shutdown unless force-destroy is explicitly required."
+      ],
+      "evidence": [
+        "minimize maps to core:window:allow-minimize.",
+        "toggleMaximize maps to core:window:allow-toggle-maximize.",
+        "close maps to core:window:allow-close and destroy maps to core:window:allow-destroy.",
+        "The real target window runs without a not-allowed error."
+      ]
+    },
+    {
+      "id": "tauri-close-coordinator",
+      "title": "All Tauri close requests share one coordinator",
+      "statement": "Vue controls, the native close control, keyboard shortcuts, and Rust CloseRequested behavior converge on one idempotent save and exit chain.",
+      "preflight": [
+        "Identify whether Rust prevents CloseRequested.",
+        "Define how frontend save completion reaches the final close command."
+      ],
+      "evidence": [
+        "Both custom and system close preserve dirty state.",
+        "Save failure or conflict leaves the window recoverable.",
+        "Restart reads the just-persisted result."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "tauri-config-present",
+      "type": "any_path_exists",
+      "paths": [
+        "src-tauri/tauri.conf.json",
+        "src-tauri/tauri.conf.json5"
+      ],
+      "severity": "error",
+      "message": "A Tauri configuration file is required."
+    },
+    {
+      "id": "tauri-vue-dependency",
+      "type": "package_dependency",
+      "name": "vue",
+      "severity": "error",
+      "message": "Vue must be declared in package.json."
+    },
+    {
+      "id": "tauri-generation-decision",
+      "type": "profile_value",
+      "path": "decisions.tauri_generation",
+      "allowed": [
+        "v2"
+      ],
+      "severity": "error",
+      "message": "This template governs Tauri v2 projects."
+    },
+    {
+      "id": "tauri-window-shell-chain",
+      "type": "tauri_window_shell",
+      "severity": "error",
+      "message": "Tauri decorations, Vue controls, window methods, and capability permissions must form one complete shell."
+    }
+  ],
+  "manual_verification": [
+    {
+      "id": "tauri-windows-shell-runtime",
+      "title": "Windows Tauri shell runtime",
+      "steps": [
+        "Run a real Tauri window on Windows.",
+        "Exercise drag, double-click, minimize, maximize, restore, and close.",
+        "Inspect light, dark, 100 percent, and 125 percent layouts for border or titlebar drift."
+      ]
+    },
+    {
+      "id": "tauri-permission-and-close-runtime",
+      "title": "Capability and close runtime",
+      "steps": [
+        "Create dirty project state and close from Vue.",
+        "Repeat with the native close control.",
+        "Confirm persisted state after restart and confirm no permission error in the UI or terminal."
+      ]
+    }
+  ]
+}

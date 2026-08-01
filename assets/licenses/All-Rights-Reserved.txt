@@ -1,0 +1,14 @@
+All Rights Reserved
+
+Copyright (c) {{year}} {{copyright_holder}}
+
+Scope
+
+{{scope}}
+
+No permission is granted to copy, modify, distribute, sublicense, sell, or
+create derivative works from the materials identified above, except where a
+separate written license or applicable law expressly permits it.
+
+Third-party materials remain subject to their respective licenses and rights.
+This notice does not claim ownership of third-party content.

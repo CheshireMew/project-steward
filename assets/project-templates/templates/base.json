@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "id": "base",
+  "version": "1.1.0",
+  "layer": "base",
+  "name": "Project foundation",
+  "description": "Cross-project truth, change, migration, and verification contracts.",
+  "requires": [],
+  "detection": {
+    "always": true
+  },
+  "defaults": {
+    "decisions": {
+      "source_of_truth": "project-files",
+      "change_strategy": "root-cause-full-migration",
+      "verification_chain": "producer-boundary-consumer-observable",
+      "git_role": "optional-history-and-publication"
+    }
+  },
+  "invariants": [
+    {
+      "id": "single-source-of-truth",
+      "title": "One source of truth per project fact",
+      "statement": "Every mutable project fact has one authoritative owner; caches, recovery copies, generated output, and remote mirrors do not become parallel writable truth.",
+      "preflight": [
+        "Name the authoritative owner before changing storage or state.",
+        "List every producer and consumer that must migrate."
+      ],
+      "evidence": [
+        "The formal producer writes the authoritative boundary.",
+        "The formal consumer reads the same result.",
+        "A restart or second consumer does not recover from an older mirror."
+      ]
+    },
+    {
+      "id": "complete-migration",
+      "title": "Migrate the contract, not one symptom",
+      "statement": "A replacement type, command, state boundary, or helper is complete only after every caller and consumer uses it and the superseded path is inactive.",
+      "preflight": [
+        "Inventory callers, exports, persisted fields, recovery paths, tests, and documentation.",
+        "Define the residual search that proves the old identity exited."
+      ],
+      "evidence": [
+        "The new path preserves required behavior.",
+        "Activity searches contain no superseded public entry or fallback.",
+        "Any external compatibility adapter has an explicit owner and exit condition."
+      ]
+    },
+    {
+      "id": "real-user-chain",
+      "title": "Verify the chain a user actually depends on",
+      "statement": "Core verification starts with the formal producer, crosses the real storage, transport, or native boundary, reaches the formal consumer, and ends in an observable result.",
+      "preflight": [
+        "State which boundary the test is intended to prove.",
+        "Keep mocks outside that boundary."
+      ],
+      "evidence": [
+        "The producer created the tested result.",
+        "The consumer did not receive hand-written replacement data.",
+        "The user-visible result is inspected or exercised."
+      ]
+    },
+    {
+      "id": "plain-project-first",
+      "title": "A project does not require Git",
+      "statement": "A normal directory remains a valid project; Git is detected only at the exact project root and is used for history or publication when present.",
+      "preflight": [
+        "Inspect the exact project root before invoking Git.",
+        "Keep project facts and Git facts separate."
+      ],
+      "evidence": [
+        "A directory inside a parent repository is not treated as its own Git project.",
+        "A plain temporary directory can be inspected, adopted, and verified."
+      ]
+    },
+    {
+      "id": "diagnostic-evidence-classification",
+      "title": "Diagnostic output is classified by evidence",
+      "statement": "Build, linker, development-server, runtime, and application messages are classified by their producing phase, command outcome, observable chain impact, and reproducibility rather than by a warning label or color alone.",
+      "preflight": [
+        "Identify which process and phase produced each material message.",
+        "Separate command success, process liveness, artifact generation, and user-visible behavior."
+      ],
+      "evidence": [
+        "A warning is either explained with its actual impact, assigned an owner and action, or kept as a bounded observation.",
+        "A successful command is not used to dismiss a reproducible message that changes the formal artifact or user result.",
+        "One process's output is not attributed to another layer without evidence."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "base-profile-source-of-truth",
+      "type": "profile_value",
+      "path": "decisions.source_of_truth",
+      "allowed": [
+        "project-files"
+      ],
+      "severity": "error",
+      "message": "Project files must remain the authoritative project truth."
+    },
+    {
+      "id": "base-profile-present",
+      "type": "path_exists",
+      "path": ".project-steward/project.json",
+      "severity": "error",
+      "message": "The adopted project profile must be present."
+    }
+  ],
+  "manual_verification": [
+    {
+      "id": "base-primary-user-result",
+      "title": "Primary user result",
+      "steps": [
+        "Choose the project's first observable user result.",
+        "Exercise it through the formal entry point.",
+        "Confirm the result is produced, crosses its real boundary, and is consumed."
+      ]
+    },
+    {
+      "id": "base-residual-audit",
+      "title": "Superseded path audit",
+      "steps": [
+        "Search active source, tests, configuration, public exports, and documentation for superseded identities.",
+        "Confirm retained compatibility is external, intentional, and time-bounded."
+      ]
+    },
+    {
+      "id": "base-diagnostic-triage",
+      "title": "Build and runtime diagnostic triage",
+      "steps": [
+        "For each material diagnostic, record its producer, phase, complete context, exit state, and reproducibility.",
+        "Confirm whether the formal artifact and user result changed before deciding to explain, monitor, or remediate it."
+      ]
+    }
+  ]
+}

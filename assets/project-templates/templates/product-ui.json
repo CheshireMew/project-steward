@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "id": "product-ui",
+  "version": "1.2.0",
+  "layer": "surface",
+  "name": "Digital product interface",
+  "description": "User-task, interface-use-quality, design-system, and visible-result governance for projects with a real product UI.",
+  "requires": [
+    "base"
+  ],
+  "detection": {
+    "any": [
+      {
+        "type": "any_path_exists",
+        "paths": [
+          "DESIGN.md",
+          "Design.md",
+          "design.md",
+          ".agents/context/DESIGN.md",
+          ".agents/context/Design.md",
+          ".agents/context/design.md",
+          "docs/DESIGN.md",
+          "docs/Design.md",
+          "docs/design.md"
+        ]
+      }
+    ]
+  },
+  "defaults": {
+    "decisions": {
+      "product_surface_contract": "user-task-first",
+      "interface_contract": "complete-visible-states",
+      "visual_direction_source": "project-identity-content-platform",
+      "design_system_owner": "single-project-system",
+      "optional_capability_disclosure": "core-task-first",
+      "interface_use_quality": "coherent-fluent-comfortable-context-fit",
+      "ui_verification": "real-entry-target-viewports"
+    }
+  },
+  "invariants": [
+    {
+      "id": "ui-task-before-styling",
+      "title": "User task precedes styling",
+      "statement": "A product surface is designed from its user, trigger, core object, result, and recovery path before colors, components, or decoration are selected.",
+      "preflight": [
+        "Name the primary user task and observable success.",
+        "Mark the content, behavior, and surfaces that must remain protected."
+      ],
+      "evidence": [
+        "Every major region and control has a task, information, state, action, trust, or recovery responsibility.",
+        "The primary task can be completed without relying on explanatory design notes."
+      ]
+    },
+    {
+      "id": "ui-project-native-direction",
+      "title": "Visual direction comes from project facts",
+      "statement": "Visual direction is derived from project identity, real content, user task, target platform, and the existing design system rather than a generic style recipe.",
+      "preflight": [
+        "Separate confirmed visual facts from open design decisions.",
+        "Choose the surface register and platform constraints before detailed styling."
+      ],
+      "evidence": [
+        "The interface has a coherent hierarchy and recognizably belongs to the project.",
+        "Reference products inform relationships without silently expanding scope or copying unrelated appearance."
+      ]
+    },
+    {
+      "id": "ui-complete-interface-contract",
+      "title": "The interface contract covers the whole visible result",
+      "statement": "Layout ownership, control topology, content and state families, responsive behavior, themes, input methods, and accessibility are decided as one interface contract.",
+      "preflight": [
+        "Assign layout, boundary, scrolling, and overlay ownership.",
+        "Enumerate the reachable content, loading, success, failure, conflict, and recovery states that matter."
+      ],
+      "evidence": [
+        "Controls expose the intended number of choices and the intended state transitions.",
+        "The primary task remains usable across the promised viewports, themes, zoom levels, and input methods."
+      ]
+    },
+    {
+      "id": "ui-single-design-system",
+      "title": "Shared visual facts have one owner",
+      "statement": "Semantic tokens, component states, and platform-shell adaptations have one active project design-system owner and explicit consumers.",
+      "preflight": [
+        "Locate the source that owns each shared visual role.",
+        "Inventory every consumer affected by a shared change."
+      ],
+      "evidence": [
+        "A shared change reaches all active consumers.",
+        "Superseded tokens, components, and local overrides no longer form a second visual truth."
+      ]
+    },
+    {
+      "id": "ui-real-visible-verification",
+      "title": "Visible experience is verified through the real entry",
+      "statement": "Interface completion starts from the formal entry, uses real content and state producers, crosses the actual runtime boundary, and ends in the visible, usable result.",
+      "preflight": [
+        "Write the entry-to-visible-result chain before implementation.",
+        "Keep mocks outside the boundary the verification claims to prove."
+      ],
+      "evidence": [
+        "The real application or site renders the result through its normal route.",
+        "Target states and viewports are inspected after the final relevant change."
+      ]
+    },
+    {
+      "id": "ui-core-path-before-advanced-capabilities",
+      "title": "Optional capabilities do not own the core task",
+      "statement": "A capability described as optional or advanced does not gate the primary user's core object or first successful task; its state, controls, errors, and terminology appear only when the capability is available or intentionally being enabled.",
+      "preflight": [
+        "Name the core task that must work without optional capabilities.",
+        "Define each capability's activation condition, added states, failure behavior, and interface location."
+      ],
+      "evidence": [
+        "The primary task succeeds with the optional capability absent.",
+        "Capability-specific status and actions do not leak into the core interface while unavailable.",
+        "Enabling the capability adds its advanced path without replacing the core object's identity."
+      ]
+    },
+    {
+      "id": "ui-interface-use-quality",
+      "title": "The interface feels coherent, fluent, comfortable, and fit for its task",
+      "statement": "A visible interface is complete only when its spatial hierarchy, interaction path, feedback rhythm, platform behavior, and recovery fit the task frequency and risk as one continuous experience.",
+      "preflight": [
+        "Translate the intended feel into observable decisions about directness, density, feedback, control, and platform fit.",
+        "Identify the natural task, repeated actions, input method, and error cost before polishing individual components."
+      ],
+      "evidence": [
+        "The affected task can be completed without purposeless searching, backtracking, memorization, or mode switching.",
+        "Frequent low-risk actions stay direct while consequential actions slow down only where the user needs scope and consequence.",
+        "The real interface remains visually coherent, responsive, and under user control through waiting, repetition, failure, and recovery."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "ui-product-surface-contract",
+      "type": "profile_value",
+      "path": "decisions.product_surface_contract",
+      "allowed": [
+        "user-task-first"
+      ],
+      "severity": "error",
+      "message": "Product surfaces must be governed from the primary user task."
+    },
+    {
+      "id": "ui-interface-contract",
+      "type": "profile_value",
+      "path": "decisions.interface_contract",
+      "allowed": [
+        "complete-visible-states"
+      ],
+      "severity": "error",
+      "message": "The project must keep a complete interface and state contract."
+    },
+    {
+      "id": "ui-design-system-owner",
+      "type": "profile_value",
+      "path": "decisions.design_system_owner",
+      "allowed": [
+        "single-project-system"
+      ],
+      "severity": "error",
+      "message": "Shared visual facts must have one project design-system owner."
+    },
+    {
+      "id": "ui-optional-capability-disclosure",
+      "type": "profile_value",
+      "path": "decisions.optional_capability_disclosure",
+      "allowed": [
+        "core-task-first"
+      ],
+      "severity": "error",
+      "message": "Optional capabilities must not gate or rename the core user task."
+    },
+    {
+      "id": "ui-interface-use-quality",
+      "type": "profile_value",
+      "path": "decisions.interface_use_quality",
+      "allowed": [
+        "coherent-fluent-comfortable-context-fit"
+      ],
+      "severity": "error",
+      "message": "The interface must be governed as one coherent, fluent, comfortable, and context-fit experience."
+    },
+    {
+      "id": "ui-visible-verification",
+      "type": "profile_value",
+      "path": "decisions.ui_verification",
+      "allowed": [
+        "real-entry-target-viewports"
+      ],
+      "severity": "error",
+      "message": "UI verification must reach the real entry and target viewports."
+    }
+  ],
+  "manual_verification": [
+    {
+      "id": "ui-primary-task-visible-chain",
+      "title": "Primary task and visible experience",
+      "steps": [
+        "Run the real product through its natural entry with representative content.",
+        "Complete the primary task and exercise its important waiting, failure, recovery, and repeated-use states.",
+        "Inspect hierarchy, design direction, control semantics, focus, and readability at the promised viewports, themes, zoom levels, and input methods."
+      ]
+    },
+    {
+      "id": "ui-core-without-optional-capability",
+      "title": "Core task without advanced capabilities",
+      "steps": [
+        "Remove or disable an optional capability without fabricating replacement state.",
+        "Complete the primary task and confirm capability-specific controls, status, and errors are absent.",
+        "Enable the capability when the product offers it and confirm the advanced path appears without changing the core object's identity."
+      ]
+    },
+    {
+      "id": "ui-interface-use-quality-chain",
+      "title": "Interface use quality through a continuous task",
+      "steps": [
+        "Define the intended feel from the task, frequency, platform, input method, and error cost rather than from generic style adjectives.",
+        "Inspect the whole real surface, then complete the affected task from its natural entry with representative content and record searching, backtracking, attention shifts, feedback, and recovery.",
+        "Repeat frequent actions and exercise relevant waiting, failure, narrow-view, theme, zoom, and input states; confirm the interface remains coherent, fluent, comfortable, context-fit, and under user control."
+      ]
+    }
+  ]
+}

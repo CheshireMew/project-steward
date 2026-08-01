@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "id": "desktop-app",
+  "version": "2.0.0",
+  "layer": "archetype",
+  "name": "Desktop application",
+  "description": "Window shell, native capability, persistence, and shutdown contracts for desktop applications.",
+  "requires": [
+    "product-ui"
+  ],
+  "detection": {
+    "any": [
+      {
+        "type": "any_path_exists",
+        "paths": [
+          "src-tauri/tauri.conf.json",
+          "src-tauri/tauri.conf.json5",
+          "electron-builder.yml",
+          "electron-builder.yaml",
+          "wails.json"
+        ]
+      },
+      {
+        "type": "package_dependency",
+        "name": "electron"
+      }
+    ]
+  },
+  "defaults": {
+    "decisions": {
+      "window_shell": "integrated",
+      "close_semantics": "flush-then-close",
+      "native_capability_owner": "backend",
+      "titlebar_layout_owner": "app-shell"
+    }
+  },
+  "invariants": [
+    {
+      "id": "desktop-window-shell",
+      "title": "Window shell is an explicit product decision",
+      "statement": "A branded desktop application uses one integrated application shell by default; retaining native decorations requires an explicit project override and removes duplicate in-app window controls.",
+      "preflight": [
+        "Choose integrated or native-explicit before implementing layout.",
+        "Assign titlebar, navigation, content header, and border ownership."
+      ],
+      "evidence": [
+        "The real desktop window shows exactly one titlebar strategy.",
+        "Content separators do not extend into navigation unless the shell owns them.",
+        "Window controls work at normal and maximized sizes."
+      ]
+    },
+    {
+      "id": "desktop-native-permission-chain",
+      "title": "Every native call has a matching capability",
+      "statement": "Each user action maps through one frontend boundary to one native command and the exact permission granted to the target window.",
+      "preflight": [
+        "Map window, filesystem, dialog, opener, and process calls before UI completion.",
+        "Keep raw native errors out of user-facing messages."
+      ],
+      "evidence": [
+        "The real command succeeds from the target window.",
+        "Permission failure paths produce an actionable product message.",
+        "The terminal and UI contain no unhandled not-allowed error."
+      ]
+    },
+    {
+      "id": "desktop-shutdown-chain",
+      "title": "Shutdown preserves user state",
+      "statement": "Custom close controls, system close controls, and shortcuts enter one idempotent save, conflict, flush, and exit coordinator.",
+      "preflight": [
+        "Distinguish close window, hide, and exit application.",
+        "Define behavior for dirty state, conflicts, save failure, and repeated close requests."
+      ],
+      "evidence": [
+        "A dirty document is closed through the real UI and is present after restart.",
+        "A save failure keeps recoverable state available.",
+        "The process reaches the intended final state."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "desktop-window-shell-decision",
+      "type": "profile_value",
+      "path": "decisions.window_shell",
+      "allowed": [
+        "integrated",
+        "native-explicit"
+      ],
+      "severity": "error",
+      "message": "Choose one desktop window shell strategy."
+    },
+    {
+      "id": "desktop-close-semantics",
+      "type": "profile_value",
+      "path": "decisions.close_semantics",
+      "allowed": [
+        "flush-then-close"
+      ],
+      "severity": "error",
+      "message": "Desktop shutdown must flush project state before normal close."
+    },
+    {
+      "id": "desktop-titlebar-owner",
+      "type": "profile_value",
+      "path": "decisions.titlebar_layout_owner",
+      "allowed": [
+        "app-shell"
+      ],
+      "severity": "error",
+      "message": "The top-level app shell must own the titlebar layout."
+    }
+  ],
+  "manual_verification": [
+    {
+      "id": "desktop-window-visual-chain",
+      "title": "Real window shell",
+      "steps": [
+        "Run the real desktop window rather than a browser preview.",
+        "Inspect normal, maximized, restored, and minimum sizes in light and dark themes.",
+        "Verify titlebar, navigation, and content borders remain in their owned regions."
+      ]
+    },
+    {
+      "id": "desktop-close-restart-chain",
+      "title": "Close, flush, exit, and restart",
+      "steps": [
+        "Create real dirty state.",
+        "Close from the custom control and then from the system control.",
+        "Restart and confirm the formal consumer reads the saved state."
+      ]
+    }
+  ]
+}

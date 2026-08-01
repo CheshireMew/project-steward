@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "catalog_version": "2026-07-31.1",
+  "source": {
+    "name": "SPDX License List Data",
+    "version": "3.28.0",
+    "release": "https://github.com/spdx/license-list-data/releases/tag/v3.28.0",
+    "license_list": "https://spdx.org/licenses/",
+    "retrieved": "2026-07-31"
+  },
+  "licenses": {
+    "MIT": {
+      "name": "MIT License",
+      "kind": "software",
+      "text_path": "MIT.txt",
+      "sha256": "d05e60c26619835775bd00eccd7917760f1266c21e13b49ec17c77d7c5ba1316",
+      "source_id": "MIT",
+      "source_url": "https://spdx.org/licenses/MIT.html",
+      "template_fields": [
+        "year",
+        "copyright_holder"
+      ]
+    },
+    "Apache-2.0": {
+      "name": "Apache License 2.0",
+      "kind": "software",
+      "text_path": "Apache-2.0.txt",
+      "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+      "source_id": "Apache-2.0",
+      "source_url": "https://spdx.org/licenses/Apache-2.0.html",
+      "template_fields": []
+    },
+    "MPL-2.0": {
+      "name": "Mozilla Public License 2.0",
+      "kind": "software",
+      "text_path": "MPL-2.0.txt",
+      "sha256": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172",
+      "source_id": "MPL-2.0",
+      "source_url": "https://spdx.org/licenses/MPL-2.0.html",
+      "template_fields": []
+    },
+    "GPL-3.0-only": {
+      "name": "GNU General Public License v3.0 only",
+      "kind": "software",
+      "text_path": "GPL-3.0.txt",
+      "sha256": "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0",
+      "source_id": "GPL-3.0-only",
+      "source_url": "https://spdx.org/licenses/GPL-3.0-only.html",
+      "template_fields": [],
+      "gnu_notice_mode": "only"
+    },
+    "GPL-3.0-or-later": {
+      "name": "GNU General Public License v3.0 or later",
+      "kind": "software",
+      "text_path": "GPL-3.0.txt",
+      "sha256": "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0",
+      "source_id": "GPL-3.0-or-later",
+      "source_url": "https://spdx.org/licenses/GPL-3.0-or-later.html",
+      "template_fields": [],
+      "gnu_notice_mode": "or-later"
+    },
+    "AGPL-3.0-only": {
+      "name": "GNU Affero General Public License v3.0 only",
+      "kind": "software",
+      "text_path": "AGPL-3.0.txt",
+      "sha256": "d8a6cc31abc16b6748c7a21f21611f5a1ec33f67d22ca23d7da1c19b95496bee",
+      "source_id": "AGPL-3.0-only",
+      "source_url": "https://spdx.org/licenses/AGPL-3.0-only.html",
+      "template_fields": [],
+      "gnu_notice_mode": "only"
+    },
+    "AGPL-3.0-or-later": {
+      "name": "GNU Affero General Public License v3.0 or later",
+      "kind": "software",
+      "text_path": "AGPL-3.0.txt",
+      "sha256": "d8a6cc31abc16b6748c7a21f21611f5a1ec33f67d22ca23d7da1c19b95496bee",
+      "source_id": "AGPL-3.0-or-later",
+      "source_url": "https://spdx.org/licenses/AGPL-3.0-or-later.html",
+      "template_fields": [],
+      "gnu_notice_mode": "or-later"
+    },
+    "CC-BY-4.0": {
+      "name": "Creative Commons Attribution 4.0 International",
+      "kind": "content",
+      "text_path": "CC-BY-4.0.txt",
+      "sha256": "d557539df68e771cc1eedcc91d13f70fca930e508d11eedcafa4b15db49e3744",
+      "source_id": "CC-BY-4.0",
+      "source_url": "https://spdx.org/licenses/CC-BY-4.0.html",
+      "template_fields": []
+    },
+    "CC-BY-SA-4.0": {
+      "name": "Creative Commons Attribution ShareAlike 4.0 International",
+      "kind": "content",
+      "text_path": "CC-BY-SA-4.0.txt",
+      "sha256": "cde7883b9050a1104f4ac19a1572aafd6e5d7323b68351aaf51fbf4beba54966",
+      "source_id": "CC-BY-SA-4.0",
+      "source_url": "https://spdx.org/licenses/CC-BY-SA-4.0.html",
+      "template_fields": []
+    },
+    "CC-BY-NC-SA-4.0": {
+      "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+      "kind": "content",
+      "text_path": "CC-BY-NC-SA-4.0.txt",
+      "sha256": "600ca4e25fe11762b75a97e714707fab48bb778374e92d24c6ca068791661c11",
+      "source_id": "CC-BY-NC-SA-4.0",
+      "source_url": "https://spdx.org/licenses/CC-BY-NC-SA-4.0.html",
+      "template_fields": []
+    },
+    "ODbL-1.0": {
+      "name": "Open Data Commons Open Database License v1.0",
+      "kind": "database",
+      "text_path": "ODbL-1.0.txt",
+      "sha256": "77d2692c3d64efdd4db18dce2407699baf62930e2b50d6e5ed90b48acf16b7c1",
+      "source_id": "ODbL-1.0",
+      "source_url": "https://spdx.org/licenses/ODbL-1.0.html",
+      "template_fields": []
+    }
+  },
+  "notices": {
+    "MPL-2.0-Notice": {
+      "name": "Mozilla Public License 2.0 project notice",
+      "kind": "notice",
+      "text_path": "MPL-2.0-NOTICE.txt",
+      "sha256": "b8a3616d7a272d75eb34d91f8ec37a3a0fd29a054d6be58702ee245af2a10e26",
+      "source_url": "https://www.mozilla.org/en-US/MPL/2.0/FAQ/",
+      "template_fields": [
+        "project_name",
+        "year",
+        "copyright_holder"
+      ]
+    },
+    "All-Rights-Reserved": {
+      "name": "All Rights Reserved scope notice",
+      "kind": "notice",
+      "text_path": "All-Rights-Reserved.txt",
+      "sha256": "83aaa722a2db2829018cc98d49493a46ecef583959cd13b4b0b0a5467080458f",
+      "template_fields": [
+        "year",
+        "copyright_holder",
+        "scope"
+      ]
+    }
+  }
+}

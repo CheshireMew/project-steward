@@ -1,0 +1,17 @@
+# Project Steward licensing notice
+
+This Source Code Form is subject to the terms of the Mozilla Public License,
+v. 2.0. If a copy of the MPL was not distributed with this file, You can
+obtain one at https://mozilla.org/MPL/2.0/.
+
+Project research methods and archive extraction tooling were migrated from
+`github-project-research`, Copyright (c) 2026 柴郡Cheshire, under the same
+Mozilla Public License 2.0.
+
+Parts adapted from `beautify-github-readme` remain subject to the MIT License.
+See `THIRD_PARTY_NOTICES.md` for the exact files, attribution, and license
+text.
+
+An archived, inactive project-experience-store implementation was adapted
+from `Project Cairn`, Copyright (c) 2026 iBlinkQ, under the MIT License. See
+`THIRD_PARTY_NOTICES.md` for its exact archived scope and full license text.

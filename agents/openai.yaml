@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Steward"
+  short_description: "从完整项目过程持续学习，并治理架构、持久操作、用户环境、仓库研究与发布链路"
+  default_prompt: "使用 $project-steward 阅读这个会话的完整过程，按多个用户结果提炼可迁移机制；项目专属事实继续留在项目原有真源。先展示未来行为、影响文件和验证方式并停下，得到我确认后再让 Project Steward 的可复用治理能力自我进化。"
