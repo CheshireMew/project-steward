@@ -1,0 +1,60 @@
+name: Project Steward Star History
+description: Generate light and dark star-history SVGs with the caller repository token.
+
+inputs:
+  token:
+    description: Short-lived GitHub token for the repository being charted.
+    required: true
+  output-branch:
+    description: Dedicated branch that stores generated SVG files.
+    required: false
+    default: star-history
+  light-path:
+    description: Light-theme SVG path on the output branch.
+    required: false
+    default: star-history.svg
+  dark-path:
+    description: Dark-theme SVG path on the output branch.
+    required: false
+    default: star-history-dark.svg
+
+outputs:
+  changed:
+    description: Whether this run published a new output commit.
+    value: ${{ steps.publish.outputs.changed }}
+  star_count:
+    description: Number of stargazers represented in the chart.
+    value: ${{ steps.publish.outputs.star_count }}
+  branch:
+    description: Branch containing the generated SVG files.
+    value: ${{ steps.publish.outputs.branch }}
+  light_url:
+    description: Raw URL for the light-theme SVG.
+    value: ${{ steps.publish.outputs.light_url }}
+  dark_url:
+    description: Raw URL for the dark-theme SVG.
+    value: ${{ steps.publish.outputs.dark_url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.12"
+
+    - name: Generate and publish star history
+      id: publish
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        STAR_HISTORY_BRANCH: ${{ inputs.output-branch }}
+        STAR_HISTORY_LIGHT_PATH: ${{ inputs.light-path }}
+        STAR_HISTORY_DARK_PATH: ${{ inputs.dark-path }}
+        PYTHONUTF8: "1"
+      run: |
+        python "$GITHUB_ACTION_PATH/../../../scripts/github_star_history.py" \
+          --repository "$GITHUB_REPOSITORY" \
+          --branch "$STAR_HISTORY_BRANCH" \
+          --light-path "$STAR_HISTORY_LIGHT_PATH" \
+          --dark-path "$STAR_HISTORY_DARK_PATH"

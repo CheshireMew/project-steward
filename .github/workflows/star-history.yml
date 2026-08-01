@@ -1,0 +1,65 @@
+name: Generate Star History
+
+on:
+  workflow_call:
+    inputs:
+      output-branch:
+        description: Dedicated branch that stores generated SVG files.
+        required: false
+        type: string
+        default: star-history
+      light-path:
+        description: Light-theme SVG path on the output branch.
+        required: false
+        type: string
+        default: star-history.svg
+      dark-path:
+        description: Dark-theme SVG path on the output branch.
+        required: false
+        type: string
+        default: star-history-dark.svg
+    outputs:
+      changed:
+        description: Whether a new output commit was published.
+        value: ${{ jobs.generate.outputs.changed }}
+      star_count:
+        description: Number of stargazers represented in the chart.
+        value: ${{ jobs.generate.outputs.star_count }}
+      branch:
+        description: Branch containing the generated SVG files.
+        value: ${{ jobs.generate.outputs.branch }}
+      light_url:
+        description: Raw URL for the light-theme SVG.
+        value: ${{ jobs.generate.outputs.light_url }}
+      dark_url:
+        description: Raw URL for the dark-theme SVG.
+        value: ${{ jobs.generate.outputs.dark_url }}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: star-history-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      changed: ${{ steps.star-history.outputs.changed }}
+      star_count: ${{ steps.star-history.outputs.star_count }}
+      branch: ${{ steps.star-history.outputs.branch }}
+      light_url: ${{ steps.star-history.outputs.light_url }}
+      dark_url: ${{ steps.star-history.outputs.dark_url }}
+    steps:
+      - name: Generate star history
+        id: star-history
+        uses: CheshireMew/project-steward/.github/actions/star-history@main
+        with:
+          token: ${{ github.token }}
+          output-branch: ${{ inputs.output-branch }}
+          light-path: ${{ inputs.light-path }}
+          dark-path: ${{ inputs.dark-path }}

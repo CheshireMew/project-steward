@@ -267,6 +267,42 @@ python scripts/project_templates.py verify <项目根>
 
 桌面应用的方法还会处理同一窗口在紧凑栏、工作区和悬浮控制条之间切换时的标题栏、内容区尺寸、系统按钮保留区、拖动命中、用户位置和多显示器缩放。屏幕捕获产品会把每个自有顶层窗口的捕获可见性作为正式产品合同，并从最终录制产物验证；面向人的设备或窗口选择器则把稳定机器身份与用户标题、默认顺序和诊断信息分开。存在辅助进程和事件流时，还会在连接前建立进程所有权，分开结构化业务结果、完整日志、终止原因、进程结果和传输收尾，等待结果与事件消费、日志写入和订阅者排空，并把有界零退出码、标准流编码和无孤儿进程纳入真实验收。页面或窗口派生延迟界面工作时，会按对象职责绑定生命周期，并在替换、重载和关闭后排空事件循环。自动化或验证脚本需要关闭后重开时，会等待公开的释放完成或失败状态，不用私有任务、对象消失或固定睡眠猜测资源已经释放。
 
+## 自托管 Star History
+
+第三方 Star History 图片因为 GitHub 星标时间戳访问边界变化或公共服务令牌限流而失效时，不需要为每个项目维护一份生成脚本。Project Steward 提供中央可复用工作流；每个项目只增加一个很薄的调用器，使用该仓库运行时自动签发的短期 `github.token`，把亮色和暗色 SVG 原子发布到自己的 `star-history` 分支。没有新星标时不会产生新提交，也不需要个人访问令牌或第三方服务。
+
+在调用仓库建立 `.github/workflows/star-history.yml`：
+
+```yaml
+name: Update Star History
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    permissions:
+      contents: write
+    uses: CheshireMew/project-steward/.github/workflows/star-history.yml@main
+```
+
+README 随后引用自己仓库输出分支中的文件：
+
+```html
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OWNER/REPOSITORY/star-history/star-history-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/OWNER/REPOSITORY/star-history/star-history.svg">
+  <img alt="GitHub Star History" src="https://raw.githubusercontent.com/OWNER/REPOSITORY/star-history/star-history.svg">
+</picture>
+```
+
+公开仓库连续 60 天没有活动时，GitHub 可能停用定时工作流；已有图片仍在，但不再更新。完整诊断、接入和恢复方法见 [`references/github-star-history.md`](./references/github-star-history.md)。
+
 ## 安装与验证
 
 将完整的 `project-steward` 文件夹放入支持 Agent Skills 的工具所使用的 Skills 目录。运行时需要保留 `SKILL.md`、`agents/`、`references/`、`scripts/` 和 `assets/`。用户环境档案位于 Skill 与项目之外，不随 Skill 安装包复制。
@@ -296,6 +332,7 @@ python scripts/audit_readme.py README.md
 | `scripts/inventory_repository.py` | 盘点本地目录或经 GitHub CLI 授权的仓库范围 |
 | `scripts/apply_license.py` | 对批准后的许可证方案做预演、写入、发布或验证 |
 | `scripts/audit_readme.py` | 只检查 README 本地图片引用、替代文字和基础 SVG 结构；不判断来源时效、事实准确性或视觉质量 |
+| `scripts/github_star_history.py` | 读取 GitHub 星标时间戳，生成亮暗主题 SVG，并原子发布到调用仓库的独立输出分支 |
 | `scripts/render_motion_gif.py` | 按运动规格把命名 SVG 图层渲染为 GIF |
 
 ## 许可证、致谢与第三方来源
