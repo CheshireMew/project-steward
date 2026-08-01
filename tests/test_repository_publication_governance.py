@@ -98,6 +98,31 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_local_validation_failure_does_not_grant_fix_authority(self) -> None:
+        for fragment in (
+            "本地候选在提交或推送前验证失败时",
+            "立即冻结当前发布候选",
+            "不授权为了消除失败而修改源码、配置、测试、工作流或生成逻辑",
+            "用户看到失败证据后另行授权",
+            "不暂存、不提交、不推送",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
+    def test_authorized_fix_invalidates_only_affected_validation_evidence(
+        self,
+    ) -> None:
+        for fragment in (
+            "继续消费原验证账本",
+            "不把一次修复当成全部证据清零",
+            "新鲜通过结果继续有效",
+            "优先重跑原失败检查、受修复影响的消费者和必要用户链",
+            "测试收集、共享夹具、全局配置、公共边界",
+            "不能为了得到一份整齐的新日志而丢弃仍然有效的昂贵证据",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
 
 if __name__ == "__main__":
     unittest.main()

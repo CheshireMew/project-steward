@@ -44,6 +44,7 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             "### 并发、所有权与顺序",
             "### 确定性派生产物的单一生产者",
             "### 吞吐、背压与资源",
+            "### 连续实时管线的进度真值与分层验收",
             "### 受验证的高速路径与原子回退",
             "### 环境与外部进程",
             "### 数据、缓存与版本沿袭",
@@ -70,6 +71,71 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             "输入自带发生时间或序列",
             "固定睡眠只作为等待上限",
             "独立部署目标和浏览器场景使用新鲜环境",
+        ):
+            with self.subTest(public_behavior=public_behavior):
+                self.assertIn(public_behavior, README_TEXT)
+
+    def test_continuous_realtime_progress_uses_layered_authoritative_evidence(
+        self,
+    ) -> None:
+        for fragment in (
+            "逐层列出每个实际读取者",
+            "不能用某一层的局部含义推断整条链",
+            "正式生产完成序列",
+            "正式消费或展示确认",
+            "最终可见或提交结果",
+            "序列连续只能证明没有离散缺口",
+            "不能证明整条管线没有整体变慢",
+            "每一个可能跳过、丢弃、延后或追赶结果的决定点",
+            "正常负载下的实时能力",
+            "过载时如实报告",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
+        ordered_stages = (
+            "启动和短窗口",
+            "目标平台的真实消费者",
+            "持续运行与长时累计",
+            "过载、解除压力与恢复",
+        )
+        positions = [DIAGNOSTIC_TEXT.index(stage) for stage in ordered_stages]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("前一层通过不能替代后一层", DIAGNOSTIC_TEXT)
+        self.assertIn("环境饱和可以让正常能力基准失去代表性", DIAGNOSTIC_TEXT)
+        self.assertIn("仍可证明过载合同", DIAGNOSTIC_TEXT)
+
+        for public_behavior in (
+            "墙钟、正式生产进度、消费或展示确认和最终可见结果",
+            "序列连续和“丢失为零”不能证明没有整体变慢",
+            "正常负载能力和过载时如实报告及降级分别得出结论",
+        ):
+            with self.subTest(public_behavior=public_behavior):
+                self.assertIn(public_behavior, README_TEXT)
+
+    def test_health_metrics_require_real_measurement_and_user_calibration(
+        self,
+    ) -> None:
+        for fragment in (
+            "先证明诊断指标确实测量了所声称的事实",
+            "正式测量生产者与测量边界",
+            "尚未测量、不可用和真实零值怎样区分",
+            "用于校准的独立用户可观察结果",
+            "默认值、常量、缺失回调",
+            "零是已经测量得到的值",
+            "用户结果是失败证据，指标失去诊断资格",
+            "从公共表面、成功条件和测试断言中退出",
+            "不保留没有来源的兼容属性",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
+        self.assertIn("现有健康指标与用户可见结果冲突", SKILL_TEXT)
+        self.assertIn("无法指出正式测量生产者", SKILL_TEXT)
+        for public_behavior in (
+            "零值不会被用来表示“没有测量”",
+            "与独立用户结果校准",
+            "没有正式生产者的指标会退出成功条件",
         ):
             with self.subTest(public_behavior=public_behavior):
                 self.assertIn(public_behavior, README_TEXT)
@@ -155,6 +221,81 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
         self.assertIn("不能 mock 掉正在判断的核心边界", DIAGNOSTIC_TEXT)
         self.assertIn("不直接开始另一轮相同的昂贵运行", DIAGNOSTIC_TEXT)
+
+    def test_repeated_observations_prove_the_same_object_before_state_change(
+        self,
+    ) -> None:
+        ordered = (
+            "先证明多次观测针对同一个对象",
+            "对象标识的权威发现来源",
+            "每次探测实际收到的字面标识",
+            "各次解析后的稳定对象身份",
+            "只有各次探测身份相同",
+            "才允许进入同一对象的状态变化解释",
+        )
+        positions = [DIAGNOSTIC_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "直接把这个值传给后续探测",
+            "相对路径相同但工作目录不同",
+            "身份不同的探测分别描述各自对象",
+            "“未找到”只证明该次字面标识解析到的对象不存在",
+            "在此之前不得归因于同步、并发写入、缓存或外部进程",
+            "不得开始等待或重试",
+            "没有跨观测比较的单次稳定检查不增加这份对象对照",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
+        for public_behavior in (
+            "多次命令的结果不同时",
+            "不同身份只表示查了不同对象",
+            "只有同一对象在可比条件下确实变化后",
+            "普通单次检查不会增加这套对照",
+        ):
+            with self.subTest(public_behavior=public_behavior):
+                self.assertIn(public_behavior, README_TEXT)
+
+    def test_multistage_toolchains_are_verified_at_the_handoff_boundaries(
+        self,
+    ) -> None:
+        ordered = (
+            "建立从父入口到正式消费者的多层工具链执行闭包",
+            "逐层记录实际可执行文件与版本",
+            "工具在当前终端能够单独运行",
+            "与正式入口相同的启动器和交接语义",
+            "每次只改变一个能够排除竞争解释的变量",
+            "最早出现身份或语义偏离的边界取证",
+        )
+        positions = [DIAGNOSTIC_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "手工复制产物、跳过正式任务",
+            "从新鲜输出状态重新运行同一个正常入口",
+            "正式消费者读取本轮结果",
+            "不能把替代路径留下的产物与新运行拼成一次通过",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
+        self.assertIn("父子进程实际选择的可执行文件", README_TEXT)
+
+    def test_external_process_attempts_keep_one_owner_until_terminal(self) -> None:
+        ordered = (
+            "本次执行尝试身份",
+            "外层等待结束不改变原执行所有权",
+            "查询失败、部分返回或空输出只让相应事实保持未知",
+            "重新执行前先取得原执行的正式终态",
+            "整个进程树已经结束",
+            "资源已经释放",
+            "停止后重新核对进程、监听端口、锁和输出位置",
+        )
+        positions = [DIAGNOSTIC_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("一个进程已经消失不能替其它进程退出", DIAGNOSTIC_TEXT)
+        self.assertIn("不启动争用同一资源的重复任务", DIAGNOSTIC_TEXT)
 
     def test_reference_is_cross_project_and_remains_a_leaf_method(self) -> None:
         self.assertNotIn("references/", DIAGNOSTIC_TEXT)

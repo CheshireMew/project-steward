@@ -82,6 +82,27 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         self.assertIn("同一操作先失败后成功", DURABLE_TEXT)
         self.assertIn("只产生一个账本、结构化事件和日志", README_TEXT)
 
+    def test_conflicted_rebinding_uses_a_strict_plan_and_commit_boundary(
+        self,
+    ) -> None:
+        ordered = (
+            "`plan` 只读地重新取得源、目标和受影响记录的准确身份与当前版本",
+            "覆盖整份计划的不可变摘要",
+            "`commit` 必须同时收到原计划摘要和每一项冲突的明确决定",
+            "任何写入前再次读取源、目标和受影响记录",
+            "任一对象漂移就拒绝整份计划并重新生成",
+            "才越过操作接受点",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "无冲突的瞬时内存修改不使用这套流程",
+            "不得提供 `allow_conflicts`、尽力而为或隐式偏好",
+            "不能只重算发生变化的局部后继续使用旧摘要",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
     def test_tests_consume_producer_owned_truth(self) -> None:
         for fragment in (
             "动作前的事务身份集合",
@@ -111,6 +132,37 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         self.assertIn("两个独立调度观察者", DURABLE_TEXT)
         self.assertIn("一个原子边界内写入发生记录、任务和调度进度", README_TEXT)
         self.assertIn("不重放结果不确定的业务生产者", DURABLE_TEXT)
+
+    def test_result_sets_and_run_evidence_have_one_retention_lifecycle(
+        self,
+    ) -> None:
+        for fragment in (
+            "完整结果集合一起发布或撤回",
+            "全部成员共享同一操作身份",
+            "整个集合保持未决或失败",
+            "验证运行证据的保留生命周期",
+            "运行开始前，在受控证据根内先写入由工具拥有的清单",
+            "保留全部失败与中断运行",
+            "每个明确类别只保留最近一次完整成功",
+            "更新的成功终态和完整证据已经持久提交",
+            "不得触碰仍在运行、状态未知、缺少工具所有权标记",
+            "清理失败要作为独立保留错误",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
+        ordered = (
+            "先写入由工具拥有的清单",
+            "`running` 状态",
+            "正式生产者结束",
+            "成功、失败或中断",
+            "执行保留选择",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("测试、性能、审计或真实用户链", SKILL_TEXT)
+        self.assertIn("实际删除或归档仍遵守当前用户与项目权限", README_TEXT)
+        self.assertIn("不会篡改测试本身的终态", README_TEXT)
 
     def test_async_ownership_preserves_authoritative_state(self) -> None:
         for fragment in (

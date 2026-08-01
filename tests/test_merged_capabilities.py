@@ -187,6 +187,48 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, guidelines)
 
+    def test_perceptual_layer_and_icon_family_contracts_are_active(
+        self,
+    ) -> None:
+        quality = (
+            SKILL_ROOT / "references" / "interface-experience-quality.md"
+        ).read_text(encoding="utf-8")
+        guidelines = (
+            SKILL_ROOT / "references" / "interface-guidelines.md"
+        ).read_text(encoding="utf-8")
+        review = (
+            SKILL_ROOT / "references" / "implementation-review.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "先锁定用户感受所在的感知层",
+            "仍可能的竞争解释",
+            "不能因为用户提到“现代”就直接选择换色",
+            "不因局部纠正重开整体改版",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, quality)
+
+        for fragment in (
+            "图标是独立的视觉组件家族",
+            "名义图形尺寸与光学边界",
+            "独立的按钮命中范围",
+            "扩大按钮边界，不按同一比例放大图形和线宽",
+            "共享图标与状态来源",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, guidelines)
+
+        for fragment in (
+            "自动断言只能证明结构约束已生效",
+            "整体画面和实际显示尺度的代表性局部画面",
+            "任一尺度通过都不能替另一尺度通过",
+            "哪些主观目标仍等待用户接受",
+            "不把“现代、轻量、舒服、美观或与参考一致”写成已证明结论",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, review)
+
     def test_media_surface_governance_is_routed_and_observable(self) -> None:
         root_cause = (
             SKILL_ROOT / "references" / "root-cause-remediation.md"

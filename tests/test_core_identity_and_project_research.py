@@ -14,6 +14,9 @@ README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 AGENT_TEXT = (
     SKILL_ROOT / "agents" / "openai.yaml"
 ).read_text(encoding="utf-8")
+PROJECT_RESEARCH_TEXT = (
+    SKILL_ROOT / "references" / "project-research.md"
+).read_text(encoding="utf-8")
 
 
 class CoreIdentityTests(unittest.TestCase):
@@ -116,6 +119,39 @@ class CoreIdentityTests(unittest.TestCase):
         self.assertIn("按多个用户最终结果", first_use)
         self.assertIn("项目专属事实继续留在项目原有真源", first_use)
         self.assertNotIn("综合审计", first_use)
+
+    def test_complete_capability_absorption_has_a_bounded_research_handoff(
+        self,
+    ) -> None:
+        research_section = SKILL_TEXT.split(
+            "### 6. 项目研究与讲解", 1
+        )[1].split("### 7. 项目基线与模板", 1)[0]
+        for fragment in (
+            "完整能力吸收研究",
+            "来源能力台账",
+            "只要求建议时保持只读",
+            "改动前预防",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, research_section)
+
+        for fragment in (
+            "只有用户明确要求完整阅读参考项目",
+            "完整覆盖边界",
+            "规范真源、手工维护来源与派生视图",
+            "名称、别名和示例只负责发现",
+            "目标项目的用户结果与唯一边界",
+            "只要求“看看有哪些值得吸收”时保持只读",
+            "不自行创建目标 schema、资源、兼容层或演示实现",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_RESEARCH_TEXT)
+
+        self.assertIn(
+            "普通项目介绍、一般比较和只问“它能做什么”继续读取最少够用的材料",
+            PROJECT_RESEARCH_TEXT,
+        )
+        self.assertIn("完整阅读这个项目，看哪些能力值得另一个项目吸收", README_TEXT)
 
     def test_self_evolution_is_explicit_and_project_paths_stop_at_result(
         self,
