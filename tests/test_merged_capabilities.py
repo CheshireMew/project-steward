@@ -299,6 +299,74 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, review)
 
+    def test_interface_polish_contracts_have_unique_active_owners(
+        self,
+    ) -> None:
+        quality = (
+            SKILL_ROOT / "references" / "interface-experience-quality.md"
+        ).read_text(encoding="utf-8")
+        guidelines = (
+            SKILL_ROOT / "references" / "interface-guidelines.md"
+        ).read_text(encoding="utf-8")
+        interaction = (
+            SKILL_ROOT / "references" / "interaction-motion.md"
+        ).read_text(encoding="utf-8")
+        review = (
+            SKILL_ROOT / "references" / "implementation-review.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "让检查范围和取舍可以复核",
+            "未覆盖部分及原因",
+            "真正考虑但没有采用的边界候选",
+            "“阻断”“需要调整”或“可接受”",
+        ):
+            with self.subTest(owner="quality", fragment=fragment):
+                self.assertIn(fragment, quality)
+
+        for fragment in (
+            "等宽数字能力",
+            "保持同心关系",
+            "阴影优先表达高度",
+            "扩大后的相邻命中矩形不得重叠",
+            "支持从右到左界面时按语义",
+            "共享图标自身能够修正时不让每个消费者各自追加边距",
+        ):
+            with self.subTest(owner="guidelines", fragment=fragment):
+                self.assertIn(fragment, guidelines)
+
+        for fragment in (
+            "Web 动效实现服从现有系统",
+            "不能为了一个细节引入第二套样式写法",
+            "不使用 `transition: all`",
+            "不能写成 `all`",
+            "不把示例数值升级成跨项目默认",
+        ):
+            with self.subTest(owner="interaction", fragment=fragment):
+                self.assertIn(fragment, interaction)
+
+        for fragment in (
+            "动效在正常速度与慢放中分别验收",
+            "减速播放、逐帧、filmstrip 或录屏回放",
+            "减速工具只改变观察方式",
+            "回到正常速度完成同一任务",
+        ):
+            with self.subTest(owner="review", fragment=fragment):
+                self.assertIn(fragment, review)
+
+        headings = (
+            "让检查范围和取舍可以复核",
+            "Web 动效实现服从现有系统",
+            "动效在正常速度与慢放中分别验收",
+        )
+        all_design_text = "\n".join(
+            (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+            for name in DESIGN_REFERENCES
+        )
+        for heading in headings:
+            with self.subTest(unique_owner=heading):
+                self.assertEqual(all_design_text.count(heading), 1)
+
     def test_ui_automation_uses_stable_identity_and_design_truth(self) -> None:
         review = (
             SKILL_ROOT / "references" / "implementation-review.md"
