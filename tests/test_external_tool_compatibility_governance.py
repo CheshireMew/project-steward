@@ -28,6 +28,28 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
         )
         self.assertNotIn("references/", COMPATIBILITY_TEXT)
 
+    def test_cross_root_compound_packages_load_shared_contract_governance(
+        self,
+    ) -> None:
+        route = SKILL_TEXT.split("## 外部工具兼容性", 1)[1].split("##", 1)[0]
+        for fragment in (
+            "跨项目根的公共合同、派生快照或复合交付包",
+            "references/external-tool-compatibility.md",
+            "references/change-prevention.md",
+            "公共合同、合同采用闭包与跨根交付边界",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, route)
+
+        for fragment in (
+            "复合交付包不会只检查顶层清单或一份 schema",
+            "区分“已经声明可用”与“已经被场景或配置正式采用”",
+            "进入消费者执行计划",
+            "消费者自行迁移或手写的样例只能证明内部链路",
+        ):
+            with self.subTest(readme_fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
     def test_compatibility_claim_is_closed_and_adapter_specific(self) -> None:
         for fragment in (
             "明确支持的适配器集合",

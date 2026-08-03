@@ -791,6 +791,24 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
+    def test_compound_packages_close_contract_adoption_and_output_chain(
+        self,
+    ) -> None:
+        for fragment in (
+            "复合交付包先证明合同与采用闭包",
+            "顶层清单、伴随 schema、素材或资源账本、运行时接口",
+            "这些节点及其引用关系形成的闭包",
+            "可用性声明与正式采用关系必须分开",
+            "资源进入账本只证明它可被发现",
+            "消费者再把这项采用编译成自己的执行计划",
+            "对可见、可听或可使用结果作出可辨认贡献",
+            "消费者自行迁移或手写的样例只证明消费者内部链路",
+            "只使依赖这些身份的证据失效",
+            "不能把变化前后的局部通过拼成一个完整兼容结论",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
     def test_cross_root_contracts_have_independent_delivery_evidence(
         self,
     ) -> None:
