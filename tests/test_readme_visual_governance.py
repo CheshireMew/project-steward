@@ -28,23 +28,27 @@ MOTION_TEXT = (
 
 
 class ReadmeVisualGovernanceTests(unittest.TestCase):
-    def test_main_router_owns_the_visual_evidence_decision(self) -> None:
-        self.assertIn("建立视觉证据合同", SKILL_TEXT)
-        self.assertIn("证据等级：已有体系 / 原生材料充分 / 证据不足", SKILL_TEXT)
-        self.assertIn("在同一上层按证据等级选择一次视觉路径", SKILL_TEXT)
+    def test_visual_method_owns_the_visual_evidence_decision(self) -> None:
+        self.assertIn("建立视觉证据合同", VISUAL_TEXT)
+        self.assertIn("证据等级：已有体系 / 原生材料充分 / 证据不足", VISUAL_TEXT)
+        self.assertIn("按证据等级选择一次视觉路径", VISUAL_TEXT)
         self.assertIn(
             "当前 README 视觉、仓库内部图片和同批次生成的素材无论数量多少",
-            SKILL_TEXT,
+            VISUAL_TEXT,
         )
-        self.assertIn("它们不能证明项目已有视觉体系", SKILL_TEXT)
-        self.assertIn("没有明确家族合同的项目按独立项目处理", SKILL_TEXT)
-        self.assertIn("只有已经通过上层来源与时效核定的材料才能进入视觉合同", SKILL_TEXT)
-        self.assertIn("不重新选择证据等级或恢复已退出材料", SKILL_TEXT)
+        self.assertIn("证明项目已有视觉体系", VISUAL_TEXT)
+        self.assertIn("没有明确家族合同的项目按独立项目处理", VISUAL_TEXT)
+        self.assertIn("才能进入视觉合同", VISUAL_TEXT)
+        self.assertIn("不重新选择证据等级或恢复已退出材料", VISUAL_TEXT)
 
-        visual_index = SKILL_TEXT.index("references/visual-direction.md")
-        hero_index = SKILL_TEXT.index("references/project-native-hero.md")
-        canvas_index = SKILL_TEXT.index("references/github-readme-canvas.md")
-        svg_index = SKILL_TEXT.index("references/svg-production.md")
+        readme_route = SKILL_TEXT.split("## README 与主页", 1)[1].split(
+            "## 许可证治理",
+            1,
+        )[0]
+        visual_index = readme_route.index("references/visual-direction.md")
+        hero_index = readme_route.index("references/project-native-hero.md")
+        canvas_index = readme_route.index("references/github-readme-canvas.md")
+        svg_index = readme_route.index("references/svg-production.md")
         self.assertLess(visual_index, hero_index)
         self.assertLess(hero_index, canvas_index)
         self.assertLess(canvas_index, svg_index)
@@ -56,7 +60,7 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
             "只有上层已经核定来源、适用项目状态和公开职责的材料才能选择“复用已有”",
             "文件存在、链接有效、画面完整或曾在 README 出现都不构成复用资格",
             "Material basis:",
-            "不恢复上层已经判定为过时或未验证的产物",
+            "不恢复内容方法已经判定为过时或未验证的产物",
             "内部图片、旧截图或历史流程图不因文件存在而重新获得资格",
         ):
             with self.subTest(fragment=fragment):
@@ -64,7 +68,7 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
 
         self.assertIn(
             "整页模式必须明确选择复用已有、制作新的、排版表达或跳过",
-            SKILL_TEXT,
+            VISUAL_TEXT,
         )
 
     def test_project_category_no_longer_selects_a_surface_style(self) -> None:

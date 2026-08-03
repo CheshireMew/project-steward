@@ -82,8 +82,8 @@ class MergedCapabilityTests(unittest.TestCase):
                 self.assertTrue(path.is_file())
 
         section = SKILL_TEXT.split(
-            "### 14. 用户环境档案与执行环境", 1
-        )[1].split("### 15. 项目综合审计", 1)[0]
+            "## 用户环境档案与执行环境", 1
+        )[1].split("## 项目综合审计", 1)[0]
         for route in (
             "references/user-environment-governance.md",
             "assets/user-environment/profile.schema.json",
@@ -113,14 +113,7 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, desktop)
 
-        self.assertIn(
-            "窗口呈现状态矩阵",
-            SKILL_TEXT,
-        )
-        self.assertIn(
-            "每个自有顶层窗口是否进入录制",
-            SKILL_TEXT,
-        )
+        self.assertIn("references/desktop-app-governance.md", SKILL_TEXT)
 
     def test_human_projection_and_layout_accountability_are_active(
         self,
@@ -159,6 +152,83 @@ class MergedCapabilityTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, quality)
+
+    def test_usage_binding_and_reusable_resources_have_distinct_owners(
+        self,
+    ) -> None:
+        ux = (SKILL_ROOT / "references" / "ux-design.md").read_text(
+            encoding="utf-8"
+        )
+
+        for fragment in (
+            "用途绑定与可复用资源分开建模",
+            "用户用途：哪类任务需要什么结果",
+            "能力载体：哪个模型、CLI、插件、设备或服务能够完成",
+            "连接配置只决定“怎样访问这个资源”",
+            "当前分工位于资源库或单个详情之外",
+            "可执行文件路径、供应商默认地址、环境变量和命令参数",
+            "统一能力角色",
+            "稳定身份的适配器选项",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, ux)
+
+    def test_controls_settings_and_secret_feedback_have_observable_contracts(
+        self,
+    ) -> None:
+        guidelines = (
+            SKILL_ROOT / "references" / "interface-guidelines.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "外部布局矩形、内部内容矩形和真实命中矩形",
+            "目标语言长文案、系统文字缩放和显示缩放",
+            "不能用负偏移、未经验证的固定坐标",
+            "每个应有选项都形成可见、可读、可命中且不被裁切的行",
+            "本地、可逆、彼此独立的开关、模式和单项选择",
+            "失去焦点、关闭面板或退出应用前强制提交",
+            "关闭并重新打开由同一消费者读取",
+            "持久原值、编辑缓冲和显示投影",
+            "掩码只用于呈现，不能回写成凭据",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, guidelines)
+
+    def test_visual_quality_diagnosis_separates_design_and_technology(
+        self,
+    ) -> None:
+        design = (
+            SKILL_ROOT / "references" / "design-method.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "先从用户结果、对象与内容结构、层级、空间、排版、色彩、组件一致性和运行时完成度",
+            "编程语言、UI 框架和渲染方案本身不是审美结论",
+            "确实不能满足已经定义的字体、布局、合成、动效、性能、可访问性或系统集成合同",
+            "不用“换一种语言会更好看”代替设计与实现判断",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, design)
+
+    def test_agent_operated_products_keep_human_and_machine_roles_clear(
+        self,
+    ) -> None:
+        experience = (
+            SKILL_ROOT / "references" / "product-experience-governance.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "任务由用户、AI 或 Agent 和确定性系统共同完成时",
+            "用户负责表达目标、决定真正影响结果的取舍并审阅后果",
+            "AI 或 Agent 负责读取结构化事实、形成带理由的操作计划",
+            "公开 CLI 或 API 承担稳定 schema、对象身份、版本、预检和提交",
+            "先证明它是正式消费者",
+            "不能只通过虚拟化、分页或缓存把无职责表面保留下来",
+            "应退出该表面的状态投影、控制器、交互入口和专用恢复分支",
+            "人工精细编辑本身具有独立价值时继续保留",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, experience)
 
     def test_visual_recovery_and_action_content_contracts_are_active(
         self,
@@ -229,6 +299,25 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, review)
 
+    def test_ui_automation_uses_stable_identity_and_design_truth(self) -> None:
+        review = (
+            SKILL_ROOT / "references" / "implementation-review.md"
+        ).read_text(encoding="utf-8")
+
+        ordered = (
+            "对象身份优先来自稳定对象标识、可访问语义或组件公开身份",
+            "当前翻译文案、列表位置和临时像素坐标",
+            "不能充当其它行为的定位键",
+            "设计值从活动 token、组件公开属性或正式布局合同取得",
+            "不能把当前像素常量复制进测试形成第二套设计真源",
+            "几何断言验证边界和关系",
+            "整体与局部画面验证可读性、视觉重量和构图",
+            "共享组件修改还要覆盖全部正式消费者",
+            "实例级覆盖则证明共享默认值未被改变",
+        )
+        positions = [review.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_media_surface_governance_is_routed_and_observable(self) -> None:
         root_cause = (
             SKILL_ROOT / "references" / "root-cause-remediation.md"
@@ -247,7 +336,7 @@ class MergedCapabilityTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn(
-            "媒体预览表现为内容缺失、裁切或比例留白且边界不清",
+            "references/root-cause-remediation.md",
             SKILL_TEXT,
         )
         for fragment in (
@@ -420,12 +509,8 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, review)
 
-        for fragment in (
-            "集合抽样消费和排他转场",
-            "分类播放与声音职责",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, SKILL_TEXT)
+        self.assertIn("references/interaction-motion.md", SKILL_TEXT)
+        self.assertIn("references/implementation-review.md", SKILL_TEXT)
 
     def test_project_research_capability_is_fully_migrated(self) -> None:
         for name in PROJECT_RESEARCH_REFERENCES:
@@ -447,8 +532,8 @@ class MergedCapabilityTests(unittest.TestCase):
         )
         script_text = archive_script.read_text(encoding="utf-8")
         research_section = SKILL_TEXT.split(
-            "### 6. 项目研究与讲解", 1
-        )[1].split("### 7. 项目基线与模板", 1)[0]
+            "## 项目研究与讲解", 1
+        )[1].split("## 项目基线与模板", 1)[0]
         self.assertIn(
             "[Parameter(Mandatory = $true, Position = 1)]",
             script_text,

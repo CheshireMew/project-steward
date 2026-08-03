@@ -14,20 +14,18 @@ DIAGNOSTIC_TEXT = (
 
 class HardToReproduceDiagnosticTests(unittest.TestCase):
     def test_skill_routes_the_method_from_prevention_and_root_cause(self) -> None:
-        prevention = SKILL_TEXT.split("### 4. 改动前预防", 1)[1].split(
-            "### 5. 根因治理", 1
+        prevention = SKILL_TEXT.split("## 改动前预防", 1)[1].split(
+            "## 根因治理", 1
         )[0]
-        remediation = SKILL_TEXT.split("### 5. 根因治理", 1)[1].split(
-            "## 支撑与专项能力", 1
+        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 项目研究与讲解", 1
         )[0]
         route = "references/hard-to-reproduce-diagnostics.md"
 
         self.assertIn(route, prevention)
         self.assertIn(route, remediation)
-        self.assertIn("先记录本次进入原因与适用维度", prevention)
-        self.assertIn("先明确进入原因与适用维度", remediation)
-        self.assertIn("普通确定性问题不加载这项方法", prevention)
-        self.assertIn("普通确定性缺陷继续沿本节的常规根因路径", remediation)
+        self.assertIn("进入原因和适用的特殊维度", DIAGNOSTIC_TEXT)
+        self.assertIn("普通确定性问题不需要这项加重方法", DIAGNOSTIC_TEXT)
 
     def test_common_path_precedes_and_composes_special_dimensions(self) -> None:
         common = DIAGNOSTIC_TEXT.index("## 2. 共同路径")
@@ -74,6 +72,68 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         ):
             with self.subTest(public_behavior=public_behavior):
                 self.assertIn(public_behavior, README_TEXT)
+
+    def test_overlapping_operations_are_correlated_by_producer_identity(
+        self,
+    ) -> None:
+        concurrent = DIAGNOSTIC_TEXT.split("### 并发、所有权与顺序", 1)[
+            1
+        ].split("### 确定性派生产物的单一生产者", 1)[0]
+        ordered = (
+            "正式生产者分配稳定操作身份",
+            "开始、更新、完成、失败、取消和清理事件",
+            "消费者按操作身份与 generation 建立索引",
+            "正式入口启动两个真实操作",
+            "实际事件、队列或传输边界",
+            "正式消费者处理",
+            "第二个操作没有被修改、移除或错误终止",
+        )
+        positions = [concurrent.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "缺少它们的事件都是合同失败",
+            "不得退回“最后一个”“当前项”",
+            "过期回调、较晚失败和取消只能收尾它们所属的旧尝试",
+            "直接调用消费者 handler 或手写事件 payload",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, concurrent)
+
+        for public_behavior in (
+            "并发操作由正式生产者分配稳定身份和 generation",
+            "消费者不会按最后一项、当前选中项或列表位置猜目标",
+            "两个真实操作交错经过正式事件边界",
+        ):
+            with self.subTest(public_behavior=public_behavior):
+                self.assertIn(public_behavior, README_TEXT)
+
+    def test_foreground_work_has_explicit_shared_resource_arbitration(
+        self,
+    ) -> None:
+        ordered = (
+            "阻止后台重新取得资源",
+            "请求当前后台生产者停止",
+            "等待它确认退出或释放",
+            "开始前台生产者",
+            "前台完成后恢复调度",
+        )
+        positions = [DIAGNOSTIC_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "交互前台与后台整理、索引、预热、同步或维护任务",
+            "不能让后台任务碰巧先取得普通互斥锁",
+            "未完成批次是否允许推进游标或检查点",
+            "等待超时保持资源所有权未知并阻止第二个生产者",
+            "用受控阻塞生产者让后台先取得真实共享资源",
+            "未完成后台进度没有前移",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
+        self.assertIn("先停止后台重新取锁", README_TEXT)
+        self.assertIn("不推进未完成游标", README_TEXT)
 
     def test_continuous_realtime_progress_uses_layered_authoritative_evidence(
         self,
@@ -130,8 +190,8 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        self.assertIn("现有健康指标与用户可见结果冲突", SKILL_TEXT)
-        self.assertIn("无法指出正式测量生产者", SKILL_TEXT)
+        self.assertIn("两者冲突时，用户结果是失败证据", DIAGNOSTIC_TEXT)
+        self.assertIn("默认值、常量、缺失回调", DIAGNOSTIC_TEXT)
         for public_behavior in (
             "零值不会被用来表示“没有测量”",
             "与独立用户结果校准",
@@ -283,6 +343,9 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         self.assertIn("父子进程实际选择的可执行文件", README_TEXT)
 
     def test_external_process_attempts_keep_one_owner_until_terminal(self) -> None:
+        external_process = DIAGNOSTIC_TEXT.split("### 环境与外部进程", 1)[
+            1
+        ].split("### 数据、缓存与版本沿袭", 1)[0]
         ordered = (
             "本次执行尝试身份",
             "外层等待结束不改变原执行所有权",
@@ -292,7 +355,7 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             "资源已经释放",
             "停止后重新核对进程、监听端口、锁和输出位置",
         )
-        positions = [DIAGNOSTIC_TEXT.index(fragment) for fragment in ordered]
+        positions = [external_process.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
         self.assertIn("一个进程已经消失不能替其它进程退出", DIAGNOSTIC_TEXT)
         self.assertIn("不启动争用同一资源的重复任务", DIAGNOSTIC_TEXT)

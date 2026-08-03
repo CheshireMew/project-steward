@@ -17,87 +17,112 @@ AGENT_TEXT = (
 PROJECT_RESEARCH_TEXT = (
     SKILL_ROOT / "references" / "project-research.md"
 ).read_text(encoding="utf-8")
+EFFECTIVENESS_TEXT = (
+    SKILL_ROOT / "references" / "project-effectiveness-review.md"
+).read_text(encoding="utf-8")
 
 
 class CoreIdentityTests(unittest.TestCase):
     def test_default_identity_is_learning_prevention_and_governance(self) -> None:
-        goal = SKILL_TEXT.split("## 目标", 1)[1].split("## 路由", 1)[0]
+        router = SKILL_TEXT.split("## 角色与路由", 1)[1].split(
+            "## 共同边界",
+            1,
+        )[0]
         for fragment in (
-            "按时间完整覆盖请求、决定、动作、警告、超时、重试、纠正与证据",
-            "按多个用户最终结果分别恢复成功与失误",
-            "找到已证明机制、能力缺口和最早预防点",
-            "用可迁移机制更新 Project Steward 的活动能力",
-            "在后续改动前预防或在缺陷后完成根因治理",
-            "用新的真实结果继续校正同一项能力",
+            "保存跨项目可复用的治理方法",
+            "同一请求中的独立结果分别建账",
+            "对话学习与自我进化",
+            "改动前预防",
+            "根因治理",
+            "项目综合审计",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, goal)
+                self.assertIn(fragment, router)
 
-        self.assertIn(
-            "只有用户明确要求全面检查、健康判断或综合审计时",
-            goal,
-        )
         self.assertNotIn("默认执行只读的项目综合审计", SKILL_TEXT)
         self.assertIn(
-            "用户环境档案保存当前用户与机器的可变工具事实",
-            goal,
+            "用户和机器的可变工具事实留在项目与 Skill 之外的环境档案中",
+            router,
         )
 
     def test_main_router_places_core_loop_before_specialties_and_audit(
         self,
     ) -> None:
-        router = SKILL_TEXT.split(
-            "### 1. 先按最终结果选择主路径", 1
-        )[1].split("### 2. 建立共同项目事实", 1)[0]
+        router = SKILL_TEXT.split("## 角色与路由", 1)[1].split(
+            "## 共同边界",
+            1,
+        )[0]
 
         ordered = (
-            "进入“对话学习与自我进化”",
-            "进入“改动前预防”",
-            "进入“根因治理”",
-            "进入“项目研究与讲解”",
-            "进入“README 与主页”",
-            "进入“人性化日志”",
-            "进入“用户环境档案与执行环境”",
-            "进入“项目综合审计”",
+            "对话学习与自我进化。",
+            "改动前预防。",
+            "根因治理。",
+            "项目研究与讲解。",
+            "README 与主页。",
+            "人性化日志。",
+            "用户环境档案与执行环境。",
+            "项目综合审计。",
         )
         positions = [router.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
 
     def test_bare_repository_uses_project_explanation(self) -> None:
-        goal = SKILL_TEXT.split("## 目标", 1)[1].split("## 路由", 1)[0]
         self.assertIn(
-            "只提供 GitHub 仓库、本地目录或源码包进入“项目研究与讲解”",
-            goal,
+            "看懂仓库、目录或源码包",
+            SKILL_TEXT,
         )
 
         research_section = SKILL_TEXT.split(
-            "### 6. 项目研究与讲解", 1
-        )[1].split("### 7. 项目基线与模板", 1)[0]
+            "## 项目研究与讲解", 1
+        )[1].split("## 项目基线与模板", 1)[0]
         self.assertIn(
-            "它为谁解决什么问题、用户最终得到什么、什么时候有用",
-            research_section,
-        )
-        self.assertIn(
-            "达到当前问题的理解结果后停止",
+            "references/project-research.md",
             research_section,
         )
         self.assertIn(
             r"E:\Work\BaiduSyncdisk\Code\Example",
             research_section,
         )
+        self.assertIn("项目解决什么问题、用户得到什么、什么时候有用", PROJECT_RESEARCH_TEXT)
+        self.assertIn("达到对应结果后返回上层主流程", PROJECT_RESEARCH_TEXT)
         self.assertIn(
             "-DestinationRoot <目标根>",
             research_section,
         )
-        self.assertIn("失败时保留已产生目录", research_section)
-        self.assertIn("停止本条路径", research_section)
-        self.assertIn("上下文噪音", research_section)
         self.assertIn(
-            "只有第 4 项条件成立时，才进一步给出效果、适用性或“值不值得用”的判断",
-            research_section,
+            "上层已经选择实际效果、可靠性、上下文噪音、适用性或采用判断时",
+            PROJECT_RESEARCH_TEXT,
         )
         self.assertIn("understand a repository", SKILL_TEXT)
         self.assertNotIn("one-off explanation", SKILL_TEXT)
+
+    def test_source_archive_research_preparation_needs_no_extra_confirmation(
+        self,
+    ) -> None:
+        common_boundaries = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
+            1,
+        )[0]
+        for fragment in (
+            "解压是进入只读研究所需的材料准备，不是项目正式写入",
+            "独立避重名目录",
+            "无需额外取得解压确认",
+            "只授权创建研究副本和读取其内容",
+            "安装依赖或解压工具",
+            "移动或删除原文件",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, common_boundaries)
+
+        research_section = SKILL_TEXT.split(
+            "## 项目研究与讲解", 1
+        )[1].split("## 项目基线与模板", 1)[0]
+        self.assertIn("scripts/extract_project_archive.ps1", research_section)
+        self.assertIn("-DestinationRoot <目标根>", research_section)
+        self.assertIn(
+            r"E:\Work\BaiduSyncdisk\Code\Example",
+            research_section,
+        )
 
     def test_metadata_and_first_use_expose_the_core_route(self) -> None:
         self.assertIn(
@@ -124,13 +149,13 @@ class CoreIdentityTests(unittest.TestCase):
         self,
     ) -> None:
         research_section = SKILL_TEXT.split(
-            "### 6. 项目研究与讲解", 1
-        )[1].split("### 7. 项目基线与模板", 1)[0]
+            "## 项目研究与讲解", 1
+        )[1].split("## 项目基线与模板", 1)[0]
         for fragment in (
-            "完整能力吸收研究",
-            "来源能力台账",
-            "只要求建议时保持只读",
-            "改动前预防",
+            "完整研究或能力采用",
+            "references/project-research.md",
+            "references/project-effectiveness-review.md",
+            "references/project-research-report.md",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, research_section)
@@ -141,6 +166,15 @@ class CoreIdentityTests(unittest.TestCase):
             "规范真源、手工维护来源与派生视图",
             "名称、别名和示例只负责发现",
             "目标项目的用户结果与唯一边界",
+            "候选能力在目标项目中属于核心对象、现有对象操作、获取渠道、视图或筛选、状态反馈还是可选集成",
+            "建议入口：现有统一入口 / 对象内行动 / 次级入口 / 独立工作区 / 不采用",
+            "来源项目存在某个导航项、独立页面、显眼按钮",
+            "与现有对象共享同一组保存、查找、编辑、删除、恢复和交付行为",
+            "独立且反复发生的结果、关键决定、生命周期或恢复路径",
+            "会改变专业判断与结果的构成性细节",
+            "目标项目已经有相同职责、对象或入口",
+            "不能证明具体细节已经存在",
+            "具体细节已经存在、只有大方向、值得吸收的新细节、不吸收",
             "只要求“看看有哪些值得吸收”时保持只读",
             "不自行创建目标 schema、资源、兼容层或演示实现",
         ):
@@ -152,6 +186,19 @@ class CoreIdentityTests(unittest.TestCase):
             PROJECT_RESEARCH_TEXT,
         )
         self.assertIn("完整阅读这个项目，看哪些能力值得另一个项目吸收", README_TEXT)
+
+        common_boundaries = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
+            1,
+        )[0]
+        for fragment in (
+            "先完成独立结果拆分和必要的因果排序",
+            "遮住来源检查目标能否认出同一条件",
+            "只有上位治理框架算部分具备",
+            "完成逐项比较后才提炼共同机制和特殊维度",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, common_boundaries)
 
     def test_self_evolution_is_explicit_and_project_paths_stop_at_result(
         self,
@@ -185,10 +232,10 @@ class CoreIdentityTests(unittest.TestCase):
             remediation,
         )
         remediation_section = SKILL_TEXT.split(
-            "### 5. 根因治理", 1
-        )[1].split("## 支撑与专项能力", 1)[0]
+            "## 根因治理", 1
+        )[1].split("## 项目研究与讲解", 1)[0]
         self.assertIn(
-            "完成后交付根因、最终边界、迁移结果、旧架构退出证据和真实用户链，随后停止",
+            "实施才一次迁移全部生产者、边界和消费者，并退出旧架构",
             remediation_section,
         )
 
@@ -238,13 +285,41 @@ class CoreIdentityTests(unittest.TestCase):
                 self.assertIn(fragment, learning)
 
         self.assertIn(
-            "项目已有的规则、设计文档、代码、配置和测试共同承担项目事实",
+            "项目自己的产品决定、架构事实和长期约束留在项目现有真源中",
             SKILL_TEXT,
         )
         self.assertIn(
             "references/conversation-learning-and-self-evolution.md",
             SKILL_TEXT,
         )
+
+    def test_harness_comparisons_control_one_variable_and_preserve_raw_evidence(
+        self,
+    ) -> None:
+        for fragment in (
+            "Harness 或调用路径的受控对照",
+            "每次只改变待比较的调用路径",
+            "`scenario_id`、标题、类别和期望标签保留在编排器与结果文件中",
+            "不发送给候选模型",
+            "使用隔离的会话、工作区和副作用目标",
+            "先证明每条候选路径按其正式协议运行",
+            "先修正实验协议并保留失败证据",
+            "不能把编排器缺陷算成模型质量",
+            "原始响应、结构化结果、最终用户可见正文、延迟、token",
+            "质量评审尽量盲化候选身份",
+            "一个指标领先不自动成为总冠军",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, EFFECTIVENESS_TEXT)
+
+        for fragment in (
+            "冻结模型、参数、输入、历史、权限和评分口径",
+            "把 `scenario_id`、标题和期望标签留在评测编排器中",
+            "适配器错误会与模型能力分开",
+            "不会用单一指标或测试特制请求宣布胜者",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
 
 class ProjectArchiveExtractionTests(unittest.TestCase):
     def test_destination_root_is_required_and_no_hidden_fallback_is_created(

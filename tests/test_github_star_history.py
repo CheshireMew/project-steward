@@ -130,8 +130,8 @@ class GitHubStarHistoryTests(unittest.TestCase):
         self.assertTrue(all(method == "GET" for method, _ in client.calls))
 
     def test_skill_routes_diagnosis_and_implementation_to_one_reference(self) -> None:
-        readme_section = SKILL_TEXT.split("### 11. README 与主页", 1)[1].split(
-            "### 12.", 1
+        readme_section = SKILL_TEXT.split("## README 与主页", 1)[1].split(
+            "## 许可证治理", 1
         )[0]
         self.assertIn("references/github-star-history.md", readme_section)
         self.assertIn("只读", readme_section)

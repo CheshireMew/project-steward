@@ -36,6 +36,14 @@ FORBIDDEN_KEY_PARTS = (
     "secret",
     "token",
 )
+LARGE_CONTENT_CATEGORY_KEYS = {
+    "default": "default",
+    "application-content": "application_content",
+    "project": "projects",
+    "media": "media",
+    "generated-output": "generated_outputs",
+}
+LARGE_CONTENT_ROOT_KEYS = tuple(LARGE_CONTENT_CATEGORY_KEYS.values())
 
 
 class ProfileError(ValueError):
@@ -54,6 +62,19 @@ def default_profile_path() -> Path:
 
 def normalized_path(value: str | Path) -> str:
     return str(Path(value).expanduser().resolve(strict=False))
+
+
+def storage_volume(value: str | Path) -> str | None:
+    text = str(value).strip()
+    windows_drive = re.match(r"^([A-Za-z]):(?:[\\/]|$)", text)
+    if windows_drive:
+        return windows_drive.group(1).lower()
+    drive = os.path.splitdrive(text)[0].rstrip("\\/")
+    return os.path.normcase(drive) if drive else None
+
+
+def empty_large_content_roots() -> dict[str, list[str]]:
+    return {key: [] for key in LARGE_CONTENT_ROOT_KEYS}
 
 
 def existing_paths(values: Iterable[str | Path]) -> list[str]:
@@ -489,6 +510,35 @@ def parse_default_tools(values: list[str]) -> dict[str, str]:
     return result
 
 
+def parse_large_content_roots(
+    values: list[str],
+    existing: dict[str, Any],
+    cleared_categories: list[str],
+) -> dict[str, list[str]]:
+    roots = empty_large_content_roots()
+    for key in roots:
+        roots[key] = [normalized_path(value) for value in existing.get(key, [])]
+    for category in cleared_categories:
+        roots[LARGE_CONTENT_CATEGORY_KEYS[category]] = []
+
+    replacements: dict[str, list[str]] = {}
+    for item in values:
+        if "=" not in item:
+            raise ProfileError(
+                "large content root must use category=path syntax: " + item
+            )
+        category, value = item.split("=", 1)
+        category = category.strip()
+        value = value.strip()
+        if category not in LARGE_CONTENT_CATEGORY_KEYS or not value:
+            raise ProfileError(f"invalid large content root: {item}")
+        key = LARGE_CONTENT_CATEGORY_KEYS[category]
+        replacements.setdefault(key, []).append(normalized_path(value))
+    for key, values_for_key in replacements.items():
+        roots[key] = list(dict.fromkeys(values_for_key))
+    return roots
+
+
 def preferences_from(
     existing: dict[str, Any] | None,
     args: argparse.Namespace,
@@ -514,12 +564,29 @@ def preferences_from(
     )
     default_tools = dict(current.get("default_tools", {}))
     default_tools.update(parse_default_tools(getattr(args, "default_tool", [])))
+    current_storage = deepcopy(current.get("large_content_storage", {}))
+    avoid_system_drive = getattr(
+        args,
+        "avoid_system_drive_for_large_content",
+        None,
+    )
+    if avoid_system_drive is None:
+        avoid_system_drive = bool(current_storage.get("avoid_system_drive", False))
+    large_content_roots = parse_large_content_roots(
+        getattr(args, "large_content_root", []),
+        current_storage.get("roots", {}),
+        getattr(args, "clear_large_content_root", []),
+    )
     return {
         "preferred_shell": preferred_shell,
         "install_roots": list(dict.fromkeys(install_roots)),
         "download_root": download_root,
         "temp_root": temp_root,
         "default_tools": default_tools,
+        "large_content_storage": {
+            "avoid_system_drive": avoid_system_drive,
+            "roots": large_content_roots,
+        },
     }
 
 
@@ -596,13 +663,22 @@ def detect_machine() -> dict[str, str]:
         build = int(version_parts[2]) if len(version_parts) >= 3 else 0
         if build >= 22000:
             release = "11"
-    return {
+    result = {
         "hostname": socket.gethostname(),
         "system": system,
         "release": release,
         "version": version,
         "architecture": platform.machine(),
     }
+    if system == "Windows":
+        system_drive = os.environ.get("SystemDrive")
+        if not system_drive:
+            system_drive = os.path.splitdrive(
+                os.environ.get("SystemRoot", "")
+            )[0]
+        if system_drive:
+            result["system_drive"] = system_drive.rstrip("\\/")
+    return result
 
 
 def forbidden_key_paths(value: Any, prefix: str = "") -> list[str]:
@@ -756,6 +832,38 @@ def validate_schema_value(
             raise ProfileError(f"{path} must be an ISO date-time") from error
 
 
+def large_content_policy(profile: dict[str, Any]) -> dict[str, Any] | None:
+    return profile.get("preferences", {}).get("large_content_storage")
+
+
+def configured_large_content_roots(
+    policy: dict[str, Any],
+) -> Iterable[tuple[str, str]]:
+    for category, values in policy["roots"].items():
+        for value in values:
+            yield category, value
+
+
+def validate_large_content_policy(profile: dict[str, Any]) -> None:
+    policy = large_content_policy(profile)
+    if not policy or not policy["avoid_system_drive"]:
+        return
+    system_drive = profile.get("machine", {}).get("system_drive")
+    system_volume = storage_volume(system_drive) if system_drive else None
+    if not system_volume:
+        return
+    conflicts = [
+        f"{category}={value}"
+        for category, value in configured_large_content_roots(policy)
+        if storage_volume(value) == system_volume
+    ]
+    if conflicts:
+        raise ProfileError(
+            "large content roots conflict with the system-drive avoidance policy: "
+            + ", ".join(conflicts)
+        )
+
+
 def validate_profile(profile: Any) -> dict[str, Any]:
     schema = load_profile_schema()
     validate_schema_value(profile, schema, schema, "profile")
@@ -765,6 +873,7 @@ def validate_profile(profile: Any) -> dict[str, Any]:
             "profile contains forbidden sensitive keys: "
             + ", ".join(forbidden)
         )
+    validate_large_content_policy(profile)
     return profile
 
 
@@ -867,7 +976,68 @@ def verify_profile(profile: dict[str, Any]) -> dict[str, Any]:
                             "value": item,
                         }
                     )
+    policy = large_content_policy(profile)
+    if policy:
+        for category, value in configured_large_content_roots(policy):
+            path = Path(value)
+            if not path.is_dir():
+                issues.append(
+                    {
+                        "path": f"preferences.large_content_storage.roots.{category}",
+                        "issue": "recorded large content root is missing or not a directory",
+                        "value": value,
+                    }
+                )
     return {"valid": not issues, "issues": issues}
+
+
+def select_large_content_root(
+    profile: dict[str, Any],
+    category: str,
+) -> tuple[str, dict[str, Any]]:
+    policy = large_content_policy(profile)
+    if not policy:
+        raise ProfileError(
+            "large content storage policy is not configured; run plan and apply first"
+        )
+    key = LARGE_CONTENT_CATEGORY_KEYS[category]
+    candidates = list(policy["roots"][key])
+    if key != "default":
+        candidates.extend(policy["roots"]["default"])
+    candidates = list(dict.fromkeys(candidates))
+    if not candidates:
+        raise ProfileError(f"no large content root is configured for: {category}")
+
+    system_drive = profile.get("machine", {}).get("system_drive")
+    system_volume = storage_volume(system_drive) if system_drive else None
+    if policy["avoid_system_drive"] and profile["machine"]["system"] == "Windows":
+        if not system_volume:
+            raise ProfileError(
+                "system drive is unknown; cannot enforce large content storage policy"
+            )
+
+    rejected: list[dict[str, str]] = []
+    for candidate in candidates:
+        path = Path(candidate)
+        if not path.is_dir():
+            rejected.append({"root": candidate, "reason": "missing-or-not-directory"})
+            continue
+        if (
+            policy["avoid_system_drive"]
+            and system_volume
+            and storage_volume(candidate) == system_volume
+        ):
+            rejected.append({"root": candidate, "reason": "system-drive"})
+            continue
+        return normalized_path(path), {
+            "avoid_system_drive": policy["avoid_system_drive"],
+            "system_drive": system_drive,
+            "rejected": rejected,
+        }
+    raise ProfileError(
+        "no configured large content root satisfies the active policy: "
+        + json.dumps(rejected, ensure_ascii=False)
+    )
 
 
 def select_tool_record(
@@ -947,6 +1117,33 @@ def add_detection_arguments(parser: argparse.ArgumentParser) -> None:
         default=[],
         help="Preferred capability path in capability=path syntax",
     )
+    storage_policy = parser.add_mutually_exclusive_group()
+    storage_policy.add_argument(
+        "--avoid-system-drive-for-large-content",
+        dest="avoid_system_drive_for_large_content",
+        action="store_true",
+        default=None,
+        help="Reject system-drive roots for large application content, projects, media, and generated outputs",
+    )
+    storage_policy.add_argument(
+        "--allow-system-drive-for-large-content",
+        dest="avoid_system_drive_for_large_content",
+        action="store_false",
+        help="Allow explicitly configured system-drive roots for large content",
+    )
+    parser.add_argument(
+        "--large-content-root",
+        action="append",
+        default=[],
+        help="Preferred root in category=path syntax; category is default, application-content, project, media, or generated-output",
+    )
+    parser.add_argument(
+        "--clear-large-content-root",
+        action="append",
+        choices=tuple(LARGE_CONTENT_CATEGORY_KEYS),
+        default=[],
+        help="Clear every configured root for one large-content category",
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -973,6 +1170,18 @@ def parse_args() -> argparse.Namespace:
     resolve_parser = subparsers.add_parser("resolve")
     add_profile_argument(resolve_parser)
     resolve_parser.add_argument("--capability", required=True)
+
+    resolve_storage_parser = subparsers.add_parser("resolve-storage")
+    add_profile_argument(resolve_storage_parser)
+    resolve_storage_parser.add_argument(
+        "--category",
+        required=True,
+        choices=tuple(
+            category
+            for category in LARGE_CONTENT_CATEGORY_KEYS
+            if category != "default"
+        ),
+    )
 
     return parser.parse_args()
 
@@ -1035,6 +1244,18 @@ def main() -> int:
                     "capability": args.capability,
                     "tool": record,
                     "environment": environment,
+                }
+            )
+            return 0
+
+        if args.command == "resolve-storage":
+            root, policy = select_large_content_root(profile, args.category)
+            output(
+                {
+                    "profile": str(path),
+                    "category": args.category,
+                    "root": root,
+                    "policy": policy,
                 }
             )
             return 0

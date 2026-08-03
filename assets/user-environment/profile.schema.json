@@ -69,6 +69,47 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "large_content_storage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "avoid_system_drive",
+            "roots"
+          ],
+          "properties": {
+            "avoid_system_drive": {
+              "type": "boolean"
+            },
+            "roots": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "default",
+                "application_content",
+                "projects",
+                "media",
+                "generated_outputs"
+              ],
+              "properties": {
+                "default": {
+                  "$ref": "#/$defs/pathList"
+                },
+                "application_content": {
+                  "$ref": "#/$defs/pathList"
+                },
+                "projects": {
+                  "$ref": "#/$defs/pathList"
+                },
+                "media": {
+                  "$ref": "#/$defs/pathList"
+                },
+                "generated_outputs": {
+                  "$ref": "#/$defs/pathList"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -96,6 +137,9 @@
           "type": "string"
         },
         "architecture": {
+          "type": "string"
+        },
+        "system_drive": {
           "type": "string"
         }
       }
@@ -173,6 +217,13 @@
     }
   },
   "$defs": {
+    "pathList": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
     "toolRecord": {
       "type": "object",
       "additionalProperties": false,

@@ -15,22 +15,20 @@ PROGRESS_TEXT = (
 
 class TaskProgressTruthGovernanceTests(unittest.TestCase):
     def test_skill_routes_progress_from_all_formal_consumers(self) -> None:
-        prevention = SKILL_TEXT.split("### 4. 改动前预防", 1)[1].split(
-            "### 5. 根因治理", 1
+        prevention = SKILL_TEXT.split("## 改动前预防", 1)[1].split(
+            "## 根因治理", 1
         )[0]
-        remediation = SKILL_TEXT.split("### 5. 根因治理", 1)[1].split(
-            "## 支撑与专项能力", 1
+        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 项目研究与讲解", 1
         )[0]
-        experience = SKILL_TEXT.split("### 9. 产品体验与界面治理", 1)[1].split(
-            "### 10. 仓库建立与发布", 1
+        experience = SKILL_TEXT.split("## 产品体验与界面治理", 1)[1].split(
+            "## 仓库建立与发布", 1
         )[0]
         route = "references/task-progress-governance.md"
 
         self.assertIn(route, prevention)
         self.assertIn(route, remediation)
         self.assertIn(route, experience)
-        self.assertIn("普通、能够稳定验证的进度功能不因此进入高成本诊断", prevention)
-        self.assertIn("不在单个任务旁调整数字", remediation)
 
     def test_contract_separates_state_phase_and_measured_progress(self) -> None:
         for fragment in (
@@ -60,6 +58,34 @@ class TaskProgressTruthGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROGRESS_TEXT)
 
+    def test_long_tasks_outlive_their_originating_interaction(self) -> None:
+        for fragment in (
+            "长任务生命周期不等于发起它的交互回合",
+            "稳定 `task_id` 和 generation",
+            "再让发起交互结束",
+            "继续服务无关交互",
+            "不能继续锁住整个聊天或界面回合",
+            "活动任务快照",
+            "模型不能凭对话记忆猜测",
+            "任务终态不反向等待聊天模型或界面台词",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROGRESS_TEXT)
+
+    def test_task_controls_target_the_current_identity_and_generation(self) -> None:
+        for fragment in (
+            "查询、取消、追加要求和授权回答是带目标身份的任务控制",
+            "状态查询只读取快照，不重启执行者",
+            "只有生产者确认停止并完成清理后才进入 `cancelled`",
+            "不能静默改写运行中的原任务合同",
+            "授权请求身份",
+            "只能唤醒准确等待者",
+            "上一 generation 的控制不能覆盖或影响当前尝试",
+            "终态至多一次且走无损通道",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROGRESS_TEXT)
+
     def test_multistage_and_aggregate_progress_do_not_invent_math(self) -> None:
         for fragment in (
             "共享一个真实总量",
@@ -76,7 +102,7 @@ class TaskProgressTruthGovernanceTests(unittest.TestCase):
         ordered = (
             "正式进度生产者",
             "回调、事件或结构化消息",
-            "任务状态与持久化",
+            "任务生命周期所有者、队列、控制入口与持久化",
             "聚合或投影",
             "活动界面、CLI 或公共调用者",
             "完成后的正式结果",
@@ -108,6 +134,21 @@ class TaskProgressTruthGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROGRESS_TEXT)
 
+    def test_real_chain_covers_interaction_release_and_background_control(
+        self,
+    ) -> None:
+        for fragment in (
+            "一个真实长任务在发起交互结束后继续运行",
+            "提交另一项无关交互",
+            "取消、追加和授权分别命中准确任务、generation 与请求身份",
+            "两个真实任务或两个 generation 交错产生事件",
+            "真实启动并受控输出的本地生产进程",
+            "准确安装版工具",
+            "消费端手写事件、直接改任务快照或 mock 掉",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROGRESS_TEXT)
+
     def test_reference_is_cross_project_and_remains_a_leaf_method(self) -> None:
         self.assertNotIn("references/", PROGRESS_TEXT)
         self.assertNotRegex(PROGRESS_TEXT, r"[A-Za-z]:\\")
@@ -122,7 +163,10 @@ class TaskProgressTruthGovernanceTests(unittest.TestCase):
             "已完成量、总量和单位",
             "总量未知、单次外部请求或无法连续测量的阶段显示不定进度",
             "不同单位或未知成员也不会通过平均百分比伪造聚合进度",
-            "退出旧标量字段与固定阶段数字",
+            "正式登记后释放发起它的聊天或界面回合",
+            "取消、追加和授权携带准确任务与请求身份",
+            "迟到事件和旧窗口不能影响当前尝试",
+            "退出旧标量字段、固定阶段数字与第二份活动任务状态",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, README_TEXT)

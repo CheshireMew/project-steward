@@ -33,11 +33,11 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         )
         for fragment in (
             "导出、复制、保存、下载、同步、最终化",
-            "随后仍可能取消、失败、留下外部产物或需要跨重启交付",
-            "失败后无需追踪、不会留下外部结果的瞬时操作不建立事务",
+            "仍可能取消、失败、崩溃恢复或跨重启继续交付结果",
+            "失败后无需追踪且不会留下外部结果的瞬时操作不使用本方法",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, SKILL_TEXT)
+                self.assertIn(fragment, DURABLE_TEXT)
 
     def test_acceptance_physical_truth_and_visible_ack_are_ordered(self) -> None:
         for fragment in (
@@ -103,6 +103,30 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_TEXT)
 
+    def test_execution_plan_and_progress_have_stable_semantics(self) -> None:
+        for fragment in (
+            "固化为不可变执行计划",
+            "只包含会改变结果的内容相关修订或指纹",
+            "不得在真正执行时重新读取已经可能变化的全局设置",
+            "不参与结果的派生状态不能让计划失效",
+            "整体进度属于一个执行批次",
+            "在该批次内只能单调前进",
+            "阶段进度属于带稳定身份的当前步骤",
+            "不能把已有整体进度覆盖回零",
+            "显式重试创建新的执行批次和自己的进度序列",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
+        ordered = (
+            "固化为不可变执行计划",
+            "执行前仍要重新取得当前输入",
+            "进度是执行批次对这份计划的投影",
+            "成功、失败、取消、冲突和中断仍只由唯一终态决定",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_tests_consume_producer_owned_truth(self) -> None:
         for fragment in (
             "动作前的事务身份集合",
@@ -160,7 +184,7 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         )
         positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
-        self.assertIn("测试、性能、审计或真实用户链", SKILL_TEXT)
+        self.assertIn("测试、性能、审计和真实用户链", DURABLE_TEXT)
         self.assertIn("实际删除或归档仍遵守当前用户与项目权限", README_TEXT)
         self.assertIn("不会篡改测试本身的终态", README_TEXT)
 
@@ -177,6 +201,55 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
                     fragment,
                     DURABLE_TEXT + REMEDIATION_TEXT,
                 )
+
+    def test_semantic_mutations_and_sequential_batches_use_committed_state(
+        self,
+    ) -> None:
+        for fragment in (
+            "语义记录修改与连续决策批次使用已提交状态",
+            "来源、证据、权威性、资格和关系",
+            "同一次原子提交更新",
+            "固定计划批次 / 连续决策批次",
+            "后一步必须消费提交边界返回的新版本与正式结果",
+            "不能在整个循环中反复使用同一份初始快照",
+            "不能由消费端手写更新后的来源、证据或关系",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        for fragment in (
+            "记录仍存在但派生消费者将其排除",
+            "第一处错误就在修改生产者与原子提交边界",
+            "错误在批处理器的状态推进边界",
+            "不能手写一份语义已经对齐的对象绕过错误边界",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
+    def test_runtime_authority_precedes_recovery_and_scheduling(self) -> None:
+        ordered = (
+            "创建不触发持久状态变化的进程外壳",
+            "竞争并取得权威端点或服务租约",
+            "确认本进程是唯一活动实例",
+            "初始化状态服务、恢复任务和启动调度",
+            "接受客户端并产生新的状态变化",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "唯一运行权必须先于任何会改变持久状态的初始化",
+            "竞争失败的进程只能关闭自己为竞争创建的端点、句柄和内存对象",
+            "服务 `start` 必须幂等",
+            "任务状态、重试次数和调度游标不变",
+            "两个独立进程同时竞争同一权威端点",
+            "只有胜者执行一次恢复和调度",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
+        self.assertIn("唯一运行权放在恢复和调度之前", README_TEXT)
+        self.assertIn("竞争失败者只关闭自己创建的资源", README_TEXT)
 
     def test_archive_preservation_is_byte_exact_and_inactive(self) -> None:
         for fragment in (

@@ -1,0 +1,138 @@
+from __future__ import annotations
+
+import unittest
+from pathlib import Path
+
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+
+
+def read(relative: str) -> str:
+    return (SKILL_ROOT / relative).read_text(encoding="utf-8")
+
+
+SKILL_TEXT = read("SKILL.md")
+FORK_TEXT = read("references/source-fork-and-ecosystem-adoption.md")
+USER_ENVIRONMENT_TEXT = read("references/user-environment-governance.md")
+README_TEXT = read("README.md")
+
+
+class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
+    def test_source_fork_has_a_direct_route_and_unique_owner(self) -> None:
+        self.assertIn(
+            "references/source-fork-and-ecosystem-adoption.md",
+            SKILL_TEXT,
+        )
+        self.assertIn("实际复制代码时同时读取", SKILL_TEXT)
+        self.assertNotIn("references/", FORK_TEXT)
+
+    def test_relationships_are_distinct_before_adoption(self) -> None:
+        for fragment in (
+            "运行时依赖",
+            "一次性源码分叉",
+            "兼容适配器",
+            "机制借鉴",
+            "不能用一个仓库级标签掩盖不同依赖方向",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_independent_product_owns_identity_state_and_updates(self) -> None:
+        for fragment in (
+            "目标仓库、发布单元和命令身份",
+            "任务、状态、持久化与恢复的唯一真源",
+            "目标版本、发布节奏和支持平台",
+            "以后如何发现、审计和选择性采用上游变化",
+            "上游不能继续通过内部导入",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_adoption_ledger_keeps_provenance_rejections_and_tests(self) -> None:
+        for fragment in (
+            "固定提交、版本和内容哈希",
+            "许可证、版权、NOTICE",
+            "采用范围",
+            "目标所有者",
+            "移植测试",
+            "拒绝部分",
+            "后续升级",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_core_never_depends_on_the_compatibility_package(self) -> None:
+        for fragment in (
+            "核心内化与外围兼容只允许单向依赖",
+            "目标核心不能导入兼容包",
+            "删除兼容包后",
+            "不兼容版本在进入核心前明确拒绝",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_all_active_consumers_and_default_tests_are_migrated(self) -> None:
+        for fragment in (
+            "测试配置、模块别名、mock、fixture",
+            "构建脚本、原生宿主、资源清单",
+            "活动文档、示例、SDK 片段",
+            "不能从残留扫描中整体排除",
+            "目标默认测试入口",
+            "测试文件存在但默认命令没有选择它",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_upstream_updates_are_new_audited_adoptions(self) -> None:
+        for fragment in (
+            "上游变化是新的采用事务",
+            "没有自动同步、定期合并或无审计升级通道",
+            "选择拒绝、机制借鉴、局部移植或兼容适配器升级",
+            "不能用长期合并分支",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_delivery_layers_do_not_impersonate_each_other(self) -> None:
+        for fragment in (
+            "源码独立",
+            "默认测试",
+            "普通构建",
+            "原生或生成产物",
+            "当前实例采用",
+            "打包与发布",
+            "让相应层保持未验证或受阻",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_powershell_probe_failure_cannot_become_zero_findings(self) -> None:
+        for fragment in (
+            "PowerShell 证据不能由最后一条语句代替",
+            "$ErrorActionPreference = \"Stop\"",
+            "不能依赖整个脚本最后的 `$?`、`$LASTEXITCODE`",
+            "只能在产生这些事实的权威查询已经独立成功后",
+            "对应事实保持未知",
+            "而不是零",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
+
+    def test_public_description_exposes_both_behaviors(self) -> None:
+        for fragment in (
+            "运行时依赖、源码分叉、兼容适配器和只借鉴机制",
+            "后续上游变化作为新的候选人工审计",
+            "从这个 CLI 的源码起步做成独立产品",
+            "PowerShell 中一组语句最后成功",
+            "后续打印出“0”",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
+    def test_skill_main_file_stays_within_budget(self) -> None:
+        self.assertLessEqual(len(SKILL_TEXT.splitlines()), 220)
+        self.assertLessEqual(len(SKILL_TEXT), 14_000)
+
+
+if __name__ == "__main__":
+    unittest.main()

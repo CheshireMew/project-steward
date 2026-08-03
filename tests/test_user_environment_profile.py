@@ -35,6 +35,17 @@ def run_profile(
     )
 
 
+def existing_non_system_root() -> Path | None:
+    if os.name != "nt":
+        return None
+    system_drive = os.environ.get("SystemDrive", "C:").rstrip("\\/").lower()
+    for letter in "DEFGHIJKLMNOPQRSTUVWXYZ":
+        root = Path(f"{letter}:\\")
+        if root.is_dir() and f"{letter}:".lower() != system_drive:
+            return root
+    return None
+
+
 class UserEnvironmentProfileTests(unittest.TestCase):
     def test_plan_is_read_only(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -195,6 +206,74 @@ class UserEnvironmentProfileTests(unittest.TestCase):
             )
             self.assertEqual(2, completed.returncode)
             self.assertIn("profile.unexpected is not allowed", completed.stderr)
+
+    def test_large_content_policy_uses_real_profile_and_storage_consumer(
+        self,
+    ) -> None:
+        storage_root = existing_non_system_root()
+        if storage_root is None:
+            self.skipTest("no existing non-system Windows drive is available")
+
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary) / "environment-profile.json"
+            applied = run_profile(
+                "apply",
+                "--profile",
+                str(profile),
+                "--avoid-system-drive-for-large-content",
+                "--large-content-root",
+                f"media={storage_root}",
+                "--write",
+            )
+            self.assertTrue(json.loads(applied.stdout)["written"])
+
+            inspected = json.loads(
+                run_profile("inspect", "--profile", str(profile)).stdout
+            )
+            policy = inspected["preferences"]["large_content_storage"]
+            self.assertTrue(policy["avoid_system_drive"])
+
+            verified = json.loads(
+                run_profile("verify", "--profile", str(profile)).stdout
+            )
+            self.assertTrue(verified["valid"], verified["issues"])
+
+            resolved = json.loads(
+                run_profile(
+                    "resolve-storage",
+                    "--profile",
+                    str(profile),
+                    "--category",
+                    "media",
+                ).stdout
+            )
+            self.assertEqual(
+                os.path.normcase(str(storage_root.resolve())),
+                os.path.normcase(str(Path(resolved["root"]).resolve())),
+            )
+            self.assertTrue(resolved["policy"]["avoid_system_drive"])
+
+    def test_large_content_policy_rejects_a_system_drive_root(self) -> None:
+        if os.name != "nt":
+            self.skipTest("system-drive policy is a Windows volume boundary")
+        system_root = Path(os.environ.get("SystemDrive", "C:")) / "\\"
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary) / "environment-profile.json"
+            completed = run_profile(
+                "plan",
+                "--profile",
+                str(profile),
+                "--avoid-system-drive-for-large-content",
+                "--large-content-root",
+                f"generated-output={system_root}",
+                check=False,
+            )
+            self.assertEqual(2, completed.returncode)
+            self.assertIn(
+                "large content roots conflict with the system-drive avoidance policy",
+                completed.stderr,
+            )
+            self.assertFalse(profile.exists())
 
 
 if __name__ == "__main__":

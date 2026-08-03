@@ -15,7 +15,7 @@ HERO_PATH = SKILL_ROOT / "assets" / "readme" / "hero.svg"
 
 
 class ReadmeContentGovernanceTests(unittest.TestCase):
-    def test_main_router_owns_the_public_reader_contract(self) -> None:
+    def test_content_method_owns_the_public_reader_contract(self) -> None:
         for field in (
             "第一采用读者：",
             "首页读者变化：",
@@ -30,41 +30,45 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "公开事实与合格材料：",
         ):
             with self.subTest(field=field):
-                self.assertIn(field, SKILL_TEXT)
+                self.assertIn(field, CONTENT_TEXT)
 
         self.assertIn(
             "项目同时面向普通使用者和技术维护者时",
-            SKILL_TEXT,
+            CONTENT_TEXT,
         )
         self.assertIn(
             "第一次真实使用本身要求技术知识时",
-            SKILL_TEXT,
+            CONTENT_TEXT,
         )
         self.assertIn(
             "项目真实入口、输入、输出和停止位置共同确定项目本体",
-            SKILL_TEXT,
+            CONTENT_TEXT,
         )
-        self.assertIn("宿主元数据只证明相应适配、展示或分发入口存在", SKILL_TEXT)
-        self.assertIn("不能单独把通用项目缩窄为该宿主专用", SKILL_TEXT)
+        self.assertIn("references/content-architecture.md", SKILL_TEXT)
+        self.assertIn("宿主元数据只用于发现相关事实", CONTENT_TEXT)
+        self.assertIn("不用宿主名称重选项目本体", CONTENT_TEXT)
         self.assertIn(
-            "公开首层先兑现一个首页读者变化",
-            SKILL_TEXT,
+            "首层先兑现首页读者变化",
+            CONTENT_TEXT,
         )
         self.assertIn(
-            "动作差异写成“条件 → 动作 → 交付 → 停止位置”",
-            SKILL_TEXT,
+            "动作分支写成“条件 → 动作 → 交付 → 停止位置”",
+            CONTENT_TEXT,
         )
-        source_index = SKILL_TEXT.index("先建立公开事实与材料资格")
-        reader_index = SKILL_TEXT.index("随后使用已经核定的当前项目事实")
-        content_index = SKILL_TEXT.index("references/content-architecture.md")
-        visual_index = SKILL_TEXT.index("建立视觉证据合同")
+        source_index = CONTENT_TEXT.index("先建立公开事实与材料资格")
+        reader_index = CONTENT_TEXT.index("随后使用已经核定的当前项目事实")
+        readme_route = SKILL_TEXT.split("## README 与主页", 1)[1].split(
+            "## 许可证治理",
+            1,
+        )[0]
+        content_index = readme_route.index("references/content-architecture.md")
+        visual_index = readme_route.index("references/visual-direction.md")
         self.assertLess(source_index, reader_index)
-        self.assertLess(reader_index, content_index)
         self.assertLess(content_index, visual_index)
 
     def test_content_method_separates_adoption_operation_and_maintenance(self) -> None:
-        self.assertIn("消费上层已经确定的项目身份、宿主角色、材料资格", CONTENT_TEXT)
-        self.assertIn("不重新选择第一采用读者、项目身份、宿主角色或候选材料资格", CONTENT_TEXT)
+        self.assertIn("统一核定项目身份、宿主角色、材料资格、公开读者合同", CONTENT_TEXT)
+        self.assertIn("不决定视觉风格", CONTENT_TEXT)
         for layer in ("采用层材料", "操作层材料", "维护层材料"):
             with self.subTest(layer=layer):
                 self.assertIn(layer, CONTENT_TEXT)
@@ -103,11 +107,11 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "过时或未验证的图不进入公开内容",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, SKILL_TEXT + CONTENT_TEXT)
+                self.assertIn(fragment, CONTENT_TEXT)
 
         self.assertLess(
-            SKILL_TEXT.index("先建立公开事实与材料资格"),
-            SKILL_TEXT.index("随后使用已经核定的当前项目事实"),
+            CONTENT_TEXT.index("先建立公开事实与材料资格"),
+            CONTENT_TEXT.index("随后使用已经核定的当前项目事实"),
         )
 
     def test_content_method_turns_reader_change_into_written_sections(self) -> None:

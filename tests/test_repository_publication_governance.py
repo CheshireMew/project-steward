@@ -8,6 +8,7 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 PUBLICATION_TEXT = (
     SKILL_ROOT / "references" / "repository-publication.md"
 ).read_text(encoding="utf-8")
+README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 
 
 class RepositoryPublicationGovernanceTests(unittest.TestCase):
@@ -69,6 +70,65 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_local_commits_and_remote_state_are_reported_separately(self) -> None:
+        for fragment in (
+            "本地提交与远端状态分层交付",
+            "未推送提交会从多少变为多少",
+            "已有提交与新提交分别服务哪个获准结果",
+            "准确提交集合",
+            "工作区与索引：",
+            "本地分支、本轮新增提交及各自用途：",
+            "相对上游的 ahead / behind：",
+            "远端分支与 HEAD 的实际核对：",
+            "尚未执行或尚未验证的推送、打包、部署与远端检查：",
+            "不能先笼统宣称“都做完了”",
+            "用户只授权提交时明确说明远端没有变化",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
+        for fragment in (
+            "不会把“产品修改完成”“已提交到本地分支”“已推送到远端分支”和“远端结果已经验证”混成一句完成",
+            "相对上游的 ahead / behind",
+            "一次推送会连同此前提交一起进入远端",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
+    def test_entangled_worktree_does_not_expand_publication_authority(
+        self,
+    ) -> None:
+        for fragment in (
+            "混合工作树先求获准依赖闭包",
+            "从本次获准的用户结果开始",
+            "最小依赖闭包",
+            "只证明它属于技术闭包",
+            "不会让用户原有或来源不明的改动自动获得暂存与发布授权",
+            "完整工作树一起通过测试也只能证明组合兼容",
+            "立即在暂存前停止",
+            "不能把整个脏工作树改称“当前整合状态”来绕过确认",
+            "不能因为拆分困难就执行 `git add -A`",
+            "明确授权整个工作树",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
+    def test_multi_root_results_publish_each_root_independently(self) -> None:
+        for fragment in (
+            "跨项目根的发布状态分别成立",
+            "普通目录、Git 仓库、已提交、已推送和远端已验证",
+            "发布候选只属于当前获准发布的准确项目根",
+            "不能自动让那个根的文件获得暂存、提交或推送授权",
+            "项目根 A 已推送、项目根 B 仍是普通目录或只有本地修改",
+            "必须先把准确目标根与它的候选范围对应起来",
+            "正式消费者测试不能静默读取相邻项目的绝对路径",
+            "不能用该测试在当前开发机通过",
+            "跨项目链已通过",
+            "不能把两项拼成更高层结论",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
     def test_final_candidate_evidence_follows_affected_consumers(
         self,
     ) -> None:
@@ -119,6 +179,24 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "优先重跑原失败检查、受修复影响的消费者和必要用户链",
             "测试收集、共享夹具、全局配置、公共边界",
             "不能为了得到一份整齐的新日志而丢弃仍然有效的昂贵证据",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
+    def test_single_root_history_replacement_is_a_conditional_transaction(
+        self,
+    ) -> None:
+        for fragment in (
+            "有意重建为单一根提交",
+            "普通的“提交”“推送”或含糊的“继续”不授权改写历史",
+            "旧本地分支引用",
+            "已观测远端分支 SHA",
+            "父提交为空和提交数为 1",
+            "`--force-with-lease=<branch>:<observed-sha>`",
+            "远端发生变化，立即中止",
+            "推送后必须重新获取远端",
+            "禁止路径或应归档内容未进入新树",
+            "当前用户结果依赖的远端检查已经完成",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
