@@ -67,6 +67,8 @@ Project Steward 自我进化时必须执行主文件约束：
 
 - 持久操作、恢复、重启或成组产物：`references/durable-operation-governance.md`
 - 任务状态、进度或自动续跑：`references/task-progress-governance.md`
+- 高成本结果需要分阶段展示、确认、连续自动执行或按上游变化失效：`references/staged-result-governance.md`
+- 派生产物、语义缓存、工作单元切分、资源池利用或重复 Agent 编排：`references/derived-artifact-governance.md`
 - 运行中配置会重建共享服务、provider、存储根或组合图：`references/runtime-generation-governance.md`
 - 难复现、时序、并发、背压或昂贵完整链：`references/hard-to-reproduce-diagnostics.md`
 - 外部、持久化、模型或进程 JSON 存在多处解析或合同歧义：`references/structured-data-boundary.md`
@@ -82,6 +84,8 @@ Project Steward 自我进化时必须执行主文件约束：
 
 - 持久操作或恢复：`references/durable-operation-governance.md`
 - 任务进度或持续状态：`references/task-progress-governance.md`
+- 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
+- 返工来自全量重算、错误缓存失效、危险切分、资源误判或编排往返：`references/derived-artifact-governance.md`
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
 - 结构化 JSON 的编码、资源预算、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
