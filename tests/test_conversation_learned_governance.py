@@ -271,6 +271,83 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
+    def test_comprehensive_audit_covers_every_applicable_project_dimension(
+        self,
+    ) -> None:
+        coverage_fragments = (
+            "先建立维度覆盖账本",
+            "不能从已经发现的问题反推审查范围",
+            "产品定位与用户结果",
+            "功能与缺陷",
+            "代码质量",
+            "架构、内聚与重复",
+            "数据、持久化与生命周期",
+            "界面视觉",
+            "交互与完整用户旅程",
+            "无障碍、键盘与国际化",
+            "性能、资源与规模",
+            "兼容性与环境",
+            "构建、测试与 CI",
+            "安装、升级与发布",
+            "日志与诊断",
+            "文档、示例与许可证",
+            "外部集成、隐私与安全边界",
+            "覆盖状态：已审查 / 部分审查 / 未审查 / 不适用",
+            "暂时无法运行、没有安装依赖或没有取得账号",
+            "覆盖账本和问题账本是两个结果",
+        )
+        for fragment in coverage_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_AUDIT_TEXT)
+
+        coverage = PROJECT_AUDIT_TEXT.index("## 0. 先建立维度覆盖账本")
+        findings = PROJECT_AUDIT_TEXT.index("综合审计必须交付修复交接账本")
+        self.assertLess(coverage, findings)
+        self.assertNotIn("做轻量健康检查", PROJECT_AUDIT_TEXT)
+
+        audit_route = MAIN_TEXT.split("## 项目综合审计", 1)[1].split(
+            "## 平台模板资源",
+            1,
+        )[0]
+        for fragment in (
+            "全部适用维度的覆盖账本",
+            "不得只根据已经发现的问题回填审查范围",
+        ):
+            with self.subTest(route_fragment=fragment):
+                self.assertIn(fragment, audit_route)
+
+        for fragment in (
+            "全面审计会先建立维度覆盖账本，再建立问题账本",
+            "GUI 项目也不会再把界面和体验降级成轻量抽查",
+            "只有全部适用维度均已审查",
+        ):
+            with self.subTest(readme_fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
+    def test_comprehensive_ui_audit_uses_surface_and_journey_inventories(
+        self,
+    ) -> None:
+        ui_section = PROJECT_AUDIT_TEXT.split(
+            "## 7. 审计用户界面与完整体验",
+            1,
+        )[1].split("## 8. 审计性能、资源与规模", 1)[0]
+        for fragment in (
+            "product-experience-governance.md",
+            "ux-design.md",
+            "interface-experience-quality.md",
+            "implementation-review.md",
+            "后端、CLI 和库项目不检查不存在的 GUI",
+            "仍审计各自真实入口的可发现性、反馈、错误理解和完整用户旅程",
+            "全部窗口、页面、延迟面板、菜单、对话框、覆盖层",
+            "从首次启动到核心结果建立用户旅程清单",
+            "初始、空、加载、进行中、成功、失败、禁用、离线、取消和恢复状态",
+            "鼠标、触摸、键盘、快捷键和焦点顺序",
+            "截图必须实际打开并按目标显示比例检查",
+            "只能标为部分审查或未审查",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, ui_section)
+
     def test_learning_layers_common_paths_and_special_dimensions(self) -> None:
         for fragment in (
             "这不是分类时的二选一",

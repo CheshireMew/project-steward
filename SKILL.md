@@ -153,7 +153,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## 项目综合审计
 
-读取 `references/project-audit.md`。根据发现再加载相应专项；只读审计不自动治理。需要评估用户效果时追加 `references/project-effectiveness-review.md`，需要检查任务体验时追加 `references/task-experience-audit.md`。
+读取 `references/project-audit.md`。先按项目形态建立全部适用维度的覆盖账本，再加载这些维度要求的专项；不得只根据已经发现的问题回填审查范围。只读审计不自动治理。需要评估用户效果时追加 `references/project-effectiveness-review.md`，需要检查任务体验时追加 `references/task-experience-audit.md`。
 
 ## 平台模板资源
 
