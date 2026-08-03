@@ -105,6 +105,31 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
 
+    def test_adapter_owns_the_complete_argument_vector(self) -> None:
+        for fragment in (
+            "启动参数由适配器完整拥有",
+            "完整命令字符串和原始参数数组不属于用户配置",
+            "不能在这份参数之后继续拼接自由文本",
+            "不能借“高级参数”恢复第二个命令行真源",
+            "重复参数、位置敏感参数、短长别名",
+            "只检查安全参数“曾经出现”不能证明",
+            "无法可靠计算或拒绝覆盖关系时，不启动进程",
+            "设置界面、运行时调用、文档、示例和测试",
+            "退出旧字段、字符串解析器、参数清洗器和兼容恢复",
+            "操作系统实际收到的参数顺序",
+            "用重复或后置覆盖参数证明产品会在启动前拒绝",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, COMPATIBILITY_TEXT)
+
+        for fragment in (
+            "不能通过完整命令字符串、原始参数数组或“高级参数”",
+            "操作系统实际收到的参数顺序与最终有效值",
+            "覆盖会在启动前被拒绝",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
     def test_capabilities_require_enforceable_isolation_and_default_closed(
         self,
     ) -> None:

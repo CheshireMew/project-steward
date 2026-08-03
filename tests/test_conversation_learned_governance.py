@@ -1557,6 +1557,41 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
 
         self.assertIn("销毁后访问、过期回调和延迟写入", README_TEXT)
 
+    def test_desktop_blocking_work_preserves_event_loop_and_result_identity(
+        self,
+    ) -> None:
+        for fragment in (
+            "界面线程与后台工作",
+            "文件遍历、复制与大文件读写、网络和 provider 调用",
+            "只有用代表性数据测得明确上界",
+            "不能用开发机上“通常很快”",
+            "操作身份、generation、输入内容身份、目标对象",
+            "取消发生在任务开始前时不能创建工作目录",
+            "不能触碰其它任务或用户已有文件",
+            "框架规定只能由界面线程创建、转换或释放",
+            "不 mock 掉正在验证的慢生产者",
+            "在后台任务终态之前已经被事件循环处理",
+            "正常完成、被新 generation 替代、取消以及关闭目标",
+            "只断言工作线程已创建、处理器很快返回",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DESKTOP_TEXT)
+
+        for fragment in (
+            "外部 CLI 是否允许配置完整命令字符串或原始 argv",
+            "界面事件处理器是否同步执行随输入增长的文件、网络、provider、媒体、进程或序列化工作",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_AUDIT_TEXT)
+
+        for fragment in (
+            "事件处理器不会同步承担随输入增长的文件遍历与复制",
+            "在任务完成前证明事件循环已经处理另一项无冲突操作",
+            "覆盖完成、替代、取消和关闭排空",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
     def test_desktop_runtime_smoke_enumerates_lazy_surfaces_and_uses_fresh_process(
         self,
     ) -> None:
