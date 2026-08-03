@@ -634,6 +634,32 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
 
         self.assertIn("参考产品里的功能不会因为有独立页面", README_TEXT)
 
+    def test_long_ordered_content_separates_access_intents_before_replacement(
+        self,
+    ) -> None:
+        for fragment in (
+            "长期有序内容先拆分访问意图",
+            "连续追溯、定点跳转、查询与筛选以及人为分组",
+            "不能因为新增一种访问方式就静默退出另一种",
+            "目标平台上的自然输入与即时反馈",
+            "首次用户可发现的备用入口",
+            "哪些入口共享同一结果，哪些必须并存",
+            "现有入口的保留、移动或退出依据",
+            "只有用户结果已经明确退出",
+            "后台复用同一查询或新入口看起来更强",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, UX_DESIGN_TEXT)
+
+        for fragment in (
+            "连续追溯、定点跳转、查询筛选和人为分组",
+            "不会静默删掉原有的连续浏览结果",
+            "平台自然输入、可发现的备用入口",
+            "都不能单独证明旧入口可以退出",
+        ):
+            with self.subTest(readme_fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
     def test_design_selects_the_object_presentation_archetype_before_styling(
         self,
     ) -> None:
@@ -2211,6 +2237,36 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "结果阶段证明产物已经可用",
         ):
             with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
+    def test_full_record_and_bounded_model_context_have_distinct_owners(
+        self,
+    ) -> None:
+        for fragment in (
+            "完整记录与模型上下文是两个边界",
+            "完整持久记录、界面查看投影、模型上下文组装结果和 provider 最终线请求",
+            "不能因为模型窗口有限就先截断持久记录",
+            "上下文组装策略与输入预算",
+            "近期原始回合、可追溯的连续性摘要和相关召回",
+            "每项上下文片段的来源身份、原始角色、顺序、覆盖范围与版本",
+            "摘要必须保留来源或覆盖范围",
+            "界面滚动、跳转、搜索或筛选默认只改变查看位置",
+            "裁剪、摘要、召回或组装失败",
+            "不能删除、覆盖或重新解释完整记录",
+            "正式记录生产者提交超过单次输入预算的有序记录",
+            "不能手写已经裁剪好的 context pack",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, MODEL_OPERATION_TEXT)
+
+        for fragment in (
+            "长期记录可以完整保存",
+            "界面查看位置、上下文组装策略和 provider 最终线请求",
+            "不会暗中裁剪下一次模型输入",
+            "不会删除、覆盖或重新解释完整记录",
+            "provider 实际只收到符合预算的可追溯投影",
+        ):
+            with self.subTest(readme_fragment=fragment):
                 self.assertIn(fragment, README_TEXT)
 
     def test_editable_settings_prove_real_capability_to_runtime_effect(self) -> None:
