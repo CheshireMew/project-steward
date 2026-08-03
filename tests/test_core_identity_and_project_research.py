@@ -124,6 +124,22 @@ class CoreIdentityTests(unittest.TestCase):
             research_section,
         )
 
+    def test_validation_depth_follows_change_risk(self) -> None:
+        common_boundaries = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
+            1,
+        )[0]
+        for fragment in (
+            "验证按改动风险选择层级",
+            "直接覆盖本次改动和验收主张的目标检查",
+            "文档、许可证、致谢或纯元数据",
+            "不启动无关浏览器或端到端链路",
+            "公共合同、核心运行时、跨仓库边界、发布",
+            "才升级为完整回归和真实用户链",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, common_boundaries)
+
     def test_metadata_and_first_use_expose_the_core_route(self) -> None:
         self.assertIn(
             "从完整项目过程持续学习，并治理架构、持久操作、用户环境、仓库研究与发布链路",
