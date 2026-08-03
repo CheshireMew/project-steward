@@ -1610,6 +1610,41 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertIn("桌面 smoke 会先列出主窗口", README_TEXT)
         self.assertIn("测试套件残留的全局状态", README_TEXT)
 
+    def test_desktop_visual_materials_are_adopted_only_when_runtime_fit_is_proven(
+        self,
+    ) -> None:
+        for fragment in (
+            "先把结构、信息层级和互动机制与视觉表面分开",
+            "不是“更现代”的默认皮肤",
+            "实际任务密度、背景变化、目标 Windows 合成能力、QML 渲染路径",
+            "高密度编辑器、长时间阅读区、参数面板",
+            "稳定不透明表面",
+            "目标硬件的真实 Windows 合成与 QML 渲染链",
+            "稳定不透明回退",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DESKTOP_TEXT)
+
+        self.assertIn("不会被直接当成 Windows/QML 应用的默认风格", README_TEXT)
+        self.assertIn("高密度编辑工作区默认保持稳定不透明", README_TEXT)
+
+    def test_desktop_validation_separates_offscreen_and_native_windows_evidence(
+        self,
+    ) -> None:
+        for fragment in (
+            "离屏或 headless 环境用于验证组件能够创建",
+            "窗口管理器、系统标题栏、最大化与最小化",
+            "DPI 与多显示器迁移、系统背景材质或 Windows 合成器行为",
+            "真实 Windows 桌面会话和实际窗口",
+            "不修改产品来迁就测试驱动",
+            "两层分别建立证据",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DESKTOP_TEXT)
+
+        self.assertIn("分开离屏或 headless 与真实 Windows 会话", README_TEXT)
+        self.assertIn("隔离实机检查", README_TEXT)
+
     def test_native_runtime_supply_and_process_isolation_are_governed(
         self,
     ) -> None:
@@ -1953,6 +1988,21 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
 
         self.assertIn("只迁入用户实际点名的关系", README_TEXT)
         self.assertIn("不从同批其它图片或偶然生成结果补造设定", README_TEXT)
+
+    def test_visual_evidence_is_opened_and_reviewed_at_target_scale(
+        self,
+    ) -> None:
+        for fragment in (
+            "实际打开、解码并在目标显示比例下查看",
+            "文件存在、路径可读、数量正确、尺寸符合或捕获命令成功",
+            "信息层级、内容密度、裁切、对比度、焦点与状态表达",
+            "可见结论保持未知",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, IMPLEMENTATION_TEXT)
+
+        self.assertIn("不会停在“截图文件已经生成”", README_TEXT)
+        self.assertIn("没有看到目标画面时，视觉结论保持未知", README_TEXT)
 
     def test_editable_visual_deliverables_and_scene_graph_transforms_are_governed(
         self,
@@ -2456,6 +2506,27 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
         self.assertIn("等待公开的释放完成或失败状态", README_TEXT)
+
+    def test_migrations_preflight_identities_before_expensive_full_regression(
+        self,
+    ) -> None:
+        for fragment in (
+            "迁移先预检，再进入昂贵全量回归",
+            "在第一次昂贵全量测试前",
+            "硬编码旧版本或旧操作身份",
+            "模型或列表角色",
+            "国际化生成输出",
+            "测试框架实际收集的唯一身份",
+            "架构或静态预算",
+            "合同、迁移器、生成链和直接消费者",
+            "冻结相关代码、配置和测试驱动",
+            "只有影响全局、触及其它消费者，或项目规则明确要求时",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        self.assertIn("第一次昂贵全量回归前先预检", README_TEXT)
+        self.assertIn("只有影响全局或项目规则要求时", README_TEXT)
 
     def test_diagnostic_alternatives_do_not_complete_the_normal_entry(self) -> None:
         for fragment in (

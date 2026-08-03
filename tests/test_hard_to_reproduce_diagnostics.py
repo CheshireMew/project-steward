@@ -73,6 +73,23 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(public_behavior=public_behavior):
                 self.assertIn(public_behavior, README_TEXT)
 
+    def test_chronological_latest_uses_a_formal_total_order_under_clock_collision(
+        self,
+    ) -> None:
+        for fragment in (
+            "有限精度时间戳只能记录时间区间，不能单独建立全序",
+            "序列、revision 或事务内单调递增的排序值",
+            "UUID、对象 ID、列表位置",
+            "冻结时钟",
+            "相同时间戳下连续创建多个对象",
+            "存储重开、查询和最终消费者",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
+        self.assertIn("有限精度时间戳不会被当成全序", README_TEXT)
+        self.assertIn("UUID、对象 ID 和列表位置不会被拿来猜时间", README_TEXT)
+
     def test_overlapping_operations_are_correlated_by_producer_identity(
         self,
     ) -> None:
