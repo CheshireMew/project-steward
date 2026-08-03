@@ -1132,6 +1132,35 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertIn("不会让未结项的结构发现自动消失", README_TEXT)
         self.assertIn("不会宣称全部问题已经解决", README_TEXT)
 
+    def test_comprehensive_audit_emits_a_remediation_handoff_ledger(self) -> None:
+        ordered = (
+            "综合审计必须交付修复交接账本",
+            "稳定发现编号与简短标题",
+            "根因及当前唯一责任边界",
+            "受影响的生产者、传输或存储边界、正式消费者与用户结果",
+            "逐项完成条件及必须取得的生产、边界、消费和可观察证据",
+            "本地工作树、本地提交、实时远端、发布制品或其它适用证据平面的独立状态",
+            "当前状态：开放 / 待确认 / 经新证据重新分类 / 经用户明确同意退出范围 / 受阻 / 已解决",
+        )
+        positions = [PROJECT_AUDIT_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不能把某一平面的完成折叠成整个发现已经解决",
+            "不能替代该发现列出的逐项完成证据",
+            "仍有开放或待确认项时不得宣称",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_AUDIT_TEXT)
+
+        for fragment in (
+            "全面审计本身会输出可由后续普通修复任务直接消费的交接账本",
+            "未更新的远端平面自动消失",
+            "不会宣称全部问题已经解决、可合并或可发布",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
     def test_external_workspace_writers_are_gated_before_state_changes(
         self,
     ) -> None:
@@ -2621,6 +2650,37 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
+
+    def test_parent_and_child_builds_share_a_target_effective_identity(self) -> None:
+        ordered = (
+            "跨启动器构建先统一目标有效身份",
+            "源码与锁定依赖的内容身份",
+            "目标三元组",
+            "构建 profile",
+            "feature 集",
+            "目标实际选择的编译器、链接器、归档器、平台 SDK 或 API",
+            "父入口、包装器和实际构建子进程分别记录规范化后的身份清单",
+            "目标名称相同、输出目录相同、缓存已经存在",
+            "后续子进程选择同一目标有效身份",
+            "正式消费者读取与该身份绑定的同一产物内容",
+        )
+        positions = [USER_ENVIRONMENT_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "在再次启动昂贵构建前定位第一个分歧的交接边界",
+            "同一身份已复用 / 不同身份独立构建 / 状态未知",
+            "项目专属值继续由项目配置或本轮执行合同保存",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
+
+        for fragment in (
+            "目标名称相同或缓存存在不是复用证据",
+            "后续子进程选择同一身份并让最终消费者读取对应产物才是",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
 
     def test_product_successor_identity_separates_public_and_technical_names(
         self,
