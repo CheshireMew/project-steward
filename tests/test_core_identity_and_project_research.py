@@ -130,11 +130,11 @@ class CoreIdentityTests(unittest.TestCase):
             AGENT_TEXT,
         )
         self.assertIn(
-            "使用 $project-steward 阅读这个会话",
+            "使用 $project-steward 完整研究这个开源代码项目",
             AGENT_TEXT,
         )
-        self.assertIn("让 Project Steward 的可复用治理能力自我进化", AGENT_TEXT)
-        self.assertIn("项目专属事实继续留在项目原有真源", AGENT_TEXT)
+        self.assertIn("判断值得吸收的能力、原始上游和复用关系", AGENT_TEXT)
+        self.assertIn("明确要求时再自我进化", AGENT_TEXT)
         self.assertNotIn("综合审计", AGENT_TEXT)
 
         first_use = README_TEXT.split(

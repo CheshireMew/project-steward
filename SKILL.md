@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从项目对话、成功结果、用户纠正和完整实施过程中按多个用户结果提炼可迁移治理能力，判断目标 Skill 的职能是否过窄、过宽或适当，并在用户明确要求时让 Project Steward 自我进化；在功能、重构或迁移前主动预防，在缺陷后沿根因完成跨层治理，审计和治理外部 CLI、执行工具与协议兼容性，治理跨重启持久操作，并专项检查高内聚低耦合、重复实现和上帝模块；同时建立和消费用户环境档案，按需讲解仓库、重写 README、治理日志，以及处理项目模板、产品体验、许可证和仓库发布。Use when the user asks to learn from complete project conversations and process evidence, infer whether a target Skill or capability role is too narrow or broad, improve reusable governance behavior, establish or use a user environment profile, prevent recurring problems, audit or govern compatibility with external CLIs, execution tools, and protocols, govern durable operations across failure and restart, diagnose or remediate cross-layer defects, audit cohesion, coupling, semantic duplication or god modules, understand a repository, redesign a README, improve logs, evolve templates, govern product experience or licensing, publish a repository, or perform a project-wide audit; not for isolated implementation, explaining a single function, security-only review, dependency or CI-only work, or monitoring without a project-wide governance result."
+description: "从完整项目过程提炼可迁移治理能力，并在明确要求时让 Project Steward 自我进化；完整研究和学习开源代码项目，判断值得吸收的能力、直接复用边界、README 致谢与许可证责任；在改动前预防返工，在缺陷后沿根因完成跨层治理，并审计外部 CLI、持久操作、内聚耦合、重复和上帝模块；同时处理用户环境档案、项目讲解、README、日志、模板、产品体验、许可证和仓库发布。Use when the user asks to learn from project history, evolve Project Steward, understand a repository or study an open-source codebase, decide what to adopt, govern direct code or resource reuse and attribution, prevent change failures, remediate cross-layer defects, audit or govern compatibility with external CLIs, execution tools, and protocols, durable operations, cohesion, coupling, duplication or god modules, user environment, README, logging, templates, product experience, licensing, publication, or project-wide health; not for isolated implementation, a single-function explanation, security-only review, dependency or CI-only work, or monitoring without a project-wide result."
 ---
 
 # Project Steward
@@ -100,7 +100,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## 项目研究与讲解
 
-先读取 `references/project-research.md`。只读取回答当前问题所需的项目表面；用户明确要求完整研究或能力采用时才扩展覆盖。需要衡量效果、失败样本和置信度时读取 `references/project-effectiveness-review.md`；需要保存可复核报告时读取 `references/project-research-report.md`。源码归档先用 `scripts/extract_project_archive.ps1` 和 -DestinationRoot <目标根> 解压到独立目录；没有另行指定目标根时使用 E:\Work\BaiduSyncdisk\Code\Example，再从脚本返回的项目根研究。
+先读取 `references/project-research.md`。只读取回答当前问题所需的项目表面；用户明确要求完整研究或能力采用时才扩展覆盖，并同时读取 `references/source-fork-and-ecosystem-adoption.md`，先追溯原始上游并区分直接复用与方法学习；确认会直接复用代码或资源时再读取 `references/license-governance.md`，把第三方资源与致谢写入目标项目 README。需要衡量效果、失败样本和置信度时读取 `references/project-effectiveness-review.md`；需要保存可复核报告时读取 `references/project-research-report.md`。源码归档先用 `scripts/extract_project_archive.ps1` 和 -DestinationRoot <目标根> 解压到独立目录；没有另行指定目标根时使用 E:\Work\BaiduSyncdisk\Code\Example，再从脚本返回的项目根研究。
 
 ## 项目基线与模板
 

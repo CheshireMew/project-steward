@@ -13,6 +13,8 @@ def read(relative: str) -> str:
 
 SKILL_TEXT = read("SKILL.md")
 FORK_TEXT = read("references/source-fork-and-ecosystem-adoption.md")
+PROJECT_RESEARCH_TEXT = read("references/project-research.md")
+LICENSE_TEXT = read("references/license-governance.md")
 USER_ENVIRONMENT_TEXT = read("references/user-environment-governance.md")
 README_TEXT = read("README.md")
 
@@ -36,6 +38,29 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, FORK_TEXT)
+
+    def test_direct_reuse_and_method_learning_have_different_attribution(self) -> None:
+        for fragment in (
+            "### 原始上游、fork 与 README 致谢",
+            "实际采用 fork 的独有改动",
+            "直接复用或改编后再分发",
+            "方法学习后的独立实现",
+            "目标根 README 必须增加或更新“第三方资源与致谢”",
+            "没有复制来源 IP、代码、资源、示例",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+        self.assertIn("追溯原始上游并区分直接复用与方法学习", SKILL_TEXT)
+        self.assertIn("实际拟采用内容来自哪一层", PROJECT_RESEARCH_TEXT)
+        self.assertIn("README 必须包含“第三方资源与致谢”", LICENSE_TEXT)
+        self.assertIn("不能把来源写成目标正在使用的第三方依赖", LICENSE_TEXT)
+
+    def test_a_fork_never_replaces_the_canonical_upstream(self) -> None:
+        for text in (FORK_TEXT, LICENSE_TEXT, README_TEXT):
+            with self.subTest(source=text[:40]):
+                self.assertIn("原始上游", text)
+                self.assertIn("fork", text)
 
     def test_independent_product_owns_identity_state_and_updates(self) -> None:
         for fragment in (
@@ -120,11 +145,19 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
 
     def test_public_description_exposes_both_behaviors(self) -> None:
         for fragment in (
-            "运行时依赖、源码分叉、兼容适配器和只借鉴机制",
+            "运行时依赖、源码分叉、兼容适配器、直接资源复用和只借鉴机制",
             "后续上游变化作为新的候选人工审计",
             "从这个 CLI 的源码起步做成独立产品",
             "PowerShell 中一组语句最后成功",
             "后续打印出“0”",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
+        for fragment in (
+            "直接复用或改编后再分发的代码与资源",
+            "只学习视觉锚点、核心动作、工作流或反复刻方法并独立实现",
+            "只有确实采用 fork 的独有改动才另列 fork",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, README_TEXT)
