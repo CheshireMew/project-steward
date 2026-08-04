@@ -2501,6 +2501,49 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, README_TEXT)
 
+    def test_settings_have_scoped_targets_and_one_atomic_commit(self) -> None:
+        for fragment in (
+            "从用户点名的稳定设置身份推导准确目标集合",
+            "未选中的同级路由、provider 或设备设置基线",
+            "不能通过遍历全部同级项来猜测修改范围",
+            "兄弟路由必须保持逐字段不变",
+            "一个配置事务或一次持久提交",
+            "旧的持久状态和活动状态都保持可用",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        self.assertIn("设置或维护工具越过唯一写入边界", REMEDIATION_TEXT)
+        self.assertIn("一次动作只修改它准确选择的目标", README_TEXT)
+        self.assertIn("全部目标通过一次配置提交发布", README_TEXT)
+
+    def test_realtime_sessions_wait_for_authority_and_publish_truthful_capabilities(
+        self,
+    ) -> None:
+        for fragment in (
+            "实时连接先建立权威身份与可调用状态",
+            "传输已经连接与领域已经就绪的不同里程碑",
+            "首次连接、重新连接与显式 reset",
+            "configured、process online、endpoint reachable、callable",
+            "客户端默认值、`0`、缓存身份",
+            "队列清空只能消费已确认的当前身份",
+            "隐藏这些活动入口",
+            "旧 generation 迟到消息",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        for fragment in (
+            "连接已经打开但交互尚未就绪",
+            "握手前清空队列",
+            "哪个生产者提前发布了更强状态",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
+        self.assertIn("客户端收到当前身份后才释放排队请求", README_TEXT)
+        self.assertIn("只有准确路由及其依赖确实就绪时才公开调用 URL", README_TEXT)
+
     def test_model_call_graph_is_minimal_and_executor_context_isolated(
         self,
     ) -> None:
@@ -2590,6 +2633,30 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, README_TEXT)
 
         self.assertNotIn("20 轮", LOG_TEXT)
+
+    def test_memory_recall_and_maintenance_share_formal_domain_boundaries(
+        self,
+    ) -> None:
+        for fragment in (
+            "召回触发与维护写入边界",
+            "不能以短期对话历史非空作为前置条件",
+            "应用首次连接后的第一轮",
+            "显式 reset 后的第一轮",
+            "重新连接后的第一轮",
+            "不是第二个写入者",
+            "与正常整理器相同的类型化领域命令",
+            "不能直接调用存储 driver、写表、改索引",
+            "维护表面保持只读",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LOG_TEXT)
+
+        self.assertIn(
+            "长期记忆的首轮召回、检查器和维护写入",
+            REMEDIATION_TEXT,
+        )
+        self.assertIn("长期记忆召回不以短期对话历史非空为前提", README_TEXT)
+        self.assertIn("领域层没有相应命令时保持只读", README_TEXT)
 
     def test_recovery_actions_join_or_reject_duplicate_attempts(self) -> None:
         for fragment in (
