@@ -332,7 +332,7 @@ python scripts/inspect_project_tree.py <项目根> --no-sizes
 | “把现有网站迁移到 React，但保留已经满意的界面。” | 把实现迁移与呈现变化分成两份合同，先在相同入口、内容、视口和时序状态证明保护区等价，再实施另行授权的界面改造 |
 | “生成工具有参考图、时长或透明背景限制，怎样安排网站素材？” | 先记录工具当前真实能力和不稳定项，再选择直接静态、视频取帧、可抠像源或批次拆分，并让每个派生物对应准确页面消费者 |
 | “预览是原片不完整，还是界面没有显示全？” | 分开核对源内容、输出契约、渲染表面和布局容器，再用正式媒体完成可见与播放验收 |
-| “把 README 重写给第一次访问的人看。” | 从真实读者、输入、结果和第一步出发重组首页，并按需制作项目原生视觉 |
+| “把 README 重写给第一次访问的人看。” | 从真实读者、输入、结果和第一步出发重组首页，按需制作项目原生视觉；个人仓库需要首屏入口时，从活动配置交付中文、English、日本語以及个人链接和真实仓库状态，不生成失效翻译或手写统计数字 |
 | “让日志变成人真正能看懂的记录，并打印到控制台。” | 从一次真实操作还原事件、上下文和原文，再分别验证控制台、文件、查看器或导出等已承诺落点；开发 stdout 不替原生产物背书 |
 | “记录这台电脑的 Python、Node、Rust、Android 和终端环境。” | 先只读检测和规划，经确认写入用户级档案，再用解析出的真实工具完成消费验证 |
 | “为项目选择并应用许可证。” | 盘点内容与第三方边界，给出方案；确认后写入并核对最终状态 |
@@ -344,6 +344,10 @@ python scripts/inspect_project_tree.py <项目根> --no-sizes
 处理 README 时，Project Steward 会先确认项目身份和公开材料资格，再设计读者路径。通用 Skill 的核心工作流、实际依赖和真实使用方式决定项目身份；`agents/openai.yaml` 一类宿主元数据只说明对应工具中的展示、安装或兼容入口，除非宿主专属能力确实改变了项目能够接受的输入、动作或结果，否则不会把项目写成该宿主专用。
 
 现有 README、内部图片、截图、流程图和生成物只提供候选线索。它们必须能够对应产生时的项目状态、当前活动真源和准备承担的公开职责，才可以进入正文或视觉。用户已经指出过时、版本不明、与当前实现冲突或无法完成对应的材料会退出证据池；文件仍在、图片能打开或结构审计通过，都不会替内容准确性背书。整页重写还会明确选择复用已有、制作新的、排版表达或跳过，并在实际页面中检查读者能否看懂，而不是把“仓库里有图”当作已经完成视觉设计。
+
+个人仓库的 hero 下方可以由一份活动配置生成首屏辅助区。当前配置位于 [`assets/readme-profile/profile.json`](./assets/readme-profile/profile.json)：中文 `README.md` 是默认页，英语与日语分别使用 `README.en.md` 和 `README.ja.md`；第二行连接 X、Telegram、博客和个人主页；第三行从目标 GitHub 仓库实时显示 Stars、Forks 与许可证。官网和文档不会作为默认首屏入口。配置只在目标 owner 匹配时使用，缺少翻译文件或许可证时不会留下失效链接；个人偏好、目标仓库身份和动态状态由不同来源负责。
+
+`scripts/readme_header.py` 负责校验配置并从真实仓库身份生成带管理标记的 HTML。完整 README 新写或重写默认同时交付配置中的三种语言；只改现有首屏时不会制造占位翻译。其它徽章只有在真实发布、CI、Discussions 或下载入口会帮助读者判断项目，并且用户确认后才增加；访问计数和代码行数等装饰数字默认不加。
 
 已有界面进入连续修改时，Project Steward 会先区分新建、局部演进、视觉重做、体验重做和结构重做。用户要求返回此前接受的版本时，该版本重新成为唯一视觉基线，被否定方案不会与它混成另一套界面；新增链接、关闭入口或其它功能时，显示标签、用途说明、真实动作、位置、命中和关闭结果分别确认，功能接入本身不授权重做容器。
 
@@ -482,6 +486,15 @@ python -m unittest discover -s tests -v
 python scripts/audit_readme.py README.md
 ```
 
+校验个人配置，或为已经交付三种语言的目标仓库生成与核对首屏辅助区：
+
+```powershell
+python scripts/readme_header.py validate --profile assets/readme-profile/profile.json
+python scripts/readme_header.py render --profile assets/readme-profile/profile.json --repository OWNER/REPOSITORY --language zh-CN --branch main --readme-root <项目根>
+python scripts/readme_header.py verify --profile assets/readme-profile/profile.json --repository OWNER/REPOSITORY --language zh-CN --branch main --readme <项目根>/README.md
+python scripts/audit_readme.py <项目根>/README.md --header-profile assets/readme-profile/profile.json --repository OWNER/REPOSITORY --language zh-CN --branch main
+```
+
 修改模板时同步版本、注册表哈希和消费者测试，并从一个全新的 Skill 外部临时项目完成识别、采用、读取、检查和升级。
 
 ## 仓库中的正式工具
@@ -495,7 +508,8 @@ python scripts/audit_readme.py README.md
 | `scripts/inventory_repository.py` | 盘点本地目录或经 GitHub CLI 授权的仓库范围 |
 | `scripts/inspect_project_tree.py` | 只读盘点项目顶层路径的物理大小、文件数量、Git 跟踪、变化和忽略规则，不代替用途与删除判断 |
 | `scripts/apply_license.py` | 对批准后的许可证方案做预演、写入、发布或验证 |
-| `scripts/audit_readme.py` | 只检查 README 本地图片引用、替代文字和基础 SVG 结构；不判断来源时效、事实准确性或视觉质量 |
+| `scripts/readme_header.py` | 校验个人 README profile，并从语言文件、目标仓库身份和许可证文件生成或核对首屏辅助区 |
+| `scripts/audit_readme.py` | 检查 README 图片引用、替代文字、基础 SVG 结构和可选的 profile 首屏结构；不判断远程端点可用性、来源时效、事实准确性或视觉质量 |
 | `scripts/github_star_history.py` | 读取 GitHub 星标时间戳，生成亮暗主题 SVG，并原子发布到调用仓库的独立输出分支 |
 | `scripts/render_motion_gif.py` | 按运动规格把命名 SVG 图层渲染为 GIF |
 

@@ -136,7 +136,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## README 与主页
 
-先读取 `references/content-architecture.md`；需要表达性视觉时再读取 `references/visual-direction.md`，随后依次读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。按需选择：
+先读取 `references/content-architecture.md`；需要表达性视觉时再读取 `references/visual-direction.md`，随后依次读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时，读取 `assets/readme-profile/profile.json`，并由 `scripts/readme_header.py` 消费目标仓库身份和真实文件生成或核对；profile 不适用、翻译未交付或仓库事实不成立时不生成对应入口。按需选择：
 
 - SVG 与混合视觉：`references/svg-production.md`、`references/hybrid-svg-production.md`
 - 动效：`references/motion-production.md`

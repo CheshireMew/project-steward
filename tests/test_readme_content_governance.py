@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -12,6 +13,12 @@ CONTENT_TEXT = (
 ).read_text(encoding="utf-8")
 README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 HERO_PATH = SKILL_ROOT / "assets" / "readme" / "hero.svg"
+HEADER_PROFILE_PATH = (
+    SKILL_ROOT / "assets" / "readme-profile" / "profile.json"
+)
+HEADER_PROFILE_SCHEMA_PATH = (
+    SKILL_ROOT / "assets" / "readme-profile" / "profile.schema.json"
+)
 
 
 class ReadmeContentGovernanceTests(unittest.TestCase):
@@ -142,6 +149,51 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(excluded_method=excluded_method):
                 self.assertIn(excluded_method, CONTENT_TEXT)
+
+    def test_header_profile_has_one_owner_and_real_content_consumers(self) -> None:
+        for fragment in (
+            "首屏语言、个人入口与仓库状态",
+            "assets/readme-profile/profile.json",
+            "scripts/readme_header.py",
+            "中文、English 和日本語",
+            "X、Telegram、博客和个人主页",
+            "Stars、Forks 与许可证",
+            "不把数字、许可证名称或另一个仓库的 owner/repo 写死",
+            "不创建占位页、自动跳转页或只翻译标题的假版本",
+            "访问计数、代码行数、个人主页浏览量",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CONTENT_TEXT)
+
+        readme_route = SKILL_TEXT.split("## README 与主页", 1)[1].split(
+            "## 许可证治理", 1
+        )[0]
+        self.assertIn("assets/readme-profile/profile.json", readme_route)
+        self.assertIn("scripts/readme_header.py", readme_route)
+
+        profile = json.loads(HEADER_PROFILE_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(1, profile["schema_version"])
+        self.assertEqual(["CheshireMew"], profile["applies_to"]["github_owners"])
+        self.assertEqual(
+            ["zh-CN", "en", "ja"],
+            [language["code"] for language in profile["languages"]],
+        )
+        self.assertTrue(profile["languages"][0]["default"])
+        self.assertEqual(
+            ["x", "telegram", "blog", "homepage"],
+            [link["id"] for link in profile["social_links"]],
+        )
+        self.assertEqual(
+            ["stars", "forks", "license"], profile["repository_badges"]
+        )
+        schema = json.loads(
+            HEADER_PROFILE_SCHEMA_PATH.read_text(encoding="utf-8")
+        )
+        self.assertEqual(1, schema["properties"]["schema_version"]["const"])
+        self.assertEqual(
+            ["stars", "forks", "license"],
+            schema["properties"]["repository_badges"]["items"]["enum"],
+        )
 
     def test_public_readme_opens_with_self_evolution_contract(self) -> None:
         opening = README_TEXT.split("## 三条核心路径", 1)[0]

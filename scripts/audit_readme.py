@@ -3,14 +3,17 @@
 # SPDX-License-Identifier: MIT
 #
 # Migrated from oil-oil/beautify-github-readme. See THIRD_PARTY_NOTICES.md.
-"""Audit local README image references and basic SVG compatibility."""
+"""Audit README images, SVG compatibility, and an optional managed header."""
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+from readme_header import HeaderProfileError, load_profile, verify_readme_header
 
 
 MARKDOWN_IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+[^)]*)?\)")
@@ -19,7 +22,8 @@ HTML_ALT = re.compile(r"\balt=[\"']([^\"']*)[\"']", re.I)
 UNSAFE_SVG_TAGS = {"script", "foreignObject"}
 SCOPE_MESSAGE = (
     "Scope: structural checks only; source currency, factual accuracy, "
-    "visual relevance, and rendered quality are not evaluated."
+    "remote endpoint availability, visual relevance, and rendered quality "
+    "are not evaluated."
 )
 
 
@@ -52,14 +56,36 @@ def audit_svg(path: Path) -> list[str]:
     return issues
 
 
-def main() -> int:
-    if len(sys.argv) != 2:
-        print("usage: audit_readme.py /path/to/README.md", file=sys.stderr)
-        return 2
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("readme", type=Path)
+    parser.add_argument("--header-profile", type=Path)
+    parser.add_argument("--repository", help="OWNER/REPOSITORY")
+    parser.add_argument("--language", help="current README language code")
+    parser.add_argument("--branch", default="main")
+    parser.add_argument("--license-path", default="LICENSE")
+    parser.add_argument("--allow-missing-languages", action="store_true")
+    return parser
 
-    readme = Path(sys.argv[1]).expanduser().resolve()
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    readme = args.readme.expanduser().resolve()
     if not readme.is_file():
         print(f"ERROR: README not found: {readme}")
+        return 2
+
+    if args.header_profile and (not args.repository or not args.language):
+        print(
+            "ERROR: --header-profile requires --repository and --language",
+            file=sys.stderr,
+        )
+        return 2
+    if not args.header_profile and (args.repository or args.language):
+        print(
+            "ERROR: --repository and --language require --header-profile",
+            file=sys.stderr,
+        )
         return 2
 
     text = readme.read_text(encoding="utf-8")
@@ -90,15 +116,33 @@ def main() -> int:
             for issue in audit_svg(target):
                 warnings.append(f"{src}: {issue}")
 
+    header_checked = False
+    if args.header_profile:
+        header_checked = True
+        try:
+            profile = load_profile(args.header_profile.expanduser().resolve())
+            verify_readme_header(
+                readme,
+                profile,
+                repository=args.repository,
+                current_language=args.language,
+                branch=args.branch,
+                license_path=args.license_path,
+                allow_missing_languages=args.allow_missing_languages,
+            )
+        except HeaderProfileError as exc:
+            warnings.append(f"managed README header: {exc}")
+
     print(f"README: {readme}")
     print(f"Local images checked: {checked}")
+    print(f"Managed header checked: {'yes' if header_checked else 'no'}")
     print(SCOPE_MESSAGE)
     if warnings:
         print("Issues:")
         for warning in warnings:
             print(f"- {warning}")
         return 1
-    print("OK: structural image reference and SVG checks passed")
+    print("OK: structural README checks passed")
     return 0
 
 

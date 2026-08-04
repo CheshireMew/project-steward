@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CheshireMew/project-steward/blob/main/assets/readme-profile/profile.schema.json",
+  "title": "Project Steward README header profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "applies_to",
+    "badge_style",
+    "languages",
+    "social_links",
+    "repository_badges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "applies_to": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["github_owners"],
+      "properties": {
+        "github_owners": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
+          }
+        }
+      }
+    },
+    "badge_style": {
+      "enum": ["flat", "flat-square", "plastic", "for-the-badge", "social"]
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "label", "path", "default"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})?$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._/-]+\\.md$"
+          },
+          "default": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "social_links": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "url", "badge_src", "alt"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "badge_src": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "alt": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "repository_badges": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": ["stars", "forks", "license"]
+      }
+    }
+  }
+}

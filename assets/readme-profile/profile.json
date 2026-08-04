@@ -1,0 +1,65 @@
+{
+  "$schema": "./profile.schema.json",
+  "schema_version": 1,
+  "applies_to": {
+    "github_owners": [
+      "CheshireMew"
+    ]
+  },
+  "badge_style": "flat",
+  "languages": [
+    {
+      "code": "zh-CN",
+      "label": "中文",
+      "path": "README.md",
+      "default": true
+    },
+    {
+      "code": "en",
+      "label": "English",
+      "path": "README.en.md",
+      "default": false
+    },
+    {
+      "code": "ja",
+      "label": "日本語",
+      "path": "README.ja.md",
+      "default": false
+    }
+  ],
+  "social_links": [
+    {
+      "id": "x",
+      "label": "X",
+      "url": "https://x.com/0xCheshire",
+      "badge_src": "https://img.shields.io/badge/X-%400xCheshire-000000?logo=x&logoColor=white",
+      "alt": "X：@0xCheshire"
+    },
+    {
+      "id": "telegram",
+      "label": "Telegram",
+      "url": "https://t.me/CheshireBTC",
+      "badge_src": "https://img.shields.io/badge/Telegram-CheshireBTC-26A5E4?logo=telegram&logoColor=white",
+      "alt": "Telegram：CheshireBTC"
+    },
+    {
+      "id": "blog",
+      "label": "Blog",
+      "url": "https://blog.blacknico.com/",
+      "badge_src": "https://img.shields.io/badge/Blog-blog.blacknico.com-2E7D32?logo=rss&logoColor=white",
+      "alt": "博客：blog.blacknico.com"
+    },
+    {
+      "id": "homepage",
+      "label": "Homepage",
+      "url": "https://blacknico.com/",
+      "badge_src": "https://img.shields.io/badge/Home-blacknico.com-1F6FEB?logo=googlechrome&logoColor=white",
+      "alt": "个人主页：blacknico.com"
+    }
+  ],
+  "repository_badges": [
+    "stars",
+    "forks",
+    "license"
+  ]
+}

@@ -139,6 +139,27 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
         self.assertIn("不选择背景明暗、配色、字体角色、构图或容器样式", CANVAS_TEXT)
         self.assertIn("背景可以是浅色、深色或经双主题验证的透明表面", CANVAS_TEXT)
 
+    def test_clickable_and_live_header_content_stays_outside_hero(self) -> None:
+        for fragment in (
+            "语言切换、个人入口、Stars、Forks、许可证",
+            "不属于 hero 元数据",
+            "不能画进 SVG、PNG 或 WebP",
+            "首屏辅助区不能把第一屏挤成只有链接和数字",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, HERO_TEXT)
+
+        for fragment in (
+            "语言、个人入口和仓库状态分别使用独立的居中段落",
+            "当前语言使用文本，其它语言使用真实链接",
+            "徽章图片由外层 `<a>` 提供点击目标",
+            "不依赖徽章服务 URL 中的 `link` 参数",
+            "scripts/readme_header.py",
+            "语言文件缺失",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CANVAS_TEXT)
+
     def test_hybrid_and_motion_consumers_cannot_restore_card_defaults(self) -> None:
         self.assertIn("消费已经选定的视觉合同", HYBRID_TEXT)
         self.assertIn("合同没有网格或容器时不补加", HYBRID_TEXT)
