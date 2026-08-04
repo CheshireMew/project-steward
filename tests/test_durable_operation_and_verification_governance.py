@@ -233,6 +233,35 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_TEXT)
 
+    def test_discoverable_sessions_use_shared_admission_leases(self) -> None:
+        for route_fragment in (
+            "常驻有状态服务中可发现会话与共享资源",
+            "会话准入与释放竞争",
+        ):
+            with self.subTest(route_fragment=route_fragment):
+                self.assertIn(route_fragment, SKILL_TEXT)
+
+        ordered = (
+            "同一原子边界内验证对象仍可发现",
+            "增加活动使用者并返回共享准入租约",
+            "移出可发现集合并标记为 `closing`",
+            "等待已经发放的共享准入租约归零",
+            "取得对象的独占写入或关闭权",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "查表后返回裸对象，再由调用者晚些时候加锁",
+            "派生工作必须在原命令释放前取得自己的租约",
+            "不能用一把覆盖会话整个生命期的排他锁",
+            "按实际依赖的资源域分类",
+            "读取项目状态的工作必须在项目资源释放前排空",
+            "状态保持 `closing` 且所有权未知",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
 
     def test_archive_preservation_is_byte_exact_and_inactive(self) -> None:
         for fragment in (

@@ -105,6 +105,28 @@ class DerivedArtifactGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DERIVED_TEXT)
 
+    def test_equivalent_state_representations_share_one_canonical_projection(
+        self,
+    ) -> None:
+        ordered = (
+            "先判断集合顺序是否属于业务语义",
+            "顺序本身必须进入权威状态、版本和持久表示",
+            "按稳定语义身份生成确定顺序",
+            "缓存键、工作单元切分和最终装配共同消费这份投影",
+        )
+        positions = [DERIVED_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "实时内存、持久化重开、网络副本或迁移结果",
+            "同一语义状态必须在进入缓存前得到相同规范投影和内容身份",
+            "不能让缓存键、工作单元切分或最终装配各自排序、补默认值或猜顺序",
+            "分别从实时状态生产者和持久化重开生产者",
+            "真正有语义的换序才改变缓存身份",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DERIVED_TEXT)
+
     def test_target_size_is_separate_from_the_safety_limit(self) -> None:
         for fragment in (
             "目标单元与安全上限是两种约束",
