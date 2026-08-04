@@ -5,7 +5,7 @@
 <!-- readme-header:start -->
 
 <p align="center">
-  <strong>中文</strong> · <a href="./README.en.md">English</a> · <a href="./README.ja.md">日本語</a>
+  <strong>中文</strong> · <a href="./README.en.md">English</a> · <a href="./README.ja.md">日本語</a> | <a href="./SKILL.md">文档</a> | <a href="./CONTRIBUTING.md">贡献</a> | <a href="https://github.com/CheshireMew/project-steward/issues">反馈</a>
 </p>
 
 <p align="center">
@@ -107,7 +107,7 @@ Star History、链接和发布，并把真实结果完整交付。
 
 - 正文：删除内部方法镜像和重复说明，保留项目身份、主要结果、真实入口、第一次成功与维护导航。
 - 视觉：核对 hero、图片和证据资格，并检查桌面、窄屏以及 GitHub 深浅主题。
-- 首屏：按活动配置生成中文、English、日本語、个人入口、Stars、Forks 与许可证。
+- 首屏：按活动配置生成中文、English、日本語、文档、贡献、反馈、个人入口、Stars、Forks 与许可证。
 - 许可证：已有且准确时保持；缺失时先核对授权权利和采用目标，再应用确认后的方案。
 - Star History：对公开 GitHub 仓库运行真实工作流，验证输出分支、亮暗 SVG 和 README 消费端。
 - 发布：已有远端且确认包含发布时，精确提交、推送并核对远端 HEAD；不会自动创建远端、改变可见性、强推或删除文件。

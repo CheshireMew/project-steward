@@ -5,7 +5,7 @@
 <!-- readme-header:start -->
 
 <p align="center">
-  <a href="./README.md">中文</a> · <a href="./README.en.md">English</a> · <strong>日本語</strong>
+  <a href="./README.md">中文</a> · <a href="./README.en.md">English</a> · <strong>日本語</strong> | <a href="./SKILL.md">文档</a> | <a href="./CONTRIBUTING.md">贡献</a> | <a href="https://github.com/CheshireMew/project-steward/issues">反馈</a>
 </p>
 
 <p align="center">
@@ -107,7 +107,7 @@ Star History、リンク、公開を確認し、完成した結果まで届け�
 
 - 文章：内部方法の写しと重複を除き、役割、成果、実際の入口、最初の成功、保守ナビゲーションを残します。
 - 視覚：hero、画像、証拠の適格性を確認し、デスクトップ、狭い画面、GitHub の明暗テーマで検査します。
-- ヘッダー：中文、English、日本語、個人リンク、Stars、Forks、ライセンスを実際の事実から生成します。
+- ヘッダー：中文、English、日本語、文書、貢献、フィードバック、個人リンク、Stars、Forks、ライセンスを実際の事実から生成します。
 - ライセンス：正しい既存ライセンスは維持し、存在しない場合は権利と採用目的を確認してから、承認済みの選択を適用します。
 - Star History：公開 GitHub リポジトリで実際のワークフローを実行し、両方の SVG と README の消費を確認します。
 - 公開：承認済みの既存リモートには正確にコミットして push し、リモート HEAD を確認します。リモート作成、公開範囲変更、強制 push、ファイル削除は自動では行いません。

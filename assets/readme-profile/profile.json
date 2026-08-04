@@ -1,6 +1,6 @@
 {
   "$schema": "./profile.schema.json",
-  "schema_version": 1,
+  "schema_version": 2,
   "applies_to": {
     "github_owners": [
       "CheshireMew"
@@ -25,6 +25,26 @@
       "label": "日本語",
       "path": "README.ja.md",
       "default": false
+    }
+  ],
+  "navigation_links": [
+    {
+      "id": "docs",
+      "label": "文档",
+      "kind": "existing_path",
+      "path": "SKILL.md"
+    },
+    {
+      "id": "contribute",
+      "label": "贡献",
+      "kind": "existing_path",
+      "path": "CONTRIBUTING.md"
+    },
+    {
+      "id": "feedback",
+      "label": "反馈",
+      "kind": "repository_path",
+      "path": "issues"
     }
   ],
   "social_links": [

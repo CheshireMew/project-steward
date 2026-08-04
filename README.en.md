@@ -5,7 +5,7 @@
 <!-- readme-header:start -->
 
 <p align="center">
-  <a href="./README.md">中文</a> · <strong>English</strong> · <a href="./README.ja.md">日本語</a>
+  <a href="./README.md">中文</a> · <strong>English</strong> · <a href="./README.ja.md">日本語</a> | <a href="./SKILL.md">文档</a> | <a href="./CONTRIBUTING.md">贡献</a> | <a href="https://github.com/CheshireMew/project-steward/issues">反馈</a>
 </p>
 
 <p align="center">
@@ -107,7 +107,7 @@ A complete README task checks whether the repository is initialized, whether a R
 
 - Content: remove internal-method mirrors and repetition; retain identity, outcomes, real entry points, first success, and maintainer navigation.
 - Visuals: qualify the hero, images, and evidence, then inspect desktop, narrow viewport, and GitHub light and dark themes.
-- Header: generate 中文, English, 日本語, personal links, Stars, Forks, and license from active facts.
+- Header: generate 中文, English, 日本語, documentation, contribution, feedback, personal links, Stars, Forks, and license from active facts.
 - License: preserve an accurate existing license; when absent, verify rights and adoption goals before applying the confirmed choice.
 - Star History: run the real workflow for a public GitHub repository and verify both SVGs and the README consumer.
 - Publication: for an approved existing remote, commit precisely, push, and verify remote HEAD without silently creating remotes, changing visibility, force-pushing, or deleting files.

@@ -22,6 +22,7 @@ ALLOWED_BADGE_STYLES = {
     "social",
 }
 ALLOWED_REPOSITORY_BADGES = {"stars", "forks", "license"}
+ALLOWED_NAVIGATION_LINK_KINDS = {"existing_path", "repository_path"}
 OWNER_PATTERN = re.compile(
     r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
 )
@@ -99,14 +100,15 @@ def validate_profile(profile: object) -> dict:
             "applies_to",
             "badge_style",
             "languages",
+            "navigation_links",
             "social_links",
             "repository_badges",
         },
         optional={"$schema"},
         field="profile",
     )
-    if type(profile["schema_version"]) is not int or profile["schema_version"] != 1:
-        raise HeaderProfileError("schema_version must be 1")
+    if type(profile["schema_version"]) is not int or profile["schema_version"] != 2:
+        raise HeaderProfileError("schema_version must be 2")
 
     applies_to = profile["applies_to"]
     if not isinstance(applies_to, dict):
@@ -173,6 +175,36 @@ def validate_profile(profile: object) -> dict:
             default_count += 1
     if default_count != 1:
         raise HeaderProfileError("languages must contain exactly one default")
+
+    navigation_links = profile["navigation_links"]
+    if not isinstance(navigation_links, list):
+        raise HeaderProfileError("navigation_links must be an array")
+    navigation_ids: set[str] = set()
+    for index, link in enumerate(navigation_links):
+        field = f"navigation_links[{index}]"
+        if not isinstance(link, dict):
+            raise HeaderProfileError(f"{field} must be an object")
+        _require_exact_keys(
+            link,
+            required={"id", "label", "kind", "path"},
+            optional=set(),
+            field=field,
+        )
+        link_id = _require_string(link["id"], f"{field}.id")
+        if not LINK_ID_PATTERN.fullmatch(link_id):
+            raise HeaderProfileError(f"invalid navigation link id: {link_id}")
+        if link_id in navigation_ids:
+            raise HeaderProfileError(
+                f"duplicate navigation link id: {link_id}"
+            )
+        navigation_ids.add(link_id)
+        _require_string(link["label"], f"{field}.label")
+        kind = _require_string(link["kind"], f"{field}.kind")
+        if kind not in ALLOWED_NAVIGATION_LINK_KINDS:
+            raise HeaderProfileError(
+                f"unsupported navigation link kind: {kind}"
+            )
+        _require_relative_path(link["path"], f"{field}.path")
 
     social_links = profile["social_links"]
     if not isinstance(social_links, list):
@@ -267,7 +299,36 @@ def _available_languages(
     return available
 
 
-def _render_language_row(languages: list[dict], current_language: str) -> str:
+def _resolve_navigation_links(
+    profile: dict,
+    *,
+    repository: str,
+    readme_root: Path,
+) -> list[tuple[str, str]]:
+    quoted_repository = _quoted_repository(repository)
+    github_root = f"https://github.com/{quoted_repository}"
+    resolved: list[tuple[str, str]] = []
+    for link in profile["navigation_links"]:
+        path = _require_relative_path(
+            link["path"], f"navigation_links.{link['id']}.path"
+        )
+        if link["kind"] == "existing_path":
+            if not (readme_root / PurePosixPath(path)).exists():
+                raise HeaderProfileError(
+                    f"configured navigation target is missing: {path}"
+                )
+            href = f"./{quote(path, safe='/')}"
+        else:
+            href = f"{github_root}/{quote(path, safe='/')}"
+        resolved.append((link["label"], href))
+    return resolved
+
+
+def _render_language_row(
+    languages: list[dict],
+    current_language: str,
+    navigation_links: list[tuple[str, str]],
+) -> str:
     if not any(language["code"] == current_language for language in languages):
         raise HeaderProfileError(
             f"current language is not available: {current_language}"
@@ -280,7 +341,15 @@ def _render_language_row(languages: list[dict], current_language: str) -> str:
         else:
             href = html.escape(f"./{language['path']}", quote=True)
             items.append(f'<a href="{href}">{label}</a>')
-    return '<p align="center">\n  ' + " · ".join(items) + "\n</p>"
+    content = " · ".join(items)
+    if navigation_links:
+        navigation = " | ".join(
+            f'<a href="{html.escape(href, quote=True)}">'
+            f"{html.escape(label)}</a>"
+            for label, href in navigation_links
+        )
+        content += " | " + navigation
+    return '<p align="center">\n  ' + content + "\n</p>"
 
 
 def _render_social_row(profile: dict) -> str | None:
@@ -374,7 +443,18 @@ def render_header(
     languages = _available_languages(
         profile, root, allow_missing=allow_missing_languages
     )
-    rows = [_render_language_row(languages, current_language)]
+    navigation_links = _resolve_navigation_links(
+        profile,
+        repository=repository,
+        readme_root=root,
+    )
+    rows = [
+        _render_language_row(
+            languages,
+            current_language,
+            navigation_links,
+        )
+    ]
     social_row = _render_social_row(profile)
     if social_row:
         rows.append(social_row)

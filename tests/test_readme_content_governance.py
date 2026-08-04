@@ -76,6 +76,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "README 不存在时选择新写",
             "桌面宽度、窄屏和深浅主题",
             "实际交付的语言",
+            "文档、贡献和反馈分别抵达真实且职责不同的目标",
             "GitHub 识别",
             "零星标仓库可以生成真实的零基线",
             "About 描述和 topics",
@@ -128,13 +129,21 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
 
     def test_header_profile_has_one_owner_and_real_consumers(self) -> None:
         profile = json.loads(HEADER_PROFILE_PATH.read_text(encoding="utf-8"))
-        self.assertEqual(1, profile["schema_version"])
+        self.assertEqual(2, profile["schema_version"])
         self.assertEqual(["CheshireMew"], profile["applies_to"]["github_owners"])
         self.assertEqual(
             ["zh-CN", "en", "ja"],
             [language["code"] for language in profile["languages"]],
         )
         self.assertTrue(profile["languages"][0]["default"])
+        self.assertEqual(
+            ["docs", "contribute", "feedback"],
+            [link["id"] for link in profile["navigation_links"]],
+        )
+        self.assertEqual(
+            ["文档", "贡献", "反馈"],
+            [link["label"] for link in profile["navigation_links"]],
+        )
         self.assertEqual(
             ["x", "telegram", "blog", "homepage"],
             [link["id"] for link in profile["social_links"]],
@@ -146,6 +155,13 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
 
         schema = json.loads(
             HEADER_PROFILE_SCHEMA_PATH.read_text(encoding="utf-8")
+        )
+        self.assertEqual(2, schema["properties"]["schema_version"]["const"])
+        self.assertEqual(
+            ["existing_path", "repository_path"],
+            schema["properties"]["navigation_links"]["items"]["properties"][
+                "kind"
+            ]["enum"],
         )
         self.assertEqual(
             ["stars", "forks", "license"],
@@ -172,6 +188,12 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
                 self.assertIn("<!-- readme-header:start -->", text)
                 self.assertIn("<!-- readme-header:end -->", text)
                 self.assertIn(current_labels[language], text)
+                self.assertIn('./SKILL.md">文档</a>', text)
+                self.assertIn('./CONTRIBUTING.md">贡献</a>', text)
+                self.assertIn(
+                    'https://github.com/CheshireMew/project-steward/issues">反馈</a>',
+                    text,
+                )
                 self.assertIn("https://x.com/0xCheshire", text)
                 self.assertIn("https://t.me/CheshireBTC", text)
                 self.assertIn("github/stars/CheshireMew/project-steward", text)

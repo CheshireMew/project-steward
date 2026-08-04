@@ -9,12 +9,13 @@
     "applies_to",
     "badge_style",
     "languages",
+    "navigation_links",
     "social_links",
     "repository_badges"
   ],
   "properties": {
     "schema_version": {
-      "const": 1
+      "const": 2
     },
     "applies_to": {
       "type": "object",
@@ -57,6 +58,32 @@
           },
           "default": {
             "type": "boolean"
+          }
+        }
+      }
+    },
+    "navigation_links": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "kind", "path"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": ["existing_path", "repository_path"]
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._/-]+$"
           }
         }
       }

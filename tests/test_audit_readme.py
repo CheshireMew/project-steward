@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import tempfile
@@ -162,6 +163,10 @@ class ReadmeAuditTests(unittest.TestCase):
         ) as temporary:
             root = Path(temporary)
             (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
+            (root / "SKILL.md").write_text("# Fixture skill\n", encoding="utf-8")
+            (root / "CONTRIBUTING.md").write_text(
+                "# Contributing\n", encoding="utf-8"
+            )
             language_files = {
                 "zh-CN": root / "README.md",
                 "en": root / "README.en.md",
@@ -217,6 +222,12 @@ class ReadmeAuditTests(unittest.TestCase):
             self.assertIn("<strong>中文</strong>", chinese)
             self.assertIn('./README.en.md">English</a>', chinese)
             self.assertIn('./README.ja.md">日本語</a>', chinese)
+            self.assertIn(
+                '日本語</a> | <a href="./SKILL.md">文档</a> | '
+                '<a href="./CONTRIBUTING.md">贡献</a> | '
+                '<a href="https://github.com/CheshireMew/fixture/issues">反馈</a>',
+                chinese,
+            )
             self.assertIn("https://x.com/0xCheshire", chinese)
             self.assertIn('title="X"', chinese)
             self.assertIn("https://t.me/CheshireBTC", chinese)
@@ -226,7 +237,6 @@ class ReadmeAuditTests(unittest.TestCase):
             self.assertIn("github/forks/CheshireMew/fixture", chinese)
             self.assertIn("github/license/CheshireMew/fixture", chinese)
             self.assertNotIn("官方网站", chinese)
-            self.assertNotIn("文档", chinese)
 
             audited = run(
                 [
@@ -312,6 +322,59 @@ class ReadmeAuditTests(unittest.TestCase):
             )
             self.assertEqual(1, unowned.returncode)
             self.assertIn("does not apply to GitHub owner", unowned.stderr)
+
+    def test_profile_refuses_legacy_schema_and_missing_navigation_targets(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-navigation-"
+        ) as temporary:
+            root = Path(temporary)
+            legacy_profile = root / "legacy-profile.json"
+            profile = json.loads(HEADER_PROFILE.read_text(encoding="utf-8"))
+            profile["schema_version"] = 1
+            legacy_profile.write_text(
+                json.dumps(profile, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            legacy = run(
+                [
+                    sys.executable,
+                    str(HEADER_SCRIPT),
+                    "validate",
+                    "--profile",
+                    str(legacy_profile),
+                ],
+                root,
+                check=False,
+            )
+            self.assertEqual(1, legacy.returncode)
+            self.assertIn("schema_version must be 2", legacy.stderr)
+
+            for name in ("README.md", "README.en.md", "README.ja.md"):
+                (root / name).write_text("# Fixture\n", encoding="utf-8")
+            (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
+            (root / "SKILL.md").write_text("# Fixture skill\n", encoding="utf-8")
+            missing = run(
+                [
+                    sys.executable,
+                    str(HEADER_SCRIPT),
+                    "render",
+                    "--profile",
+                    str(HEADER_PROFILE),
+                    "--repository",
+                    "CheshireMew/fixture",
+                    "--language",
+                    "zh-CN",
+                    "--readme-root",
+                    str(root),
+                ],
+                root,
+                check=False,
+            )
+            self.assertEqual(1, missing.returncode)
+            self.assertIn(
+                "configured navigation target is missing: CONTRIBUTING.md",
+                missing.stderr,
+            )
 
 
 if __name__ == "__main__":
