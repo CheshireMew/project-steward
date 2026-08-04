@@ -1166,6 +1166,58 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(public_behavior=public_behavior):
                 self.assertIn(public_behavior, README_TEXT)
 
+    def test_public_surface_liveness_is_not_inferred_from_repository_references(
+        self,
+    ) -> None:
+        for fragment in (
+            "仓内调用点为零只能作为有界内部符号的退出证据",
+            "HTTP、WebSocket、IPC、CLI、插件入口、框架注册、公共导出",
+            "机器可读发现或 schema",
+            "版本与发布承诺",
+            "已知外部消费者",
+            "只能标为未知或受阻",
+            "不能因仓内搜索无命中就删除、改名或宣告原功能已经迁移",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, ARCHITECTURE_TEXT)
+
+        self.assertIn("仓内零引用只足以判断消费者范围已经封闭的内部符号", README_TEXT)
+        self.assertIn("证据不足就保留为未知或受阻", README_TEXT)
+
+    def test_architecture_residue_scans_close_semantic_invariants(self) -> None:
+        for fragment in (
+            "同一问题类型、关键词、目录位置或代码形态",
+            "最早错误事实、最终所有者",
+            "受影响的生产者到消费者链",
+            "只记录为独立问题并停在原授权边界",
+            "语义闭合条件",
+            "禁止存在的所有权或依赖方向",
+            "允许存在的最终边界",
+            "自然语言误报或范围外独立问题",
+            "零匹配只有在扫描器成功覆盖预期输入",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, ARCHITECTURE_TEXT)
+
+        self.assertIn("关键词与目录只能生成候选", README_TEXT)
+
+    def test_migration_test_failures_stay_bound_to_findings_and_target_behavior(
+        self,
+    ) -> None:
+        for fragment in (
+            "逐项映射到稳定发现身份和已冻结的目标行为基线",
+            "同一测试文件、套件或目录不能证明多个失败属于同一迁移边界",
+            "生产者、合同、边界或消费者的迁移确实改变了该断言或夹具",
+            "无关断言、并发改动或目标仍未知的失败",
+            "不能用脏工作树当前显示的文字",
+            "反向改写目标行为",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, ARCHITECTURE_TEXT)
+
+        self.assertIn("同一测试文件不等于同一迁移边界", README_TEXT)
+        self.assertIn("不会为了让套件变绿而顺手改写", README_TEXT)
+
     def test_async_workflows_close_by_stage_without_central_redispatch(
         self,
     ) -> None:
