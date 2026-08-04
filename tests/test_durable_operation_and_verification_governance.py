@@ -267,6 +267,28 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
+    def test_run_evidence_consumers_bind_explicit_run_identities(self) -> None:
+        ordered = (
+            "每次调用返回的明确运行身份",
+            "类别 + 运行身份 + 工具所有权标记",
+            "不能按目录修改时间、排序后的“最新目录”",
+            "当前调用显式传入的运行身份集合",
+            "不能用未匹配的旧运行补位",
+            "聚合报告是派生证据",
+            "列出完整输入运行身份集合",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "保留策略移动目录不能改变证据身份",
+            "聚合保持不完整或未知",
+            "目录修改时间或归档位置变化不会换入旧报告",
+            "运行证据的身份、显式消费集合、聚合、保留、轮换和清理错误",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
     def test_public_identity_exposes_the_new_capability(self) -> None:
 
         self.assertIn(

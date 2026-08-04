@@ -2694,6 +2694,42 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
+    def test_implementation_plan_audit_rebuilds_a_fresh_requirement_ledger(
+        self,
+    ) -> None:
+        for fragment in (
+            "按实施计划逐项审计完成度",
+            "audit implementation-plan completion or conformance",
+            "按实施计划逐项核对完成度",
+            "诊断读取设置、运行报告、结构化制品或日志时",
+        ):
+            with self.subTest(main_fragment=fragment):
+                self.assertIn(fragment, MAIN_TEXT)
+
+        ordered = (
+            "冻结计划内容身份、项目状态、明确排除项和证据平面",
+            "每一项规范性要求、验收标准、公开方法或事件、schema 字段、平台目标",
+            "稳定计划条目身份和原文定位",
+            "预期关键测试身份与实际收集身份",
+            "状态：已实现且已验证 / 已实现但未验证 / 缺失 / 明确排除 / 受阻",
+            "从原始计划和当前已接受合同重新生成全新符合性账本",
+        )
+        positions = [PROJECT_AUDIT_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不能从现有源码、测试名称或已经发现的问题反推计划范围",
+            "完整测试通过不能替没有映射关系的计划条目背书",
+            "语义残留扫描、正式调用点退出和真实消费者证据",
+            "本地代码与运行、CI、目标平台实机和外部服务分别成立",
+            "不得复制上一轮的完成标记",
+            "实施计划审计只覆盖计划范围",
+        ):
+            with self.subTest(audit_fragment=fragment):
+                self.assertIn(fragment, PROJECT_AUDIT_TEXT)
+
+        self.assertIn("审计实施计划完成度", AGENT_TEXT)
+
 
 
 if __name__ == "__main__":

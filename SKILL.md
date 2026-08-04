@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从完整项目过程提炼可迁移治理能力，并在明确要求时让 Project Steward 自我进化；完整研究和学习开源代码项目，判断值得吸收的能力、直接复用边界、README 致谢与许可证责任；盘点和整理项目目录，判断真实使用、生成状态、归档与忽略边界；在改动前预防返工，在缺陷后沿根因完成跨层治理，并审计外部 CLI、持久操作、内聚耦合、重复和上帝模块；同时处理用户环境档案、项目讲解、README、日志、模板、产品体验、许可证和仓库发布。Use when the user asks to learn from project history, evolve Project Steward, understand a repository, organize a repository, determine which folders are active, generated, local, legacy, archival, or ignored, study an open-source codebase, decide what to adopt, govern direct code or resource reuse and attribution, prevent change failures, remediate cross-layer defects, audit or govern compatibility with external CLIs, execution tools, and protocols, durable operations, cohesion, coupling, duplication or god modules, user environment, README, logging, templates, product experience, licensing, publication, or project-wide health; not for isolated implementation, a single-function explanation, security-only review, dependency or CI-only work, or monitoring without a project-wide result."
+description: "从完整项目过程提炼可迁移治理能力，并在明确要求时让 Project Steward 自我进化；按实施计划逐项审计完成度并在修复后全新复查；完整研究和学习开源代码项目，判断值得吸收的能力、直接复用边界、README 致谢与许可证责任；盘点和整理项目目录，判断真实使用、生成状态、归档与忽略边界；在改动前预防返工，在缺陷后沿根因完成跨层治理，并审计外部 CLI、持久操作、内聚耦合、重复和上帝模块；同时处理用户环境档案、项目讲解、README、日志、模板、产品体验、许可证和仓库发布。Use when the user asks to learn from project history, evolve Project Steward, audit implementation-plan completion or conformance, understand a repository, organize a repository, determine which folders are active, generated, local, legacy, archival, or ignored, study an open-source codebase, decide what to adopt, govern direct code or resource reuse and attribution, prevent change failures, remediate cross-layer defects, audit or govern compatibility with external CLIs, execution tools, and protocols, durable operations, cohesion, coupling, duplication or god modules, user environment, README, logging, templates, product experience, licensing, publication, or project-wide health; not for isolated implementation, a single-function explanation, security-only review, dependency or CI-only work, or monitoring without a project-wide result."
 ---
 
 # Project Steward
@@ -25,7 +25,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 12. 初始化 Git、创建仓库、提交、推送、改变可见性或验证远端：仓库建立与发布。
 13. 选择、应用或批量治理许可证与第三方授权：许可证治理。
 14. 建立或消费用户环境档案，检查工具、缓存、SDK、终端或长任务：用户环境档案与执行环境。
-15. 全面检查、判断项目健康状况或排列项目级风险：项目综合审计。
+15. 按实施计划逐项核对完成度，或全面检查、判断项目健康状况和排列项目级风险：项目综合审计。
 
 只点名本 Skill 时按现有材料选择最匹配路径；材料不足时给出一个贴近上下文的直接请求示例并停下。
 
@@ -47,6 +47,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 - 验证按改动风险选择层级：先运行直接覆盖本次改动和验收主张的目标检查；只改文档、许可证、致谢或纯元数据时在相应维护入口通过后停止，不启动无关浏览器或端到端链路；公共合同、核心运行时、跨仓库边界、发布或目标检查暴露系统性影响时，才升级为完整回归和真实用户链。
 - 状态改变后直接回读权威目标。完成验证必须沿正式生产者、传输或存储边界、消费者和用户可观察结果；不能让消费端手写假数据或 mock 掉正在验证的核心链路。
 - 测试结果用于关闭承诺或宣告完成前，预期关键测试身份必须与测试框架实际收集的唯一身份一致；缺失或非唯一身份都只能标为未覆盖。
+- 诊断读取设置、运行报告、结构化制品或日志时，按 `references/log-audit-standard.md` 先投影当前判断需要的允许字段；未知结构不得整份递归输出，凭据必须在进入工具输出、对话或诊断导出前脱敏。
 
 ## 对话学习与自我进化
 
@@ -159,7 +160,7 @@ README 不作为每项内部治理规则的第二份活动真源；自我进化�
 
 ## 项目综合审计
 
-读取 `references/project-audit.md`。先按项目形态建立全部适用维度的覆盖账本，再加载这些维度要求的专项；不得只根据已经发现的问题回填审查范围。只读审计不自动治理。需要评估用户效果时追加 `references/project-effectiveness-review.md`，需要检查任务体验时追加 `references/task-experience-audit.md`。
+读取 `references/project-audit.md`。用户询问实施计划完成度时，先从原计划建立逐项符合性账本；获准修复后必须从原计划和当前已接受合同重新生成一次全新复查，不沿用旧完成标记，也不从现有测试反推计划范围。全面检查则先按项目形态建立全部适用维度的覆盖账本，再加载这些维度要求的专项；不得只根据已经发现的问题回填审查范围。只读审计不自动治理。需要评估用户效果时追加 `references/project-effectiveness-review.md`，需要检查任务体验时追加 `references/task-experience-audit.md`。
 
 ## 平台模板资源
 

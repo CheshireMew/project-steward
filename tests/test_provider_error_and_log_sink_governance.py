@@ -76,6 +76,30 @@ class ProviderErrorAndLogSinkGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LOG_TEXT)
 
+    def test_diagnostic_evidence_projects_fields_and_redacts_credentials_before_output(
+        self,
+    ) -> None:
+        ordered = (
+            "诊断读取先投影再输出",
+            "先读取文件身份、schema 和字段名",
+            "只输出当前判断需要的允许字段",
+            "API Key、访问令牌、认证 header",
+            "在进入控制台、工具输出、对话、日志或诊断导出前",
+            "原始证据继续留在正式所有者",
+        )
+        positions = [LOG_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不在发现结构的步骤输出字段值",
+            "禁止递归输出未知结构化文件",
+            "包括嵌套对象、数组和动态键",
+            "不能先输出再依赖下游界面遮盖",
+            "本地桌面应用也不把方便诊断解释成",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LOG_TEXT)
+
     def test_existing_routes_and_public_description_consume_the_contracts(
         self,
     ) -> None:
