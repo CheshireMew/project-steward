@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Steward"
-  short_description: "从完整项目过程持续学习，并治理架构、持久操作、用户环境、仓库研究与发布链路；判断职能边界与开源代码吸收"
+  short_description: "从完整项目过程持续学习，并治理架构、持久操作、用户环境、仓库研究与发布链路；判断职能边界、开源代码吸收与项目目录职责"
   default_prompt: "使用 $project-steward 完整研究这个开源代码项目，判断值得吸收的能力、原始上游和复用关系；先展示职能边界、采用与致谢方案并停下，确认后实施；明确要求时再自我进化。"

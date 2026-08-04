@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从完整项目过程提炼可迁移治理能力，并在明确要求时让 Project Steward 自我进化；完整研究和学习开源代码项目，判断值得吸收的能力、直接复用边界、README 致谢与许可证责任；在改动前预防返工，在缺陷后沿根因完成跨层治理，并审计外部 CLI、持久操作、内聚耦合、重复和上帝模块；同时处理用户环境档案、项目讲解、README、日志、模板、产品体验、许可证和仓库发布。Use when the user asks to learn from project history, evolve Project Steward, understand a repository or study an open-source codebase, decide what to adopt, govern direct code or resource reuse and attribution, prevent change failures, remediate cross-layer defects, audit or govern compatibility with external CLIs, execution tools, and protocols, durable operations, cohesion, coupling, duplication or god modules, user environment, README, logging, templates, product experience, licensing, publication, or project-wide health; not for isolated implementation, a single-function explanation, security-only review, dependency or CI-only work, or monitoring without a project-wide result."
+description: "从完整项目过程提炼可迁移治理能力，并在明确要求时让 Project Steward 自我进化；完整研究和学习开源代码项目，判断值得吸收的能力、直接复用边界、README 致谢与许可证责任；盘点和整理项目目录，判断真实使用、生成状态、归档与忽略边界；在改动前预防返工，在缺陷后沿根因完成跨层治理，并审计外部 CLI、持久操作、内聚耦合、重复和上帝模块；同时处理用户环境档案、项目讲解、README、日志、模板、产品体验、许可证和仓库发布。Use when the user asks to learn from project history, evolve Project Steward, understand a repository, organize a repository, determine which folders are active, generated, local, legacy, archival, or ignored, study an open-source codebase, decide what to adopt, govern direct code or resource reuse and attribution, prevent change failures, remediate cross-layer defects, audit or govern compatibility with external CLIs, execution tools, and protocols, durable operations, cohesion, coupling, duplication or god modules, user environment, README, logging, templates, product experience, licensing, publication, or project-wide health; not for isolated implementation, a single-function explanation, security-only review, dependency or CI-only work, or monitoring without a project-wide result."
 ---
 
 # Project Steward
@@ -15,16 +15,17 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 2. 功能、重构、迁移或跨层改动开始前消除返工：改动前预防。
 3. 缺陷、半迁移、重复修补、真实链路失效，或内聚、耦合、重复、上帝模块检查：根因治理。
 4. 检查、接入或修复项目与外部 CLI、执行工具或协议的兼容关系：外部工具兼容性。
-5. 看懂仓库、目录或源码包，或研究参考项目能力：项目研究与讲解。
-6. 建立、采用、升级或检查项目模板：项目基线与模板。
-7. 把稳定默认写入模板：模板演进。
-8. 定义、审查、重建或实施产品体验与界面：产品体验与界面治理。
-9. 审计、重写 README 或制作 GitHub 主页视觉：README 与主页。
-10. 治理项目日志、LLM 记录、长期记忆、TTS 或日志查看结果：人性化日志。
-11. 初始化 Git、创建仓库、提交、推送、改变可见性或验证远端：仓库建立与发布。
-12. 选择、应用或批量治理许可证与第三方授权：许可证治理。
-13. 建立或消费用户环境档案，检查工具、缓存、SDK、终端或长任务：用户环境档案与执行环境。
-14. 全面检查、判断项目健康状况或排列项目级风险：项目综合审计。
+5. 看懂仓库、目录或源码包的用途、架构和能力，或研究参考项目：项目研究与讲解。
+6. 盘点或整理项目目录，判断真实使用、生成状态、忽略、移动、归档与删除边界：项目目录治理。
+7. 建立、采用、升级或检查项目模板：项目基线与模板。
+8. 把稳定默认写入模板：模板演进。
+9. 定义、审查、重建或实施产品体验与界面：产品体验与界面治理。
+10. 审计、重写 README 或制作 GitHub 主页视觉：README 与主页。
+11. 治理项目日志、LLM 记录、长期记忆、TTS 或日志查看结果：人性化日志。
+12. 初始化 Git、创建仓库、提交、推送、改变可见性或验证远端：仓库建立与发布。
+13. 选择、应用或批量治理许可证与第三方授权：许可证治理。
+14. 建立或消费用户环境档案，检查工具、缓存、SDK、终端或长任务：用户环境档案与执行环境。
+15. 全面检查、判断项目健康状况或排列项目级风险：项目综合审计。
 
 只点名本 Skill 时按现有材料选择最匹配路径；材料不足时给出一个贴近上下文的直接请求示例并停下。
 
@@ -102,6 +103,10 @@ Project Steward 自我进化时必须执行主文件约束：
 ## 项目研究与讲解
 
 先读取 `references/project-research.md`。只读取回答当前问题所需的项目表面；用户明确要求完整研究或能力采用时才扩展覆盖，并同时读取 `references/source-fork-and-ecosystem-adoption.md`，先追溯原始上游并区分直接复用与方法学习；确认会直接复用代码或资源时再读取 `references/license-governance.md`，把第三方资源与致谢写入目标项目 README。需要衡量效果、失败样本和置信度时读取 `references/project-effectiveness-review.md`；需要保存可复核报告时读取 `references/project-research-report.md`。源码归档先用 `scripts/extract_project_archive.ps1` 和 -DestinationRoot <目标根> 解压到独立目录；没有另行指定目标根时使用 E:\Work\BaiduSyncdisk\Code\Example，再从脚本返回的项目根研究。
+
+## 项目目录治理
+
+读取 `references/repository-directory-governance.md`。先用 `scripts/inspect_project_tree.py` 取得只读物理与 Git 证据，再核对每个候选目录的正式生产者、路径真源、消费者和生命周期；检查、解释与计划停在证据账本，只有明确授权整理、移动或归档时才改变准确路径，删除继续遵守单独授权。移动触及活动源码、模型、数据、素材、构建或运行入口时同时读取 `references/change-prevention.md`；已经存在旧路径、双读、同步副本或半迁移时再读取 `references/root-cause-remediation.md`，一次迁移消费者并退出旧入口。
 
 ## 项目基线与模板
 
