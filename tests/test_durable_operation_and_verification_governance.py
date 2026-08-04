@@ -17,7 +17,6 @@ PREVENTION_TEXT = read("references/change-prevention.md")
 REMEDIATION_TEXT = read("references/root-cause-remediation.md")
 DESKTOP_TEXT = read("references/desktop-app-governance.md")
 IMPLEMENTATION_TEXT = read("references/implementation-review.md")
-README_TEXT = read("README.md")
 AGENT_TEXT = read("agents/openai.yaml")
 
 
@@ -80,7 +79,6 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             DURABLE_TEXT.index("创建父目录或临时目录"),
         )
         self.assertIn("同一操作先失败后成功", DURABLE_TEXT)
-        self.assertIn("只产生一个账本、结构化事件和日志", README_TEXT)
 
     def test_conflicted_rebinding_uses_a_strict_plan_and_commit_boundary(
         self,
@@ -142,19 +140,8 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
                 )
 
     def test_automatic_occurrence_and_execution_attempt_are_distinct(self) -> None:
-        for fragment in (
-            "队列、调度器、重试器或多个观察者",
-            "稳定发生身份",
-            "同一事务中写入发生记录、创建任务并推进调度游标",
-            "发生身份回答“这是不是同一次触发”",
-            "不得自动重放同一批次",
-            "显式重试产生可区分的新批次",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, SKILL_TEXT + DURABLE_TEXT + README_TEXT)
 
         self.assertIn("两个独立调度观察者", DURABLE_TEXT)
-        self.assertIn("一个原子边界内写入发生记录、任务和调度进度", README_TEXT)
         self.assertIn("不重放结果不确定的业务生产者", DURABLE_TEXT)
 
     def test_result_sets_and_run_evidence_have_one_retention_lifecycle(
@@ -185,8 +172,6 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
         self.assertIn("测试、性能、审计和真实用户链", DURABLE_TEXT)
-        self.assertIn("实际删除或归档仍遵守当前用户与项目权限", README_TEXT)
-        self.assertIn("不会篡改测试本身的终态", README_TEXT)
 
     def test_async_ownership_preserves_authoritative_state(self) -> None:
         for fragment in (
@@ -248,8 +233,6 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_TEXT)
 
-        self.assertIn("唯一运行权放在恢复和调度之前", README_TEXT)
-        self.assertIn("竞争失败者只关闭自己创建的资源", README_TEXT)
 
     def test_archive_preservation_is_byte_exact_and_inactive(self) -> None:
         for fragment in (
@@ -285,13 +268,6 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
     def test_public_identity_exposes_the_new_capability(self) -> None:
-        for fragment in (
-            "## 持久操作与恢复",
-            "不播放持续刺耳的测试音",
-            "生产者真正新增的事务和实际路径",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
         self.assertIn(
             "治理架构、持久操作、用户环境、仓库研究与发布链路",

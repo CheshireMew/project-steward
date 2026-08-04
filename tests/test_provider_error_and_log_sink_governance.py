@@ -12,7 +12,6 @@ def read(relative: str) -> str:
 
 
 SKILL_TEXT = read("SKILL.md")
-README_TEXT = read("README.md")
 REMEDIATION_TEXT = read("references/root-cause-remediation.md")
 COMPATIBILITY_TEXT = read("references/external-tool-compatibility.md")
 LOG_TEXT = read("references/log-audit-standard.md")
@@ -88,14 +87,6 @@ class ProviderErrorAndLogSinkGovernanceTests(unittest.TestCase):
             with self.subTest(reference=reference):
                 self.assertIn(reference, SKILL_TEXT)
 
-        for fragment in (
-            "局部超时不会被显示成启动失败",
-            "连接测试也必须复用正式运行的适配器",
-            "控制台、日志文件、查看器和诊断导出分别是正式日志消费者",
-            "开发 stdout 不替原生产物背书",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_active_rules_do_not_retain_case_specific_evidence(self) -> None:
         combined = REMEDIATION_TEXT + COMPATIBILITY_TEXT + LOG_TEXT

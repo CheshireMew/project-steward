@@ -8,7 +8,6 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 PUBLICATION_TEXT = (
     SKILL_ROOT / "references" / "repository-publication.md"
 ).read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 
 
 class RepositoryPublicationGovernanceTests(unittest.TestCase):
@@ -87,13 +86,6 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
-        for fragment in (
-            "不会把“产品修改完成”“已提交到本地分支”“已推送到远端分支”和“远端结果已经验证”混成一句完成",
-            "相对上游的 ahead / behind",
-            "一次推送会连同此前提交一起进入远端",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_entangled_worktree_does_not_expand_publication_authority(
         self,

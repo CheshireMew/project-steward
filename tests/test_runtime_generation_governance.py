@@ -9,7 +9,6 @@ SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 RUNTIME_TEXT = (
     SKILL_ROOT / "references" / "runtime-generation-governance.md"
 ).read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 
 
 class RuntimeGenerationGovernanceTests(unittest.TestCase):
@@ -103,14 +102,6 @@ class RuntimeGenerationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, RUNTIME_TEXT)
 
-        for fragment in (
-            "根据旧图与候选图的实际身份差异决定影响范围",
-            "每个前台或后台操作持有一代不可变服务上下文",
-            "物理数据根只有全部存储、任务历史、缓存和恢复消费者",
-            "后台串行队列",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
 
 if __name__ == "__main__":

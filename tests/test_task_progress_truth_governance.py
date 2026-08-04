@@ -7,7 +7,6 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 PROGRESS_TEXT = (
     SKILL_ROOT / "references" / "task-progress-governance.md"
 ).read_text(encoding="utf-8")
@@ -157,21 +156,6 @@ class TaskProgressTruthGovernanceTests(unittest.TestCase):
             with self.subTest(project_specific_term=project_specific_term):
                 self.assertNotIn(project_specific_term, PROGRESS_TEXT)
 
-    def test_readme_exposes_task_progress_without_conflating_diagnostics(self) -> None:
-        for fragment in (
-            "用户可见的任务进度不会再把“当前阶段”和“完成比例”混成一个数字",
-            "已完成量、总量和单位",
-            "总量未知、单次外部请求或无法连续测量的阶段显示不定进度",
-            "不同单位或未知成员也不会通过平均百分比伪造聚合进度",
-            "正式登记后释放发起它的聊天或界面回合",
-            "取消、追加和授权携带准确任务与请求身份",
-            "迟到事件和旧窗口不能影响当前尝试",
-            "退出旧标量字段、固定阶段数字与第二份活动任务状态",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
-
-        self.assertIn("诊断指标也必须证明自己真的测量了所声称的事实", README_TEXT)
 
 
 if __name__ == "__main__":

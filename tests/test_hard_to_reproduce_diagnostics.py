@@ -6,7 +6,6 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 DIAGNOSTIC_TEXT = (
     SKILL_ROOT / "references" / "hard-to-reproduce-diagnostics.md"
 ).read_text(encoding="utf-8")
@@ -65,13 +64,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        for public_behavior in (
-            "输入自带发生时间或序列",
-            "固定睡眠只作为等待上限",
-            "独立部署目标和浏览器场景使用新鲜环境",
-        ):
-            with self.subTest(public_behavior=public_behavior):
-                self.assertIn(public_behavior, README_TEXT)
 
     def test_chronological_latest_uses_a_formal_total_order_under_clock_collision(
         self,
@@ -87,8 +79,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        self.assertIn("有限精度时间戳不会被当成全序", README_TEXT)
-        self.assertIn("UUID、对象 ID 和列表位置不会被拿来猜时间", README_TEXT)
 
     def test_overlapping_operations_are_correlated_by_producer_identity(
         self,
@@ -117,13 +107,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, concurrent)
 
-        for public_behavior in (
-            "并发操作由正式生产者分配稳定身份和 generation",
-            "消费者不会按最后一项、当前选中项或列表位置猜目标",
-            "两个真实操作交错经过正式事件边界",
-        ):
-            with self.subTest(public_behavior=public_behavior):
-                self.assertIn(public_behavior, README_TEXT)
 
     def test_foreground_work_has_explicit_shared_resource_arbitration(
         self,
@@ -149,8 +132,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        self.assertIn("先停止后台重新取锁", README_TEXT)
-        self.assertIn("不推进未完成游标", README_TEXT)
 
     def test_continuous_realtime_progress_uses_layered_authoritative_evidence(
         self,
@@ -182,13 +163,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         self.assertIn("环境饱和可以让正常能力基准失去代表性", DIAGNOSTIC_TEXT)
         self.assertIn("仍可证明过载合同", DIAGNOSTIC_TEXT)
 
-        for public_behavior in (
-            "墙钟、正式生产进度、消费或展示确认和最终可见结果",
-            "序列连续和“丢失为零”不能证明没有整体变慢",
-            "正常负载能力和过载时如实报告及降级分别得出结论",
-        ):
-            with self.subTest(public_behavior=public_behavior):
-                self.assertIn(public_behavior, README_TEXT)
 
     def test_health_metrics_require_real_measurement_and_user_calibration(
         self,
@@ -209,13 +183,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
 
         self.assertIn("两者冲突时，用户结果是失败证据", DIAGNOSTIC_TEXT)
         self.assertIn("默认值、常量、缺失回调", DIAGNOSTIC_TEXT)
-        for public_behavior in (
-            "零值不会被用来表示“没有测量”",
-            "与独立用户结果校准",
-            "没有正式生产者的指标会退出成功条件",
-        ):
-            with self.subTest(public_behavior=public_behavior):
-                self.assertIn(public_behavior, README_TEXT)
 
     def test_verified_fast_paths_are_qualified_and_fallback_atomically(self) -> None:
         ordered = (
@@ -231,7 +198,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
         self.assertIn("不能保留前半段高速结果", DIAGNOSTIC_TEXT)
         self.assertIn("文件存在或非空不能代表成功", DIAGNOSTIC_TEXT)
-        self.assertIn("快慢路径混合产物", README_TEXT)
 
     def test_large_immutable_content_reuses_only_bound_validation_receipts(self) -> None:
         for fragment in (
@@ -244,7 +210,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        self.assertIn("正式进入不可变状态", README_TEXT)
 
     def test_deterministic_derivatives_have_one_cross_process_producer(
         self,
@@ -274,14 +239,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        for fragment in (
-            "覆盖整个生产过程的同键租约",
-            "在租约内重新检查后只生产一次",
-            "不同键仍可并行",
-            "只触发一次重建",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_diagnostic_order_reduces_uncertainty_before_expensive_runs(self) -> None:
         ordered = (
@@ -325,14 +282,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        for public_behavior in (
-            "多次命令的结果不同时",
-            "不同身份只表示查了不同对象",
-            "只有同一对象在可比条件下确实变化后",
-            "普通单次检查不会增加这套对照",
-        ):
-            with self.subTest(public_behavior=public_behavior):
-                self.assertIn(public_behavior, README_TEXT)
 
     def test_multistage_toolchains_are_verified_at_the_handoff_boundaries(
         self,
@@ -357,7 +306,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
-        self.assertIn("父子进程实际选择的可执行文件", README_TEXT)
 
     def test_external_process_attempts_keep_one_owner_until_terminal(self) -> None:
         external_process = DIAGNOSTIC_TEXT.split("### 环境与外部进程", 1)[
@@ -392,11 +340,6 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(cross_project_boundary=cross_project_boundary):
                 self.assertIn(cross_project_boundary, DIAGNOSTIC_TEXT)
 
-    def test_readme_exposes_the_behavior_without_making_it_the_default(self) -> None:
-        self.assertIn("不会靠反复跑昂贵长测碰运气", README_TEXT)
-        self.assertIn("同一个问题可以同时叠加", README_TEXT)
-        self.assertIn("不会把这些专项检查强加给普通确定性改动", README_TEXT)
-        self.assertIn("昂贵完整链才用于最终确认", README_TEXT)
 
 
 if __name__ == "__main__":

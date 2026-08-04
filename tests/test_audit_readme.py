@@ -61,7 +61,8 @@ class ReadmeAuditTests(unittest.TestCase):
                 root,
             )
             self.assertIn("Local images checked: 1", completed.stdout)
-            self.assertIn("Scope: structural checks only", completed.stdout)
+            self.assertIn("Prose blocks checked: 0", completed.stdout)
+            self.assertIn("Scope: structural and prose-density checks", completed.stdout)
             self.assertIn("source currency", completed.stdout)
             self.assertIn("factual accuracy", completed.stdout)
             self.assertIn("visual relevance", completed.stdout)
@@ -107,6 +108,53 @@ class ReadmeAuditTests(unittest.TestCase):
                 "Markdown image missing useful alt text",
                 missing_alt.stdout,
             )
+
+    def test_prose_density_rejects_long_paragraphs_and_consecutive_walls(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-density-"
+        ) as temporary:
+            root = Path(temporary)
+            readme = root / "README.md"
+            readme.write_text(
+                (
+                    "# Fixture\n\n"
+                    + "A" * 361
+                    + "\n\n"
+                    "First short paragraph.\n\n"
+                    "Second short paragraph.\n\n"
+                    "Third short paragraph.\n\n"
+                    "Fourth short paragraph.\n"
+                ),
+                encoding="utf-8",
+            )
+
+            failed = run(
+                [sys.executable, str(SCRIPT), str(readme)],
+                root,
+                check=False,
+            )
+            self.assertEqual(1, failed.returncode)
+            self.assertIn("has 361 characters", failed.stdout)
+            self.assertIn("5 consecutive paragraphs", failed.stdout)
+
+            readme.write_text(
+                (
+                    "# Fixture\n\n"
+                    "A concise introduction.\n\n"
+                    "- A list breaks the prose run.\n\n"
+                    "A second concise paragraph.\n\n"
+                    "```text\n"
+                    + "B" * 500
+                    + "\n```\n"
+                ),
+                encoding="utf-8",
+            )
+            passed = run(
+                [sys.executable, str(SCRIPT), str(readme)],
+                root,
+            )
+            self.assertIn("Prose blocks checked: 2", passed.stdout)
+            self.assertIn("OK: structural README checks passed", passed.stdout)
 
     def test_profile_producer_reaches_all_language_readmes_and_auditor(self) -> None:
         with tempfile.TemporaryDirectory(

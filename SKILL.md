@@ -136,14 +136,14 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## README 与主页
 
-先读取 `references/content-architecture.md`；需要表达性视觉时再读取 `references/visual-direction.md`，随后依次读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时，读取 `assets/readme-profile/profile.json`，并由 `scripts/readme_header.py` 消费目标仓库身份和真实文件生成或核对；profile 不适用、翻译未交付或仓库事实不成立时不生成对应入口。按需选择：
+先读取 `references/readme-delivery.md`，用一份交付账本检查 Git 边界、README、正文、视觉、多语言、许可证、Star History、仓库元数据、验证与停止位置；只读请求停在同一账本，明确要求优化、重写或完整处理时才实施。随后按账本读取 `references/content-architecture.md`；需要表达性视觉时再读取 `references/visual-direction.md`，并依次读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时，读取 `assets/readme-profile/profile.json`，由 `scripts/readme_header.py` 消费真实语言文件、仓库身份和许可证；profile 不适用或事实不成立时不生成对应入口。按需选择：
 
 - SVG 与混合视觉：`references/svg-production.md`、`references/hybrid-svg-production.md`
 - 动效：`references/motion-production.md`
 - 平台边界：`references/platform-guidelines.md`
 - 自托管 Star History：`references/github-star-history.md`；只问失效原因或现状时保持只读，实施时同时读取 `references/repository-publication.md`，精确提交并推送调用仓库改动，手动运行工作流，再沿 API、生成器、输出分支、raw SVG 和 README 消费端的真实链路验收
 
-先确认项目身份、公开材料资格与读者路径。只有明确要求修改时才写 README 或素材；完成后运行 scripts/audit_readme.py，并在实际渲染表面核对。
+README 不作为每项内部治理规则的第二份活动真源；自我进化只有改变公开身份、读者路径、主要入口或维护导航时才更新 README。完成后运行 `scripts/audit_readme.py`，并在实际渲染表面核对。
 
 ## 许可证治理
 

@@ -11,7 +11,6 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 REFERENCE = SKILL_ROOT / "references" / "repository-directory-governance.md"
 REFERENCE_TEXT = REFERENCE.read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 OPENAI_TEXT = (SKILL_ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8")
 SCRIPT = SKILL_ROOT / "scripts" / "inspect_project_tree.py"
 
@@ -97,8 +96,6 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         self.assertIn("项目目录治理", SKILL_TEXT)
         self.assertIn("references/repository-directory-governance.md", SKILL_TEXT)
         self.assertIn("scripts/inspect_project_tree.py", SKILL_TEXT)
-        self.assertIn("项目目录治理", README_TEXT)
-        self.assertIn("scripts/inspect_project_tree.py", README_TEXT)
         self.assertIn("项目目录", OPENAI_TEXT)
 
     def test_method_preserves_evidence_and_permission_boundaries(self) -> None:

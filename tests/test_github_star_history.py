@@ -27,6 +27,9 @@ ACTION_TEXT = (
 WORKFLOW_TEXT = (
     SKILL_ROOT / ".github" / "workflows" / "star-history.yml"
 ).read_text(encoding="utf-8")
+CALLER_TEXT = (
+    SKILL_ROOT / ".github" / "workflows" / "update-star-history.yml"
+).read_text(encoding="utf-8")
 
 
 class MatchingFilesClient:
@@ -140,10 +143,13 @@ class GitHubStarHistoryTests(unittest.TestCase):
         self.assertIn("60", REFERENCE_TEXT)
 
     def test_public_workflow_keeps_credentials_in_the_caller_boundary(self) -> None:
-        combined = ACTION_TEXT + "\n" + WORKFLOW_TEXT
+        combined = ACTION_TEXT + "\n" + WORKFLOW_TEXT + "\n" + CALLER_TEXT
         self.assertIn("${{ github.token }}", WORKFLOW_TEXT)
         self.assertIn("contents: write", WORKFLOW_TEXT)
         self.assertIn("scripts/github_star_history.py", ACTION_TEXT)
+        self.assertIn("workflow_dispatch:", CALLER_TEXT)
+        self.assertIn("schedule:", CALLER_TEXT)
+        self.assertIn("uses: ./.github/workflows/star-history.yml", CALLER_TEXT)
         self.assertNotIn("api.star-history.com", combined)
         self.assertNotIn("personal access token", combined.lower())
 

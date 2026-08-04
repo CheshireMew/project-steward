@@ -8,7 +8,6 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 MAIN_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 AGENT_TEXT = (
     SKILL_ROOT / "agents" / "openai.yaml"
 ).read_text(encoding="utf-8")
@@ -89,11 +88,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertIn("按照主路由已经选定的模式执行", ARCHITECTURE_TEXT)
         self.assertIn("本方法不重新解释用户措辞", ARCHITECTURE_TEXT)
         self.assertNotIn("用户只说检查、审计、诊断", ARCHITECTURE_TEXT)
-        self.assertIn("检查是硬只读边界", README_TEXT)
 
-    def test_every_turn_rechecks_frozen_authority_before_state_change(self) -> None:
-        self.assertIn("第一次改变状态前都会重新核对", README_TEXT)
-        self.assertIn("不会进入项目写入", README_TEXT)
 
     def test_continuation_cannot_promote_a_completed_read_only_result(self) -> None:
         shared = MAIN_TEXT.split("## 共同边界", 1)[1].split(
@@ -109,13 +104,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, shared)
 
-        for fragment in (
-            "都只从最近一次用户明确动作及其尚未完成的结果恢复合同",
-            "都不会变成新的实施授权",
-            "只读结果已经交付",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_shared_boundaries_remain_on_every_project_steward_route(self) -> None:
         shared = MAIN_TEXT.split("## 共同边界", 1)[1].split(
@@ -144,10 +132,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
-        self.assertIn(
-            "不会再堆一条同义原则",
-            README_TEXT,
-        )
 
     def test_learning_attribution_requires_the_skill_to_have_been_active(
         self,
@@ -215,15 +199,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
-        for fragment in (
-            "不会只在纠偏时学习",
-            "不会把沉默误当成认可",
-            "不能因为历史里没有出现某项能力就自动删除它",
-            "不要求用户逐项补全",
-            "职能范围和操作权限始终分开",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
         self.assertIn("判断职能边界", AGENT_TEXT)
 
@@ -316,13 +291,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(route_fragment=fragment):
                 self.assertIn(fragment, audit_route)
 
-        for fragment in (
-            "全面审计会先建立维度覆盖账本，再建立问题账本",
-            "GUI 项目也不会再把界面和体验降级成轻量抽查",
-            "只有全部适用维度均已审查",
-        ):
-            with self.subTest(readme_fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_comprehensive_ui_audit_uses_surface_and_journey_inventories(
         self,
@@ -362,8 +330,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
 
         self.assertIn("再进入价值或归因门槛", LEARNING_TEXT)
 
-        self.assertIn("共同路径和特殊维度，两者不是二选一", README_TEXT)
-        self.assertIn("同一个问题可以先进入跨项目共用的方法", README_TEXT)
 
     def test_rejected_content_cannot_become_active_defaults_or_examples(self) -> None:
         for fragment in (
@@ -385,7 +351,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
-        self.assertIn("“这个会话”只指当前任务", README_TEXT)
 
     def test_source_scope_changes_rebuild_the_active_evidence_boundary(
         self,
@@ -421,8 +386,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("来源只有读到明确末尾才算完整", README_TEXT)
-        self.assertIn("一个可选检查失败不会吞掉其它成功证据", README_TEXT)
 
     def test_sources_are_preflighted_before_unbounded_reads_or_git(self) -> None:
         for fragment in (
@@ -435,8 +398,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
-        self.assertIn("只有能够一次完整容纳的来源才整份读取", README_TEXT)
-        self.assertIn("不会先在任意目录运行再靠报错找仓库", README_TEXT)
 
     def test_diagnostics_separate_facts_hypotheses_and_root_causes(self) -> None:
         for fragment in (
@@ -449,15 +410,11 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
-        self.assertIn(
-            "观察到的事实、待验证假设或已确认根因",
-            README_TEXT,
-        )
 
     def test_real_producer_assertions_follow_identity_and_fact_category(
         self,
     ) -> None:
-        for text in (PREVENTION_TEXT, REMEDIATION_TEXT, README_TEXT):
+        for text in (PREVENTION_TEXT, REMEDIATION_TEXT):
             for fragment in (
                 "稳定语义身份",
                 "对象总数、列表位置",
@@ -488,13 +445,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
-        for fragment in (
-            "长而嘈杂或需要跨轮观察的命令",
-            "等待或轮询自身失败只让相应证据保持未知",
-            "不会启动新的执行尝试",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_windows_tool_probes_and_long_tasks_preserve_user_observation(
         self,
@@ -532,7 +482,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("规则的精确触发条件确实被本次变化命中", README_TEXT)
 
     def test_behavior_baseline_separates_intent_current_state_and_history(
         self,
@@ -561,7 +510,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "不在产品体验路径另建一套来源真源",
             PRODUCT_EXPERIENCE_TEXT,
         )
-        self.assertIn("旧 Git 只证明对应提交的历史", README_TEXT)
 
     def test_reference_implementations_are_adopted_at_mechanism_level(self) -> None:
         for fragment in (
@@ -578,7 +526,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT + PROJECT_RESEARCH_TEXT)
 
         self.assertIn("不会建立第二套状态、时间轴、缓存或恢复边界", PREVENTION_TEXT)
-        self.assertIn("用当前项目的代表性负载决定", README_TEXT)
 
     def test_operational_invariants_gate_complexity_and_content_defaults(
         self,
@@ -596,8 +543,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("未经用户目标、产品合同或真实数据证明的最坏情况", README_TEXT)
-        self.assertIn("空容器不会抢占默认值", README_TEXT)
 
     def test_new_protocol_surfaces_require_a_real_consumer_and_stay_thin(
         self,
@@ -674,8 +619,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("演示或画廊只能证明预览", README_TEXT)
-        self.assertIn("工具只整体重写自己拥有的生成文件", README_TEXT)
 
     def test_reference_features_require_target_object_and_entry_evidence(
         self,
@@ -709,7 +652,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT + IMPLEMENTATION_TEXT)
 
-        self.assertIn("参考产品里的功能不会因为有独立页面", README_TEXT)
 
     def test_long_ordered_content_separates_access_intents_before_replacement(
         self,
@@ -728,14 +670,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, UX_DESIGN_TEXT)
 
-        for fragment in (
-            "连续追溯、定点跳转、查询筛选和人为分组",
-            "不会静默删掉原有的连续浏览结果",
-            "平台自然输入、可发现的备用入口",
-            "都不能单独证明旧入口可以退出",
-        ):
-            with self.subTest(readme_fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_design_selects_the_object_presentation_archetype_before_styling(
         self,
@@ -852,13 +786,23 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
+
+    def test_self_evolution_does_not_mirror_internal_rules_into_readme(self) -> None:
         for fragment in (
-            "能力实现、各根正式验证、隔离互操作、当前实例正式采用",
-            "构建或临时入口只用于会话级验证",
-            "不会把它伪装成长期工具路径",
+            "公开 README 不是每项内部能力的默认消费者",
+            "也不是自我进化日志",
+            "只有项目公开身份、第一采用读者、主要入口",
+            "不能用 README 原文断言证明内部能力已经迁移",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
+                self.assertIn(fragment, LEARNING_TEXT)
+
+        readme_route = MAIN_TEXT.split("## README 与主页", 1)[1].split(
+            "## 许可证治理",
+            1,
+        )[0]
+        self.assertIn("references/readme-delivery.md", readme_route)
+        self.assertIn("README 不作为每项内部治理规则", readme_route)
 
     def test_self_evolution_requires_a_second_stage_confirmation(self) -> None:
         section = MAIN_TEXT.split(
@@ -1001,10 +945,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         )
         self.assertIn("用户入口实际选择", PREVENTION_TEXT)
         self.assertIn("用户入口实际选择", REMEDIATION_TEXT)
-        self.assertIn(
-            "源码正确、普通构建通过和用户入口实际选中当前产物",
-            README_TEXT,
-        )
 
     def test_worker_results_streams_and_runtime_bundles_have_exact_boundaries(
         self,
@@ -1049,12 +989,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
-        for fragment in (
-            "普通日志、退出码和 EOF 不负责猜测结论",
-            "依赖与资源清单还要和运行目录实际文件集合完全一致",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_architecture_screening_aggregates_logical_owners(self) -> None:
         for fragment in (
@@ -1092,14 +1026,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        for fragment in (
-            "固定审计来源、内容身份和逻辑所有者的聚合定义",
-            "脏工作树以审计当时的实际文件为基线",
-            "旧基线失效",
-            "区分审计快照到当前状态、本任务实际改动和相对 Git 的差异",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_facade_and_composition_root_migrations_preserve_contract_identity(
         self,
@@ -1120,14 +1046,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        for fragment in (
-            "逐成员记录旧方法、属性、信号和跨语言绑定的最终所有者",
-            "必须共享同一实例",
-            "不会根据其它调用点常见的局部变量名补造依赖",
-            "实际运行不同调用形态并核对协作者身份",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_protocol_surfaces_have_liveness_and_one_semantic_contract(
         self,
@@ -1158,13 +1076,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        for public_behavior in (
-            "事件、DTO 和公共字段会逐项建立存活账本",
-            "只有测试或说明文档引用不能证明运行时表面值得保留",
-            "同一语义在整个生命周期只保留一个名称和合同",
-        ):
-            with self.subTest(public_behavior=public_behavior):
-                self.assertIn(public_behavior, README_TEXT)
 
     def test_public_surface_liveness_is_not_inferred_from_repository_references(
         self,
@@ -1181,8 +1092,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        self.assertIn("仓内零引用只足以判断消费者范围已经封闭的内部符号", README_TEXT)
-        self.assertIn("证据不足就保留为未知或受阻", README_TEXT)
 
     def test_architecture_residue_scans_close_semantic_invariants(self) -> None:
         for fragment in (
@@ -1199,7 +1108,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        self.assertIn("关键词与目录只能生成候选", README_TEXT)
 
     def test_migration_test_failures_stay_bound_to_findings_and_target_behavior(
         self,
@@ -1215,8 +1123,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        self.assertIn("同一测试文件不等于同一迁移边界", README_TEXT)
-        self.assertIn("不会为了让套件变绿而顺手改写", README_TEXT)
 
     def test_async_workflows_close_by_stage_without_central_redispatch(
         self,
@@ -1245,14 +1151,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        for fragment in (
-            "按阶段恢复职责闭环",
-            "执行器只负责平台或计算操作",
-            "让它经过正式序列化与存储、执行器、类型化结果、阶段结果应用和当前界面",
-            "阻止中央业务分支、宽控制器和旧 facade 回归",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_prior_audit_findings_must_close_before_all_fixed_claim(self) -> None:
         for fragment in (
@@ -1276,8 +1174,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
-        self.assertIn("不会让未结项的结构发现自动消失", README_TEXT)
-        self.assertIn("不会宣称全部问题已经解决", README_TEXT)
 
     def test_comprehensive_audit_emits_a_remediation_handoff_ledger(self) -> None:
         ordered = (
@@ -1300,13 +1196,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
-        for fragment in (
-            "全面审计本身会输出可由后续普通修复任务直接消费的交接账本",
-            "未更新的远端平面自动消失",
-            "不会宣称全部问题已经解决、可合并或可发布",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_external_workspace_writers_are_gated_before_state_changes(
         self,
@@ -1321,7 +1210,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
         self.assertIn("不能解释的变化不得用 `git restore` 消掉", PUBLICATION_TEXT)
-        self.assertIn("来源不明的变化不会被恢复、覆盖或顺手纳入", README_TEXT)
 
     def test_delegated_shared_worktree_writes_require_handoff_and_reverification(
         self,
@@ -1338,8 +1226,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("写入者结束却没有交接的改动", README_TEXT)
-        self.assertIn("并发期间的半迁移状态不会被当作产品缺陷", README_TEXT)
 
     def test_local_workspace_has_one_multidimensional_path_policy(self) -> None:
         for fragment in (
@@ -1354,12 +1240,9 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LOCAL_WORKSPACE_TEXT)
 
-        self.assertIn("统一内容路径策略", README_TEXT)
-        self.assertIn("即使损坏或无法解析", README_TEXT)
 
     def test_deployable_repository_scope_comes_from_a_clean_checkout(self) -> None:
         self.assertIn("用干净克隆确定仓库边界", PUBLICATION_TEXT)
-        self.assertIn("若目标包含异机运行或服务器部署", README_TEXT)
 
     def test_publication_reuses_only_fresh_verified_evidence(self) -> None:
         for fragment in (
@@ -1392,20 +1275,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
-        for fragment in (
-            "文档、示例、schema、公共导出、验证与发布脚本、真实用户链工具和生成物来源也属于正式消费者",
-            "审计实际暂存索引",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
-    def test_mutation_receipts_are_not_final_state_evidence(self) -> None:
-        for fragment in (
-            "写入工具返回成功只表示调用已经结束",
-            "按各自的退出语义区分通过、零发现与执行失败",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_verifier_success_requires_expected_input_coverage(self) -> None:
         for fragment in (
@@ -1432,10 +1302,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn(
-            "命令成功但输入为空、过期或漏掉候选内容",
-            README_TEXT,
-        )
 
     def test_completion_requires_unique_collected_test_identities(self) -> None:
         shared = MAIN_TEXT.split("## 共同边界", 1)[1].split(
@@ -1463,13 +1329,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
-        for fragment in (
-            "测试框架实际收集的唯一身份",
-            "检查同名覆盖、发现命名、过滤、排除和生成身份碰撞",
-            "缺失、重复或未执行的关键测试继续按未覆盖处理",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_activity_test_sources_match_unittest_collection(self) -> None:
         tests_root = SKILL_ROOT / "tests"
@@ -1541,7 +1400,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("不会直接推断同一个文件、分支、进程或任务", README_TEXT)
 
     def test_public_verifiers_must_execute_their_representative_path(
         self,
@@ -1558,8 +1416,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
         self.assertIn("验证与发布脚本、真实用户链工具", PREVENTION_TEXT)
-        self.assertIn("公开验证器本身是否真的执行了代表性输入", README_TEXT)
-        self.assertIn("语法检查、成功导入、帮助输出和脚本存在", README_TEXT)
 
     def test_public_validator_timeout_covers_required_child_and_cleanup(
         self,
@@ -1576,7 +1432,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
-        self.assertIn("子检查已经显示通过但包装器超时", README_TEXT)
 
     def test_high_cardinality_ui_limits_consumer_fanout_and_stale_writes(
         self,
@@ -1604,13 +1459,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        for public_behavior in (
-            "一次通知引发的重算",
-            "尚未访问的昂贵消费者不会默认随应用启动",
-            "表单只提交脏字段",
-        ):
-            with self.subTest(public_behavior=public_behavior):
-                self.assertIn(public_behavior, README_TEXT)
 
     def test_committed_state_reaches_the_current_live_projection(self) -> None:
         ordered = (
@@ -1658,15 +1506,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        for fragment in (
-            "普通查询方法能够读到新值，不代表界面会自动重新求值",
-            "存储写入成功，也不代表打开中的编辑器已经更新",
-            "较晚返回的旧快照只能更新自己的基线分区",
-            "不能整表替换掉已经显示的新状态",
-            "不用关闭重开、手工刷新或固定延时冒充活动投影成立",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_verification_coverage_is_bound_to_real_build_targets(self) -> None:
         for fragment in (
@@ -1679,7 +1518,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
         self.assertIn("目标专属代码", PROJECT_AUDIT_TEXT)
-        self.assertIn("宿主侧通过不会替", README_TEXT)
 
     def test_public_audit_uses_live_remote_and_external_capability_evidence(
         self,
@@ -1697,8 +1535,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
-        self.assertIn("缓存远端引用、实时远端检查和发布制品", README_TEXT)
-        self.assertIn("正式入口验证现实可用性", README_TEXT)
 
     def test_new_file_writers_activate_construction_sites_and_residue_checks(
         self,
@@ -1714,8 +1550,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("潜在写入生产者", README_TEXT)
-        self.assertIn("删除未获授权时", README_TEXT)
 
     def test_deferred_desktop_ui_work_survives_only_its_owned_lifecycle(
         self,
@@ -1731,7 +1565,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
-        self.assertIn("销毁后访问、过期回调和延迟写入", README_TEXT)
 
     def test_desktop_blocking_work_preserves_event_loop_and_result_identity(
         self,
@@ -1760,13 +1593,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
-        for fragment in (
-            "事件处理器不会同步承担随输入增长的文件遍历与复制",
-            "在任务完成前证明事件循环已经处理另一项无冲突操作",
-            "覆盖完成、替代、取消和关闭排空",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_desktop_runtime_smoke_enumerates_lazy_surfaces_and_uses_fresh_process(
         self,
@@ -1783,8 +1609,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
-        self.assertIn("桌面 smoke 会先列出主窗口", README_TEXT)
-        self.assertIn("测试套件残留的全局状态", README_TEXT)
 
     def test_desktop_visual_materials_are_adopted_only_when_runtime_fit_is_proven(
         self,
@@ -1801,8 +1625,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
-        self.assertIn("不会被直接当成 Windows/QML 应用的默认风格", README_TEXT)
-        self.assertIn("高密度编辑工作区默认保持稳定不透明", README_TEXT)
 
     def test_desktop_validation_separates_offscreen_and_native_windows_evidence(
         self,
@@ -1818,8 +1640,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
-        self.assertIn("分开离屏或 headless 与真实 Windows 会话", README_TEXT)
-        self.assertIn("隔离实机检查", README_TEXT)
 
     def test_native_runtime_supply_and_process_isolation_are_governed(
         self,
@@ -1871,10 +1691,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertIn(
             "发起者、终止原因、结果状态、传输收尾",
             LOG_TEXT,
-        )
-        self.assertIn(
-            "内部轮次不是新的授权边界",
-            README_TEXT,
         )
         self.assertNotIn("执行节奏与停止判断", AGENT_TEXT)
         self.assertNotIn("持久意图", AGENT_TEXT)
@@ -2010,7 +1826,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("先选择每个区域的唯一主架构", README_TEXT)
 
     def test_direct_manipulation_previews_then_commits_once_and_is_discoverable(
         self,
@@ -2068,8 +1883,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("解除关联后选择状态不能让旧关系继续生效", README_TEXT)
-        self.assertIn("不能只靠选中高亮表达", README_TEXT)
 
     def test_drag_create_preview_and_commit_share_one_placement_proposal(
         self,
@@ -2128,8 +1941,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("避免把“新增”做成替换", README_TEXT)
-        self.assertIn("不会借通用最佳实践重新扩大范围", README_TEXT)
 
     def test_visual_references_and_asset_batches_keep_source_specific_evidence(
         self,
@@ -2162,8 +1973,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LAYOUT_RESPONSIVE_TEXT)
 
-        self.assertIn("只迁入用户实际点名的关系", README_TEXT)
-        self.assertIn("不从同批其它图片或偶然生成结果补造设定", README_TEXT)
 
     def test_visual_evidence_is_opened_and_reviewed_at_target_scale(
         self,
@@ -2177,8 +1986,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("不会停在“截图文件已经生成”", README_TEXT)
-        self.assertIn("没有看到目标画面时，视觉结论保持未知", README_TEXT)
 
     def test_editable_visual_deliverables_and_scene_graph_transforms_are_governed(
         self,
@@ -2213,9 +2020,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
         self.assertIn("可视层级、变换或动效所有权", MAIN_TEXT)
-        self.assertIn("中间参考", README_TEXT)
-        self.assertIn("不能替代最终可编辑交付物", README_TEXT)
-        self.assertIn("运行时变换链和最终画面", README_TEXT)
 
     def test_shared_visual_anchor_governs_surface_different_asset_batches(
         self,
@@ -2245,8 +2049,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESIGN_METHOD_TEXT)
 
-        self.assertIn("锚点改变后，受影响的旧派生物会失效", README_TEXT)
-        self.assertIn("不用“炫酷、梦幻、3D”替代", README_TEXT)
 
     def test_longer_than_expected_work_exposes_real_state_without_scope_drift(
         self,
@@ -2259,7 +2061,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
-        self.assertIn("不会用“还在处理”反复占位", README_TEXT)
 
     def test_technical_migration_does_not_authorize_visual_redesign(self) -> None:
         for fragment in (
@@ -2281,8 +2082,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("把实现责任迁移和界面呈现变化分开", README_TEXT)
-        self.assertIn("不会被当成“更有设计感”的理由", README_TEXT)
 
     def test_external_media_production_uses_real_capabilities_and_lineage(
         self,
@@ -2306,8 +2105,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("先冻结当前真实支持的参考输入", README_TEXT)
-        self.assertIn("不会因为文件已经生成就替它补造用途", README_TEXT)
 
     def test_transparent_media_noise_is_governed_across_the_derivative_chain(
         self,
@@ -2332,8 +2129,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("区分整幅低 Alpha 噪点、边缘污染和编码伪影", README_TEXT)
-        self.assertIn("不用“带 Alpha”或“浏览器能播放”代替最终画面", README_TEXT)
 
     def test_user_visible_promises_require_branch_level_evidence(self) -> None:
         for fragment in (
@@ -2346,7 +2141,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
         self.assertIn("承诺覆盖", REMEDIATION_TEXT)
-        self.assertIn("不会用一条成功链代替整个交付", README_TEXT)
     def test_confirmed_plan_is_revalidated_against_current_targets(self) -> None:
         for fragment in (
             "用户确认后、开始写入前",
@@ -2358,10 +2152,9 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
-        self.assertIn("确认只覆盖用户看到的那份方案", README_TEXT)
 
     def test_task_replacement_preserves_partial_delivery_state(self) -> None:
-        for text in (LEARNING_TEXT, README_TEXT):
+        for text in (LEARNING_TEXT,):
             for fragment in (
                 "新的独立请求",
                 "已经写入但尚未完成验证",
@@ -2372,7 +2165,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                     self.assertIn(fragment, text)
 
         self.assertIn("新请求不授权继续或回退旧结果", LEARNING_TEXT)
-        self.assertIn("新请求不会被解释成继续或回退旧结果的授权", README_TEXT)
 
     def test_protocol_migrations_use_real_history_and_serialized_contracts(
         self,
@@ -2407,8 +2199,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
-        self.assertIn("正式序列化器实际落下的文件", README_TEXT)
-        self.assertIn("测试手写一份 JSON 不能替代", README_TEXT)
 
     def test_structured_json_has_one_strict_boundary_and_direct_routes(
         self,
@@ -2440,8 +2230,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, STRUCTURED_DATA_TEXT)
 
-        self.assertIn("外部、持久化、模型和进程 JSON", README_TEXT)
-        self.assertIn("生产代码、迁移器、验证器和维护脚本", README_TEXT)
 
     def test_model_operations_preserve_wire_inputs_runtime_truth_and_consumers(
         self,
@@ -2490,15 +2278,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "模型请求语义",
             STRUCTURED_DATA_TEXT,
         )
-        for fragment in (
-            "真正发送到 provider 的线请求",
-            "强制 route、schema、输出示例和 `response_format`",
-            "模型不能用一句完成式文案推进状态",
-            "接收阶段证明产物尚未完成",
-            "结果阶段证明产物已经可用",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_full_record_and_bounded_model_context_have_distinct_owners(
         self,
@@ -2520,15 +2299,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, MODEL_OPERATION_TEXT)
 
-        for fragment in (
-            "长期记录可以完整保存",
-            "界面查看位置、上下文组装策略和 provider 最终线请求",
-            "不会暗中裁剪下一次模型输入",
-            "不会删除、覆盖或重新解释完整记录",
-            "provider 实际只收到符合预算的可追溯投影",
-        ):
-            with self.subTest(readme_fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_editable_settings_prove_real_capability_to_runtime_effect(self) -> None:
         for fragment in (
@@ -2545,13 +2315,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        for fragment in (
-            "从真实能力到最终消费者的效用账本",
-            "没有消费者的字段不会继续伪装成可用设置",
-            "首次向导和日常设置会复用同一能力目录",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_settings_have_scoped_targets_and_one_atomic_commit(self) -> None:
         for fragment in (
@@ -2566,8 +2329,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
         self.assertIn("设置或维护工具越过唯一写入边界", REMEDIATION_TEXT)
-        self.assertIn("一次动作只修改它准确选择的目标", README_TEXT)
-        self.assertIn("全部目标通过一次配置提交发布", README_TEXT)
 
     def test_multistage_settings_separate_connection_application_and_effect(
         self,
@@ -2597,14 +2358,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(remediation_fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
-        for fragment in (
-            "把“已经接通”“活动运行时已经应用”和“对用户所说的结果有效”分开",
-            "全部分类、门控、聚合、解码或过滤阶段",
-            "同一份受控正式输入在设置前后经过真实阶段和最终消费者",
-            "后置关键词过滤不能替上游设置修复背书",
-        ):
-            with self.subTest(readme_fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_realtime_sessions_wait_for_authority_and_publish_truthful_capabilities(
         self,
@@ -2630,8 +2383,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
-        self.assertIn("客户端收到当前身份后才释放排队请求", README_TEXT)
-        self.assertIn("只有准确路由及其依赖确实就绪时才公开调用 URL", README_TEXT)
 
     def test_model_call_graph_is_minimal_and_executor_context_isolated(
         self,
@@ -2656,10 +2407,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, MODEL_OPERATION_TEXT)
 
-        self.assertIn("由一次类型化响应返回", README_TEXT)
-        self.assertIn("CLI 只收到目标、相关上下文、约束", README_TEXT)
-        self.assertIn("执行 route 被当前产品模式禁用时", README_TEXT)
-        self.assertIn("任务正式登记后才能向用户表达", README_TEXT)
 
     def test_memory_evidence_roles_and_profiles_are_not_duplicate_truths(
         self,
@@ -2678,7 +2425,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LOG_TEXT)
 
-        self.assertIn("旧回复或一次讨好被写成永久事实", README_TEXT)
 
     def test_semantic_memory_curation_batches_and_restart_recovery_share_one_cursor(
         self,
@@ -2711,15 +2457,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(reference=reference):
                 self.assertIn(reference, LOG_TEXT)
 
-        for fragment in (
-            "对话会先独立提交",
-            "重启则从持久游标补齐全部积压",
-            "失败保留原游标",
-            "真实 provider 序列化、解析、存储、重启、检索和记忆界面",
-            "不会固化成 Project Steward 的通用数字",
-        ):
-            with self.subTest(readme_fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
         self.assertNotIn("20 轮", LOG_TEXT)
 
@@ -2744,8 +2481,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "长期记忆的首轮召回、检查器和维护写入",
             REMEDIATION_TEXT,
         )
-        self.assertIn("长期记忆召回不以短期对话历史非空为前提", README_TEXT)
-        self.assertIn("领域层没有相应命令时保持只读", README_TEXT)
 
     def test_recovery_actions_join_or_reject_duplicate_attempts(self) -> None:
         for fragment in (
@@ -2760,8 +2495,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_OPERATION_TEXT)
 
-        self.assertIn("重复点击、多个窗口触发或消息重放", README_TEXT)
-        self.assertIn("旧界面或超时回调留下的取消不能影响新尝试", README_TEXT)
 
     def test_public_api_migrations_include_verifiers_and_public_release_state(
         self,
@@ -2785,7 +2518,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
-        self.assertIn("等待公开的释放完成或失败状态", README_TEXT)
 
     def test_migrations_preflight_identities_before_expensive_full_regression(
         self,
@@ -2805,8 +2537,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-        self.assertIn("第一次昂贵全量回归前先预检", README_TEXT)
-        self.assertIn("只有影响全局或项目规则要求时", README_TEXT)
 
     def test_diagnostic_alternatives_do_not_complete_the_normal_entry(self) -> None:
         for fragment in (
@@ -2819,13 +2549,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, HARD_DIAGNOSTIC_TEXT + PREVENTION_TEXT)
 
-        for fragment in (
-            "手工复制生产物、跳过正式构建任务",
-            "从新鲜状态重新运行同一个正常入口",
-            "不会把较早替代路径的成功拼成标准入口已经恢复",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
         ordered = (
             "建立从父入口到正式消费者的多层工具链执行闭包",
@@ -2879,8 +2602,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
-        self.assertIn("会继续生成工程状态、缓存、恢复文件或导出层级的系统", README_TEXT)
-        self.assertIn("不会用分区工具处理 `SUBST`", README_TEXT)
 
     def test_large_content_roots_consume_the_user_environment_policy(self) -> None:
         for fragment in (
@@ -2926,12 +2647,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
-        for fragment in (
-            "目标名称相同或缓存存在不是复用证据",
-            "后续子进程选择同一身份并让最终消费者读取对应产物才是",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_product_successor_identity_separates_public_and_technical_names(
         self,
@@ -2959,8 +2674,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
-        self.assertIn("产品升级或更名则分开治理", README_TEXT)
-        self.assertIn("旧名称可以留在明确的历史材料中", README_TEXT)
 
     def test_audit_separates_feature_merge_and_publication_readiness(
         self,
@@ -2981,7 +2694,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
-        self.assertIn("把功能可用、可合并与可发布分别判断", README_TEXT)
 
 
 if __name__ == "__main__":

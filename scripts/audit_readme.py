@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 # Migrated from oil-oil/beautify-github-readme. See THIRD_PARTY_NOTICES.md.
-"""Audit README images, SVG compatibility, and an optional managed header."""
+"""Audit README structure, prose density, images, SVGs, and managed headers."""
 
 from __future__ import annotations
 
@@ -21,9 +21,12 @@ HTML_IMAGE = re.compile(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"'][^>]*>", re.I)
 HTML_ALT = re.compile(r"\balt=[\"']([^\"']*)[\"']", re.I)
 UNSAFE_SVG_TAGS = {"script", "foreignObject"}
 SCOPE_MESSAGE = (
-    "Scope: structural checks only; source currency, factual accuracy, "
+    "Scope: structural and prose-density checks only; source currency, factual accuracy, "
     "remote endpoint availability, visual relevance, and rendered quality "
     "are not evaluated."
+)
+STRUCTURAL_BLOCK = re.compile(
+    r"^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s|>|\||<|!\[|```|~~~)"
 )
 
 
@@ -56,6 +59,88 @@ def audit_svg(path: Path) -> list[str]:
     return issues
 
 
+def content_blocks(text: str) -> list[tuple[int, str]]:
+    blocks: list[tuple[int, str]] = []
+    current: list[str] = []
+    current_line = 0
+    in_fence = False
+
+    def flush() -> None:
+        nonlocal current, current_line
+        if current:
+            blocks.append((current_line, " ".join(part.strip() for part in current)))
+            current = []
+            current_line = 0
+
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if stripped.startswith(("```", "~~~")):
+            flush()
+            blocks.append((line_number, stripped))
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if not stripped:
+            flush()
+            continue
+        if not current:
+            current_line = line_number
+        current.append(stripped)
+    flush()
+    return blocks
+
+
+def is_prose_block(block: str) -> bool:
+    return not STRUCTURAL_BLOCK.match(block)
+
+
+def visible_character_count(block: str) -> int:
+    without_links = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", block)
+    without_markup = re.sub(r"[`*_~]", "", without_links)
+    return len(without_markup)
+
+
+def audit_prose_density(
+    text: str,
+    *,
+    max_characters: int,
+    max_consecutive: int,
+) -> tuple[int, list[str]]:
+    issues: list[str] = []
+    prose_count = 0
+    run: list[tuple[int, str]] = []
+
+    def flush_run() -> None:
+        nonlocal run
+        if len(run) > max_consecutive:
+            start = run[0][0]
+            end = run[-1][0]
+            issues.append(
+                "prose wall from lines {}-{}: {} consecutive paragraphs "
+                "(maximum {})".format(start, end, len(run), max_consecutive)
+            )
+        run = []
+
+    for line_number, block in content_blocks(text):
+        if not is_prose_block(block):
+            flush_run()
+            continue
+        prose_count += 1
+        run.append((line_number, block))
+        length = visible_character_count(block)
+        if length > max_characters:
+            issues.append(
+                "prose paragraph at line {} has {} characters (maximum {})".format(
+                    line_number,
+                    length,
+                    max_characters,
+                )
+            )
+    flush_run()
+    return prose_count, issues
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("readme", type=Path)
@@ -65,6 +150,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--branch", default="main")
     parser.add_argument("--license-path", default="LICENSE")
     parser.add_argument("--allow-missing-languages", action="store_true")
+    parser.add_argument("--max-prose-characters", type=int, default=360)
+    parser.add_argument("--max-consecutive-prose", type=int, default=3)
     return parser
 
 
@@ -87,6 +174,12 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
+    if args.max_prose_characters < 1 or args.max_consecutive_prose < 1:
+        print(
+            "ERROR: prose density limits must be positive integers",
+            file=sys.stderr,
+        )
+        return 2
 
     text = readme.read_text(encoding="utf-8")
     markdown_images = MARKDOWN_IMAGE.findall(text)
@@ -95,6 +188,12 @@ def main(argv: list[str] | None = None) -> int:
     sources.extend(HTML_IMAGE.findall(text))
 
     warnings: list[str] = []
+    prose_checked, prose_issues = audit_prose_density(
+        text,
+        max_characters=args.max_prose_characters,
+        max_consecutive=args.max_consecutive_prose,
+    )
+    warnings.extend(prose_issues)
     for alt, src in markdown_images:
         if not alt.strip():
             warnings.append(f"Markdown image missing useful alt text: {src}")
@@ -135,6 +234,7 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"README: {readme}")
     print(f"Local images checked: {checked}")
+    print(f"Prose blocks checked: {prose_checked}")
     print(f"Managed header checked: {'yes' if header_checked else 'no'}")
     print(SCOPE_MESSAGE)
     if warnings:

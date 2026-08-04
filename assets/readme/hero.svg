@@ -1,60 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg"
-     width="1200" height="420" viewBox="0 0 1200 420"
+     width="1200" height="360" viewBox="0 0 1200 360"
      role="img" aria-labelledby="title desc">
   <title id="title">Project Steward</title>
-  <desc id="desc">Project Steward 从项目对话中进化，并在下一次改动前主动使用学到的方法。</desc>
+  <desc id="desc">A project governance skill that learns from results, prevents rework, and closes root causes.</desc>
 
-  <rect width="1200" height="420" fill="#F4F0E7"/>
+  <rect width="1200" height="360" fill="#F4F0E7"/>
 
-  <g id="identity">
-    <text x="64" y="54"
-          fill="#27645A"
-      font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-      font-size="18" font-weight="750" letter-spacing="2.8">
-      PROJECT STEWARD · SELF-EVOLVING GOVERNANCE
-    </text>
+  <text x="64" y="64"
+        fill="#27645A"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="19" font-weight="750" letter-spacing="3.2">
+    PROJECT GOVERNANCE SKILL
+  </text>
 
-    <text x="64" y="137"
-          fill="#17222B"
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-          font-size="66" font-weight="760" letter-spacing="-1.6">
-      让每一次项目对话
-    </text>
-    <text x="64" y="214"
-          fill="#27645A"
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-          font-size="66" font-weight="760" letter-spacing="-1.6">
-      改善下一次真实行动
-    </text>
+  <text x="64" y="154"
+        fill="#17222B"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="76" font-weight="760" letter-spacing="-1.8">
+    Project Steward
+  </text>
 
-    <text x="68" y="266"
-          fill="#46525B"
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-          font-size="28" font-weight="560">
-      吸收成功机制、问题模式与关键细节，
-    </text>
-    <text x="68" y="307"
-          fill="#46525B"
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-          font-size="28" font-weight="560">
-      动手前预防，发生后从根因把链路治理完整。
-    </text>
+  <text x="68" y="207"
+        fill="#46525B"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="25" font-weight="620" letter-spacing="0.8">
+    LEARN FROM RESULTS · PREVENT REWORK · CLOSE ROOT CAUSES
+  </text>
+
+  <g id="governance-path" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M140 278 C280 228 440 326 600 278 C760 230 920 326 1060 278"
+          stroke="#B8B1A4" stroke-width="4"/>
+    <circle cx="140" cy="278" r="11" fill="#27645A" stroke="#F4F0E7" stroke-width="5"/>
+    <circle cx="600" cy="278" r="11" fill="#9D4F31" stroke="#F4F0E7" stroke-width="5"/>
+    <circle cx="1060" cy="278" r="11" fill="#17222B" stroke="#F4F0E7" stroke-width="5"/>
   </g>
 
-  <g id="example-requests">
-    <path d="M68 357 H1132" fill="none" stroke="#B8B1A4" stroke-width="2"/>
-    <text x="68" y="397"
-          fill="#46525B"
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-          font-size="20" font-weight="650">“从这个会话中进化”</text>
-    <text x="410" y="397"
-          fill="#46525B"
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-          font-size="20" font-weight="650">“检查内聚、重复与上帝模块”</text>
-    <text x="1132" y="397"
-          text-anchor="end"
-          fill="#9D4F31"
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif"
-          font-size="20" font-weight="750">“看懂一个陌生项目”</text>
+  <g fill="#46525B"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+     font-size="19" font-weight="720" letter-spacing="1.4">
+    <text x="140" y="326" text-anchor="middle">LEARN</text>
+    <text x="600" y="326" text-anchor="middle">PREVENT</text>
+    <text x="1060" y="326" text-anchor="middle">REMEDIATE</text>
   </g>
 </svg>

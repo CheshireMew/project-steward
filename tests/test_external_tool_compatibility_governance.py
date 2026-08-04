@@ -13,7 +13,6 @@ def read(relative: str) -> str:
 
 SKILL_TEXT = read("SKILL.md")
 COMPATIBILITY_TEXT = read("references/external-tool-compatibility.md")
-README_TEXT = read("README.md")
 
 
 class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
@@ -41,14 +40,6 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, route)
 
-        for fragment in (
-            "复合交付包不会只检查顶层清单或一份 schema",
-            "区分“已经声明可用”与“已经被场景或配置正式采用”",
-            "进入消费者执行计划",
-            "消费者自行迁移或手写的样例只能证明内部链路",
-        ):
-            with self.subTest(readme_fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_compatibility_claim_is_closed_and_adapter_specific(self) -> None:
         for fragment in (
@@ -144,13 +135,6 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
 
-        for fragment in (
-            "不能通过完整命令字符串、原始参数数组或“高级参数”",
-            "操作系统实际收到的参数顺序与最终有效值",
-            "覆盖会在启动前被拒绝",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_capabilities_require_enforceable_isolation_and_default_closed(
         self,
@@ -186,14 +170,6 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
 
-        for fragment in (
-            "权限选项、即时解释和实际启动参数来自同一适配器能力目录",
-            "自动模式复用同一策略和事件账本",
-            "盲写 `yes`",
-            "只有真实强制隔离才能被描述为无法越出工作区",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_declared_executor_owns_task_interpretation_and_tool_choice(
         self,
@@ -254,22 +230,6 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
 
-    def test_public_description_matches_the_new_behavior(self) -> None:
-        for fragment in (
-            "外部 CLI、执行工具和协议兼容性使用逐适配器证据矩阵",
-            "安装版工具真正发出的上游线协议",
-            "不会被拼成一次实际上没有运行过的端到端链",
-            "检查这个项目是否与多个 CLI 相性很好",
-            "没有可强制工作区隔离的适配器不会暴露 Shell",
-            "未改变的既有文件不能冒充新产物",
-            "外部 Agent 是产品声明的任务执行者时",
-            "不会因为任务看起来只是确定性文件操作就绕过它",
-            "顶层成功也不会抹掉仍未解决的工具错误",
-            "权限选项、即时解释和实际启动参数来自同一适配器能力目录",
-            "运行中的授权请求使用执行、任务、请求和工具调用身份",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
 
 if __name__ == "__main__":

@@ -6,7 +6,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (ROOT / "SKILL.md").read_text(encoding="utf-8")
-README_TEXT = (ROOT / "README.md").read_text(encoding="utf-8")
 STAR_TEXT = (ROOT / "references" / "github-star-history.md").read_text(
     encoding="utf-8"
 )
@@ -27,7 +26,6 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
                 self.assertIn(fragment, SKILL_TEXT)
 
         self.assertIn("只改本地", SKILL_TEXT)
-        self.assertIn("现有工作树中的其它修改不会被顺手纳入", README_TEXT)
 
     def test_star_history_stops_only_after_the_remote_consumer_works(self) -> None:
         for fragment in (

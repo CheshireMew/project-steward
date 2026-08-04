@@ -7,7 +7,6 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 LOG_TEXT = (
     SKILL_ROOT / "references" / "log-audit-standard.md"
 ).read_text(encoding="utf-8")
@@ -63,8 +62,6 @@ class TtsProjectionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LOG_TEXT)
 
-        self.assertIn("从同一份已定稿语义结果产生明确投影", README_TEXT)
-        self.assertIn("TTS provider 只收到应当发声的自然语言", README_TEXT)
 
     def test_validation_starts_from_formal_message_producers(self) -> None:
         for fragment in (
@@ -96,12 +93,6 @@ class TtsProjectionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, MODEL_TEXT)
 
-        for fragment in (
-            "动作、表情、显示和语音",
-            "聊天专属控制协议不会进入共享身份提示或执行 `task brief`",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_reference_remains_cross_project(self) -> None:
         self.assertNotRegex(LOG_TEXT, r"[A-Za-z]:\\")

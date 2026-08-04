@@ -10,7 +10,6 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-README_TEXT = (SKILL_ROOT / "README.md").read_text(encoding="utf-8")
 AGENT_TEXT = (
     SKILL_ROOT / "agents" / "openai.yaml"
 ).read_text(encoding="utf-8")
@@ -153,14 +152,6 @@ class CoreIdentityTests(unittest.TestCase):
         self.assertIn("明确要求时再自我进化", AGENT_TEXT)
         self.assertNotIn("综合审计", AGENT_TEXT)
 
-        first_use = README_TEXT.split(
-            "## 第一次使用", 1
-        )[1].split("## 安装", 1)[0]
-        self.assertIn("从一次已经发生的工作里进化", first_use)
-        self.assertIn("按多个用户最终结果", first_use)
-        self.assertIn("项目专属事实继续留在项目原有真源", first_use)
-        self.assertNotIn("综合审计", first_use)
-
     def test_complete_capability_absorption_has_a_bounded_research_handoff(
         self,
     ) -> None:
@@ -201,7 +192,6 @@ class CoreIdentityTests(unittest.TestCase):
             "普通项目介绍、一般比较和只问“它能做什么”继续读取最少够用的材料",
             PROJECT_RESEARCH_TEXT,
         )
-        self.assertIn("完整阅读这个项目，看哪些能力值得另一个项目吸收", README_TEXT)
 
         common_boundaries = SKILL_TEXT.split("## 共同边界", 1)[1].split(
             "## 对话学习与自我进化",
@@ -328,14 +318,6 @@ class CoreIdentityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, EFFECTIVENESS_TEXT)
 
-        for fragment in (
-            "冻结模型、参数、输入、历史、权限和评分口径",
-            "把 `scenario_id`、标题和期望标签留在评测编排器中",
-            "适配器错误会与模型能力分开",
-            "不会用单一指标或测试特制请求宣布胜者",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
 class ProjectArchiveExtractionTests(unittest.TestCase):
     def test_destination_root_is_required_and_no_hidden_fallback_is_created(

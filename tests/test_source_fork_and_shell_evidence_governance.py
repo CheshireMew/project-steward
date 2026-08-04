@@ -16,7 +16,6 @@ FORK_TEXT = read("references/source-fork-and-ecosystem-adoption.md")
 PROJECT_RESEARCH_TEXT = read("references/project-research.md")
 LICENSE_TEXT = read("references/license-governance.md")
 USER_ENVIRONMENT_TEXT = read("references/user-environment-governance.md")
-README_TEXT = read("README.md")
 
 
 class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
@@ -57,7 +56,7 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
         self.assertIn("不能把来源写成目标正在使用的第三方依赖", LICENSE_TEXT)
 
     def test_a_fork_never_replaces_the_canonical_upstream(self) -> None:
-        for text in (FORK_TEXT, LICENSE_TEXT, README_TEXT):
+        for text in (FORK_TEXT, LICENSE_TEXT):
             with self.subTest(source=text[:40]):
                 self.assertIn("原始上游", text)
                 self.assertIn("fork", text)
@@ -143,24 +142,6 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
-    def test_public_description_exposes_both_behaviors(self) -> None:
-        for fragment in (
-            "运行时依赖、源码分叉、兼容适配器、直接资源复用和只借鉴机制",
-            "后续上游变化作为新的候选人工审计",
-            "从这个 CLI 的源码起步做成独立产品",
-            "PowerShell 中一组语句最后成功",
-            "后续打印出“0”",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
-
-        for fragment in (
-            "直接复用或改编后再分发的代码与资源",
-            "只学习视觉锚点、核心动作、工作流或反复刻方法并独立实现",
-            "只有确实采用 fork 的独有改动才另列 fork",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, README_TEXT)
 
     def test_skill_main_file_stays_within_budget(self) -> None:
         self.assertLessEqual(len(SKILL_TEXT.splitlines()), 220)

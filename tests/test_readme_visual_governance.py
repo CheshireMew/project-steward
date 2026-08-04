@@ -45,10 +45,14 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
             "## 许可证治理",
             1,
         )[0]
+        delivery_index = readme_route.index("references/readme-delivery.md")
+        content_index = readme_route.index("references/content-architecture.md")
         visual_index = readme_route.index("references/visual-direction.md")
         hero_index = readme_route.index("references/project-native-hero.md")
         canvas_index = readme_route.index("references/github-readme-canvas.md")
         svg_index = readme_route.index("references/svg-production.md")
+        self.assertLess(delivery_index, content_index)
+        self.assertLess(content_index, visual_index)
         self.assertLess(visual_index, hero_index)
         self.assertLess(hero_index, canvas_index)
         self.assertLess(canvas_index, svg_index)
