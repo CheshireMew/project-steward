@@ -2569,6 +2569,43 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertIn("一次动作只修改它准确选择的目标", README_TEXT)
         self.assertIn("全部目标通过一次配置提交发布", README_TEXT)
 
+    def test_multistage_settings_separate_connection_application_and_effect(
+        self,
+    ) -> None:
+        for fragment in (
+            "阶段效用图",
+            "所属决策阶段与精确效果",
+            "已经接通",
+            "活动运行时已经应用",
+            "对用户所说的结果有效",
+            "每个阶段实际读取的参数、默认值或硬编码值",
+            "没有更早的门控主导输入",
+            "没有更后的阶段重新产生或覆盖同一结果",
+            "一个稳定身份一次迁移能力描述",
+            "同一份由正式生产者取得或按正式输入合同记录的受控输入",
+            "不能手写已经分类、识别或过滤完成的下游结果",
+            "多阶段链路中各设置属于哪个决策阶段",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        for fragment in (
+            "沿全部决策阶段定位最早主导结果的参数、默认值或硬编码值",
+            "在最终输出增加后置特判",
+            "形成独立产品合同和验收",
+        ):
+            with self.subTest(remediation_fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
+        for fragment in (
+            "把“已经接通”“活动运行时已经应用”和“对用户所说的结果有效”分开",
+            "全部分类、门控、聚合、解码或过滤阶段",
+            "同一份受控正式输入在设置前后经过真实阶段和最终消费者",
+            "后置关键词过滤不能替上游设置修复背书",
+        ):
+            with self.subTest(readme_fragment=fragment):
+                self.assertIn(fragment, README_TEXT)
+
     def test_realtime_sessions_wait_for_authority_and_publish_truthful_capabilities(
         self,
     ) -> None:
