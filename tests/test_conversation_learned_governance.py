@@ -367,6 +367,21 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
+    def test_emphasis_preserves_full_result_coverage_and_additive_closure(
+        self,
+    ) -> None:
+        for fragment in (
+            "先区分范围词和优先级词",
+            "“尤其”“重点”“特别关注”只改变检查顺序",
+            "只有“只”“仅”“排除”“不要看”等明确收窄表达",
+            "每项结果都必须进入这份覆盖账本",
+            "现有能力已完整覆盖 / 现有能力未被消费 / 值得吸收的新缺口 / 项目事实 / 不持久化",
+            "新增验收项进入同一闭环账本",
+            "全部仍有效请求重新生成完成清单",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LEARNING_TEXT)
+
     def test_evidence_acquisition_is_complete_and_failure_isolated(self) -> None:
         for fragment in (
             "预期范围、取得方式和完整性标记",
@@ -2061,6 +2076,22 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
+    def test_per_result_timing_separates_work_wait_rework_and_uncertainty(
+        self,
+    ) -> None:
+        for fragment in (
+            "按用户结果建立耗时账本",
+            "主动检查与实现时间",
+            "工具、构建和 CI 等待时间",
+            "诊断、返工和重复验证时间",
+            "等待用户决定或外部状态时间",
+            "从请求到交付的墙钟时间",
+            "无法准确还原",
+            "不能为了回答完整而编造每项分钟数",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LEARNING_TEXT)
+
 
     def test_technical_migration_does_not_authorize_visual_redesign(self) -> None:
         for fragment in (
@@ -2536,6 +2567,39 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
+
+    def test_project_config_and_verification_stay_portable_and_proportional(
+        self,
+    ) -> None:
+        for fragment in (
+            "机器和部署事实先进入项目运行配置边界",
+            "`.env` 不是所有项目的统一答案",
+            "同一个加载器、schema、校验、优先级和规范化结果",
+            "本机值 fallback",
+            "不含开发机配置与相邻项目的干净检出",
+            "不表示使用最多的抽象、服务、缓存、兼容层",
+            "已证明用户结果、失败风险或正式消费者",
+            "不从实现步骤、源码行数或调用点数量反推测试数量",
+            "README、许可证、致谢、仓库可见性和普通元数据修改不创建产品测试",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        for fragment in (
+            "仓库反复出现本机值先检查项目配置所有权",
+            "最早根因是项目运行配置没有唯一所有者和消费边界",
+            "只把路径移进 `.env`",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
+        root_cause_route = MAIN_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性",
+            1,
+        )[0]
+        self.assertIn("硬编码本机与部署事实", root_cause_route)
+        self.assertIn("references/change-prevention.md", root_cause_route)
+        self.assertIn("references/user-environment-governance.md", root_cause_route)
 
 
     def test_diagnostic_alternatives_do_not_complete_the_normal_entry(self) -> None:

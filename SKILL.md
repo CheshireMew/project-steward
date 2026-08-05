@@ -97,6 +97,7 @@ Project Steward 自我进化时必须执行主文件约束：
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
 - 可视层级、变换或动效所有权：`references/interaction-motion.md`；需要实际运行画面验收时再读 `references/implementation-review.md`
 - 工具、路径别名、执行环境或长任务：`references/user-environment-governance.md`
+- 源码、README、脚本、测试或配置硬编码本机与部署事实：`references/change-prevention.md` 的项目运行配置边界；用户机器事实同时读取 `references/user-environment-governance.md`
 - 内聚、耦合、语义重复或上帝模块：`references/architecture-cohesion-governance.md`
 
 ## 外部工具兼容性
