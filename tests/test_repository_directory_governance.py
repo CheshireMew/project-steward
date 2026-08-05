@@ -96,7 +96,8 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         self.assertIn("项目目录治理", SKILL_TEXT)
         self.assertIn("references/repository-directory-governance.md", SKILL_TEXT)
         self.assertIn("scripts/inspect_project_tree.py", SKILL_TEXT)
-        self.assertIn("项目目录", OPENAI_TEXT)
+        self.assertIn("目录职责", SKILL_TEXT)
+        self.assertIn("治理项目变更", OPENAI_TEXT)
 
     def test_method_preserves_evidence_and_permission_boundaries(self) -> None:
         required_contracts = (

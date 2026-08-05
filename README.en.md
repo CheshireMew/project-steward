@@ -129,9 +129,11 @@ The main Skill file owns routing only. Full methods live in [references](./refer
 
 ## Installation
 
-Place the complete project-steward directory in the Skills directory used by an Agent Skills-compatible tool. Keep SKILL.md, agents, references, scripts, and assets together.
+~~~bash
+npx skills add CheshireMew/project-steward
+~~~
 
-Then invoke it directly:
+After installation, invoke it directly:
 
 ~~~text
 Use $project-steward to review this project comprehensively and order the governance work by risk.

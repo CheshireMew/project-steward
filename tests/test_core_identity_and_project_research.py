@@ -92,7 +92,7 @@ class CoreIdentityTests(unittest.TestCase):
             "上层已经选择实际效果、可靠性、上下文噪音、适用性或采用判断时",
             PROJECT_RESEARCH_TEXT,
         )
-        self.assertIn("understand a repository", SKILL_TEXT)
+        self.assertIn("understand or organize a codebase", SKILL_TEXT)
         self.assertNotIn("one-off explanation", SKILL_TEXT)
 
     def test_source_archive_research_preparation_needs_no_extra_confirmation(
@@ -141,7 +141,7 @@ class CoreIdentityTests(unittest.TestCase):
 
     def test_metadata_and_first_use_expose_the_core_route(self) -> None:
         self.assertIn(
-            "从完整项目过程持续学习，并治理架构、持久操作、用户环境、仓库研究与发布链路",
+            "治理项目变更、根因、README、仓库发布与可迁移经验",
             AGENT_TEXT,
         )
         self.assertIn(

@@ -60,6 +60,18 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_public_install_entry_finishes_at_the_remote_consumer(self) -> None:
+        for fragment in (
+            "自动同步公开安装入口",
+            "公开入口不存在、尚未发布或检查失败时不写占位命令",
+            "安装段落、项目清单与发布配置进入同一次获准发布闭包",
+            "推送后回读远端提交中的全部活动语言 README",
+            "正式安装消费者",
+            "安装入口仍未完成",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -129,9 +129,11 @@ Skill のメインファイルはルーティングだけを担当します。�
 
 ## インストール
 
-project-steward ディレクトリ全体を、Agent Skills 対応ツールが使用する Skills ディレクトリへ配置してください。SKILL.md、agents、references、scripts、assets をまとめて保持します。
+~~~bash
+npx skills add CheshireMew/project-steward
+~~~
 
-その後、依頼の中で直接呼び出します。
+インストール後、依頼の中で直接呼び出します。
 
 ~~~text
 このプロジェクトを $project-steward で包括的に確認し、リスク順に改善案を示してください。

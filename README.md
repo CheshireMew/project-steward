@@ -129,9 +129,11 @@ Project Steward 的主文件只负责路由。完整方法位于 [references](./
 
 ## 安装
 
-把完整的 project-steward 文件夹放入支持 Agent Skills 的工具所使用的 Skills 目录，保留 SKILL.md、agents、references、scripts 和 assets。
+~~~bash
+npx skills add CheshireMew/project-steward
+~~~
 
-然后在请求中直接点名：
+安装完成后，在请求中直接点名：
 
 ~~~text
 使用 $project-steward 全面检查这个项目，并按风险顺序给出治理方案。

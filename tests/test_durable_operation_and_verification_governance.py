@@ -321,7 +321,11 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
     def test_public_identity_exposes_the_new_capability(self) -> None:
 
         self.assertIn(
-            "治理架构、持久操作、用户环境、仓库研究与发布链路",
+            "durable operations",
+            SKILL_TEXT,
+        )
+        self.assertIn(
+            "治理项目变更、根因、README、仓库发布与可迁移经验",
             AGENT_TEXT,
         )
         self.assertIn(

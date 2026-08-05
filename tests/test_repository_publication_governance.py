@@ -23,6 +23,22 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_public_install_entry_is_automatically_synced_to_readmes(self) -> None:
+        for fragment in (
+            "自动同步公开安装入口",
+            "范围不限于 Skill",
+            "不能根据仓库名、目录名或惯例猜测",
+            "实际安装、下载依赖或运行安装脚本仍需当前请求授权",
+            "每份活动语言 README 的安装段落",
+            "不重复追加",
+            "标明 shell 的代码块",
+            "同一次获准发布闭包",
+            "推送后回读远端提交中的全部活动语言 README",
+            "不能只因 README 已经出现命令就报告发布可用",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
     def test_concurrent_writers_cannot_be_restored_or_published_by_accident(
         self,
     ) -> None:

@@ -61,6 +61,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         for field in (
             "准确项目根与上层 Git 边界：",
             "README 是否存在、当前动作与活动语言：",
+            "公开安装入口、已验证的最短命令与实际安装验证等级：",
             "现有视觉、图片和其它公开材料的资格：",
             "许可证文件、GitHub 识别与权利边界：",
             "Star History 生产者、输出分支、raw 文件与消费端：",
@@ -83,6 +84,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "零星标仓库可以生成真实的零基线",
             "About 描述和 topics",
             "远端 HEAD",
+            "自动写入全部活动语言 README",
         ):
             with self.subTest(outcome=outcome):
                 self.assertIn(outcome, DELIVERY_TEXT)
@@ -230,6 +232,10 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
                 self.assertIn("github/forks/CheshireMew/project-steward", text)
                 self.assertIn("github/license/CheshireMew/project-steward", text)
                 self.assertIn("--navigation-target docs=SKILL.md", text)
+                self.assertIn(
+                    "npx skills add CheshireMew/project-steward",
+                    text,
+                )
                 self.assertIn("## Star History", text)
                 self.assertIn(
                     "raw.githubusercontent.com/CheshireMew/project-steward/star-history",

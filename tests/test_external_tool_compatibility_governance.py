@@ -22,7 +22,7 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
         self.assertIn("外部工具兼容性", SKILL_TEXT)
         self.assertIn("references/external-tool-compatibility.md", SKILL_TEXT)
         self.assertIn(
-            "audit or govern compatibility with external CLIs",
+            "inspect external-tool compatibility",
             SKILL_TEXT,
         )
         self.assertNotIn("references/", COMPATIBILITY_TEXT)

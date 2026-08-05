@@ -200,7 +200,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, LEARNING_TEXT)
 
 
-        self.assertIn("判断职能边界", AGENT_TEXT)
+        self.assertIn("职能边界", AGENT_TEXT)
 
     def test_self_evolution_reports_the_actual_validation_level(self) -> None:
         ordered = (
@@ -2762,8 +2762,8 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self,
     ) -> None:
         for fragment in (
-            "按实施计划逐项审计完成度",
-            "audit implementation-plan completion or conformance",
+            "按实施计划审计完成度",
+            "audit a plan or repository",
             "按实施计划逐项核对完成度",
             "诊断读取设置、运行报告、结构化制品或日志时",
         ):
@@ -2792,7 +2792,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(audit_fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
-        self.assertIn("审计实施计划完成度", AGENT_TEXT)
+        self.assertIn("治理项目变更", AGENT_TEXT)
 
 
 
