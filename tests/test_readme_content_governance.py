@@ -87,6 +87,20 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             with self.subTest(outcome=outcome):
                 self.assertIn(outcome, DELIVERY_TEXT)
 
+    def test_text_feedback_preserves_the_other_complete_readme_outputs(self) -> None:
+        self.assertIn("只改变正文的写作与验收", DELIVERY_TEXT)
+        self.assertIn("不能把对正文的纠正解释为把其它交付改成按需", DELIVERY_TEXT)
+        for preserved_output in (
+            "语言页",
+            "贡献指南",
+            "个人入口",
+            "仓库状态",
+            "许可证",
+            "Star History",
+        ):
+            with self.subTest(preserved_output=preserved_output):
+                self.assertIn(preserved_output, DELIVERY_TEXT)
+
     def test_content_and_learning_methods_forbid_readme_method_mirrors(self) -> None:
         for fragment in (
             "README 不是内部方法的镜像",
