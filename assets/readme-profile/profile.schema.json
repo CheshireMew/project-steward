@@ -15,7 +15,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": 2
+      "const": 3
     },
     "applies_to": {
       "type": "object",
@@ -68,7 +68,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "label", "kind", "path"],
+        "required": ["id", "label", "kind"],
         "properties": {
           "id": {
             "type": "string",
@@ -79,13 +79,33 @@
             "minLength": 1
           },
           "kind": {
-            "enum": ["existing_path", "repository_path"]
+            "enum": ["existing_path", "project_path", "repository_path"]
           },
           "path": {
             "type": "string",
             "pattern": "^[A-Za-z0-9._/-]+$"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "project_path"
+                }
+              },
+              "required": ["kind"]
+            },
+            "then": {
+              "not": {
+                "required": ["path"]
+              }
+            },
+            "else": {
+              "required": ["path"]
+            }
+          }
+        ]
       }
     },
     "social_links": {

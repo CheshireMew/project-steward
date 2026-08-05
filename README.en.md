@@ -160,9 +160,9 @@ python -m unittest discover -s tests -v
 Audit all three README languages:
 
 ~~~powershell
-python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --branch main
-python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --branch main
-python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --branch main
+python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --branch main --navigation-target docs=SKILL.md
 ~~~
 
 ## Star History

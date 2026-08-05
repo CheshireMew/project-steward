@@ -75,7 +75,9 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "当前是否已经初始化 Git",
             "README 不存在时选择新写",
             "桌面宽度、窄屏和深浅主题",
-            "实际交付的语言",
+            "配置的完整语言页和贡献指南已经交付",
+            "缺少 `README.en.md`、`README.ja.md`",
+            "单个项目专属入口不成立时不影响其它组",
             "文档、贡献和反馈分别抵达真实且职责不同的目标",
             "GitHub 识别",
             "零星标仓库可以生成真实的零基线",
@@ -126,10 +128,19 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         self.assertIn("维护层材料", CONTENT_TEXT)
         self.assertIn("普通读者回述测试", CONTENT_TEXT)
         self.assertIn("对每个段落执行删除测试", CONTENT_TEXT)
+        for fragment in (
+            "不能因一个项目专属目标不同就判定整份 profile 不适用",
+            "完整优化时缺少的配置语言是待创建的完整页面",
+            "本次已存在或新建的真实 `CONTRIBUTING.md`",
+            "--navigation-target docs=<活动 Markdown>",
+            "不能临时改写 profile",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CONTENT_TEXT)
 
     def test_header_profile_has_one_owner_and_real_consumers(self) -> None:
         profile = json.loads(HEADER_PROFILE_PATH.read_text(encoding="utf-8"))
-        self.assertEqual(2, profile["schema_version"])
+        self.assertEqual(3, profile["schema_version"])
         self.assertEqual(["CheshireMew"], profile["applies_to"]["github_owners"])
         self.assertEqual(
             ["zh-CN", "en", "ja"],
@@ -144,6 +155,11 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             ["文档", "贡献", "反馈"],
             [link["label"] for link in profile["navigation_links"]],
         )
+        self.assertEqual("project_path", profile["navigation_links"][0]["kind"])
+        self.assertNotIn("path", profile["navigation_links"][0])
+        self.assertEqual(
+            "CONTRIBUTING.md", profile["navigation_links"][1]["path"]
+        )
         self.assertEqual(
             ["x", "telegram", "blog", "homepage"],
             [link["id"] for link in profile["social_links"]],
@@ -156,9 +172,9 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         schema = json.loads(
             HEADER_PROFILE_SCHEMA_PATH.read_text(encoding="utf-8")
         )
-        self.assertEqual(2, schema["properties"]["schema_version"]["const"])
+        self.assertEqual(3, schema["properties"]["schema_version"]["const"])
         self.assertEqual(
-            ["existing_path", "repository_path"],
+            ["existing_path", "project_path", "repository_path"],
             schema["properties"]["navigation_links"]["items"]["properties"][
                 "kind"
             ]["enum"],
@@ -199,6 +215,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
                 self.assertIn("github/stars/CheshireMew/project-steward", text)
                 self.assertIn("github/forks/CheshireMew/project-steward", text)
                 self.assertIn("github/license/CheshireMew/project-steward", text)
+                self.assertIn("--navigation-target docs=SKILL.md", text)
                 self.assertIn("## Star History", text)
                 self.assertIn(
                     "raw.githubusercontent.com/CheshireMew/project-steward/star-history",

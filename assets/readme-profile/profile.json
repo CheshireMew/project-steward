@@ -1,6 +1,6 @@
 {
   "$schema": "./profile.schema.json",
-  "schema_version": 2,
+  "schema_version": 3,
   "applies_to": {
     "github_owners": [
       "CheshireMew"
@@ -31,8 +31,7 @@
     {
       "id": "docs",
       "label": "文档",
-      "kind": "existing_path",
-      "path": "SKILL.md"
+      "kind": "project_path"
     },
     {
       "id": "contribute",

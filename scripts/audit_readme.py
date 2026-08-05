@@ -13,7 +13,12 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from readme_header import HeaderProfileError, load_profile, verify_readme_header
+from readme_header import (
+    HeaderProfileError,
+    load_profile,
+    parse_navigation_targets,
+    verify_readme_header,
+)
 
 
 MARKDOWN_IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+[^)]*)?\)")
@@ -150,6 +155,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--branch", default="main")
     parser.add_argument("--license-path", default="LICENSE")
     parser.add_argument("--allow-missing-languages", action="store_true")
+    parser.add_argument(
+        "--navigation-target",
+        action="append",
+        default=[],
+        metavar="LINK_ID=PATH",
+        help="resolve one project_path link to an existing Markdown file",
+    )
     parser.add_argument("--max-prose-characters", type=int, default=360)
     parser.add_argument("--max-consecutive-prose", type=int, default=3)
     return parser
@@ -168,9 +180,12 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    if not args.header_profile and (args.repository or args.language):
+    if not args.header_profile and (
+        args.repository or args.language or args.navigation_target
+    ):
         print(
-            "ERROR: --repository and --language require --header-profile",
+            "ERROR: --repository, --language and --navigation-target "
+            "require --header-profile",
             file=sys.stderr,
         )
         return 2
@@ -220,6 +235,7 @@ def main(argv: list[str] | None = None) -> int:
         header_checked = True
         try:
             profile = load_profile(args.header_profile.expanduser().resolve())
+            navigation_targets = parse_navigation_targets(args.navigation_target)
             verify_readme_header(
                 readme,
                 profile,
@@ -228,6 +244,7 @@ def main(argv: list[str] | None = None) -> int:
                 branch=args.branch,
                 license_path=args.license_path,
                 allow_missing_languages=args.allow_missing_languages,
+                navigation_targets=navigation_targets,
             )
         except HeaderProfileError as exc:
             warnings.append(f"managed README header: {exc}")

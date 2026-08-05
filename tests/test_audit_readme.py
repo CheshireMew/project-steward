@@ -163,7 +163,9 @@ class ReadmeAuditTests(unittest.TestCase):
         ) as temporary:
             root = Path(temporary)
             (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
-            (root / "SKILL.md").write_text("# Fixture skill\n", encoding="utf-8")
+            (root / "ARCHITECTURE.md").write_text(
+                "# Fixture architecture\n", encoding="utf-8"
+            )
             (root / "CONTRIBUTING.md").write_text(
                 "# Contributing\n", encoding="utf-8"
             )
@@ -191,6 +193,8 @@ class ReadmeAuditTests(unittest.TestCase):
                         "main",
                         "--readme-root",
                         str(root),
+                        "--navigation-target",
+                        "docs=ARCHITECTURE.md",
                     ],
                     root,
                 ).stdout.strip()
@@ -213,6 +217,8 @@ class ReadmeAuditTests(unittest.TestCase):
                         "main",
                         "--readme",
                         str(readme),
+                        "--navigation-target",
+                        "docs=ARCHITECTURE.md",
                     ],
                     root,
                 )
@@ -223,7 +229,7 @@ class ReadmeAuditTests(unittest.TestCase):
             self.assertIn('./README.en.md">English</a>', chinese)
             self.assertIn('./README.ja.md">日本語</a>', chinese)
             self.assertIn(
-                '日本語</a> | <a href="./SKILL.md">文档</a> | '
+                '日本語</a> | <a href="./ARCHITECTURE.md">文档</a> | '
                 '<a href="./CONTRIBUTING.md">贡献</a> | '
                 '<a href="https://github.com/CheshireMew/fixture/issues">反馈</a>',
                 chinese,
@@ -251,6 +257,8 @@ class ReadmeAuditTests(unittest.TestCase):
                     "zh-CN",
                     "--branch",
                     "main",
+                    "--navigation-target",
+                    "docs=ARCHITECTURE.md",
                 ],
                 root,
             )
@@ -276,12 +284,48 @@ class ReadmeAuditTests(unittest.TestCase):
                     "CheshireMew/fixture",
                     "--language",
                     "zh-CN",
+                    "--navigation-target",
+                    "docs=ARCHITECTURE.md",
                 ],
                 root,
                 check=False,
             )
             self.assertEqual(1, stale.returncode)
             self.assertIn("does not match the active profile", stale.stdout)
+
+    def test_unresolved_project_navigation_does_not_remove_universal_links(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-optional-navigation-"
+        ) as temporary:
+            root = Path(temporary)
+            for name in ("README.md", "README.en.md", "README.ja.md"):
+                (root / name).write_text("# Fixture\n", encoding="utf-8")
+            (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
+            (root / "CONTRIBUTING.md").write_text(
+                "# Contributing\n", encoding="utf-8"
+            )
+
+            rendered = run(
+                [
+                    sys.executable,
+                    str(HEADER_SCRIPT),
+                    "render",
+                    "--profile",
+                    str(HEADER_PROFILE),
+                    "--repository",
+                    "CheshireMew/fixture",
+                    "--language",
+                    "zh-CN",
+                    "--readme-root",
+                    str(root),
+                ],
+                root,
+            ).stdout
+
+            self.assertNotIn(">文档</a>", rendered)
+            self.assertIn('./CONTRIBUTING.md">贡献</a>', rendered)
+            self.assertIn("https://blacknico.com/", rendered)
+            self.assertIn("github/stars/CheshireMew/fixture", rendered)
 
     def test_profile_refuses_missing_translations_and_unowned_repositories(self) -> None:
         with tempfile.TemporaryDirectory(
@@ -330,7 +374,7 @@ class ReadmeAuditTests(unittest.TestCase):
             root = Path(temporary)
             legacy_profile = root / "legacy-profile.json"
             profile = json.loads(HEADER_PROFILE.read_text(encoding="utf-8"))
-            profile["schema_version"] = 1
+            profile["schema_version"] = 2
             legacy_profile.write_text(
                 json.dumps(profile, ensure_ascii=False),
                 encoding="utf-8",
@@ -347,13 +391,12 @@ class ReadmeAuditTests(unittest.TestCase):
                 check=False,
             )
             self.assertEqual(1, legacy.returncode)
-            self.assertIn("schema_version must be 2", legacy.stderr)
+            self.assertIn("schema_version must be 3", legacy.stderr)
 
             for name in ("README.md", "README.en.md", "README.ja.md"):
                 (root / name).write_text("# Fixture\n", encoding="utf-8")
             (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
-            (root / "SKILL.md").write_text("# Fixture skill\n", encoding="utf-8")
-            missing = run(
+            missing_project_target = run(
                 [
                     sys.executable,
                     str(HEADER_SCRIPT),
@@ -366,14 +409,44 @@ class ReadmeAuditTests(unittest.TestCase):
                     "zh-CN",
                     "--readme-root",
                     str(root),
+                    "--navigation-target",
+                    "docs=ARCHITECTURE.md",
                 ],
                 root,
                 check=False,
             )
-            self.assertEqual(1, missing.returncode)
+            self.assertEqual(1, missing_project_target.returncode)
+            self.assertIn(
+                "project navigation target is missing: ARCHITECTURE.md",
+                missing_project_target.stderr,
+            )
+
+            (root / "ARCHITECTURE.md").write_text(
+                "# Fixture architecture\n", encoding="utf-8"
+            )
+            missing_managed_target = run(
+                [
+                    sys.executable,
+                    str(HEADER_SCRIPT),
+                    "render",
+                    "--profile",
+                    str(HEADER_PROFILE),
+                    "--repository",
+                    "CheshireMew/fixture",
+                    "--language",
+                    "zh-CN",
+                    "--readme-root",
+                    str(root),
+                    "--navigation-target",
+                    "docs=ARCHITECTURE.md",
+                ],
+                root,
+                check=False,
+            )
+            self.assertEqual(1, missing_managed_target.returncode)
             self.assertIn(
                 "configured navigation target is missing: CONTRIBUTING.md",
-                missing.stderr,
+                missing_managed_target.stderr,
             )
 
 

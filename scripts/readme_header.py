@@ -22,7 +22,11 @@ ALLOWED_BADGE_STYLES = {
     "social",
 }
 ALLOWED_REPOSITORY_BADGES = {"stars", "forks", "license"}
-ALLOWED_NAVIGATION_LINK_KINDS = {"existing_path", "repository_path"}
+ALLOWED_NAVIGATION_LINK_KINDS = {
+    "existing_path",
+    "project_path",
+    "repository_path",
+}
 OWNER_PATTERN = re.compile(
     r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
 )
@@ -107,8 +111,8 @@ def validate_profile(profile: object) -> dict:
         optional={"$schema"},
         field="profile",
     )
-    if type(profile["schema_version"]) is not int or profile["schema_version"] != 2:
-        raise HeaderProfileError("schema_version must be 2")
+    if type(profile["schema_version"]) is not int or profile["schema_version"] != 3:
+        raise HeaderProfileError("schema_version must be 3")
 
     applies_to = profile["applies_to"]
     if not isinstance(applies_to, dict):
@@ -186,8 +190,8 @@ def validate_profile(profile: object) -> dict:
             raise HeaderProfileError(f"{field} must be an object")
         _require_exact_keys(
             link,
-            required={"id", "label", "kind", "path"},
-            optional=set(),
+            required={"id", "label", "kind"},
+            optional={"path"},
             field=field,
         )
         link_id = _require_string(link["id"], f"{field}.id")
@@ -204,7 +208,15 @@ def validate_profile(profile: object) -> dict:
             raise HeaderProfileError(
                 f"unsupported navigation link kind: {kind}"
             )
-        _require_relative_path(link["path"], f"{field}.path")
+        if kind == "project_path":
+            if "path" in link:
+                raise HeaderProfileError(
+                    f"{field}.path must be supplied by the target project"
+                )
+        else:
+            if "path" not in link:
+                raise HeaderProfileError(f"{field} is missing fields: path")
+            _require_relative_path(link["path"], f"{field}.path")
 
     social_links = profile["social_links"]
     if not isinstance(social_links, list):
@@ -299,26 +311,67 @@ def _available_languages(
     return available
 
 
+def parse_navigation_targets(values: list[str] | None) -> dict[str, str]:
+    targets: dict[str, str] = {}
+    for value in values or []:
+        link_id, separator, raw_path = value.partition("=")
+        if not separator or not LINK_ID_PATTERN.fullmatch(link_id):
+            raise HeaderProfileError(
+                "navigation target must use LINK_ID=REPOSITORY_RELATIVE_MARKDOWN_PATH"
+            )
+        if link_id in targets:
+            raise HeaderProfileError(f"duplicate navigation target: {link_id}")
+        targets[link_id] = _require_relative_markdown_path(
+            raw_path,
+            f"navigation target {link_id}",
+        )
+    return targets
+
+
 def _resolve_navigation_links(
     profile: dict,
     *,
     repository: str,
     readme_root: Path,
+    navigation_targets: dict[str, str],
 ) -> list[tuple[str, str]]:
     quoted_repository = _quoted_repository(repository)
     github_root = f"https://github.com/{quoted_repository}"
     resolved: list[tuple[str, str]] = []
-    for link in profile["navigation_links"]:
-        path = _require_relative_path(
-            link["path"], f"navigation_links.{link['id']}.path"
+    project_link_ids = {
+        link["id"]
+        for link in profile["navigation_links"]
+        if link["kind"] == "project_path"
+    }
+    unknown_targets = navigation_targets.keys() - project_link_ids
+    if unknown_targets:
+        raise HeaderProfileError(
+            "navigation targets do not match project_path links: "
+            + ", ".join(sorted(unknown_targets))
         )
-        if link["kind"] == "existing_path":
+    for link in profile["navigation_links"]:
+        if link["kind"] == "project_path":
+            path = navigation_targets.get(link["id"])
+            if path is None:
+                continue
+            if not (readme_root / PurePosixPath(path)).is_file():
+                raise HeaderProfileError(
+                    f"project navigation target is missing: {path}"
+                )
+            href = f"./{quote(path, safe='/')}"
+        elif link["kind"] == "existing_path":
+            path = _require_relative_path(
+                link["path"], f"navigation_links.{link['id']}.path"
+            )
             if not (readme_root / PurePosixPath(path)).exists():
                 raise HeaderProfileError(
                     f"configured navigation target is missing: {path}"
                 )
             href = f"./{quote(path, safe='/')}"
         else:
+            path = _require_relative_path(
+                link["path"], f"navigation_links.{link['id']}.path"
+            )
             href = f"{github_root}/{quote(path, safe='/')}"
         resolved.append((link["label"], href))
     return resolved
@@ -436,6 +489,7 @@ def render_header(
     branch: str,
     license_path: str,
     allow_missing_languages: bool = False,
+    navigation_targets: dict[str, str] | None = None,
 ) -> str:
     validate_profile(profile)
     ensure_profile_applies(profile, repository)
@@ -447,6 +501,7 @@ def render_header(
         profile,
         repository=repository,
         readme_root=root,
+        navigation_targets=navigation_targets or {},
     )
     rows = [
         _render_language_row(
@@ -492,6 +547,7 @@ def verify_readme_header(
     branch: str,
     license_path: str,
     allow_missing_languages: bool = False,
+    navigation_targets: dict[str, str] | None = None,
 ) -> None:
     try:
         text = readme.read_text(encoding="utf-8")
@@ -506,6 +562,7 @@ def verify_readme_header(
         branch=branch,
         license_path=license_path,
         allow_missing_languages=allow_missing_languages,
+        navigation_targets=navigation_targets,
     )
     if actual != expected:
         raise HeaderProfileError(
@@ -520,6 +577,13 @@ def _add_render_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--branch", default="main")
     parser.add_argument("--license-path", default="LICENSE")
     parser.add_argument("--allow-missing-languages", action="store_true")
+    parser.add_argument(
+        "--navigation-target",
+        action="append",
+        default=[],
+        metavar="LINK_ID=PATH",
+        help="resolve one project_path link to an existing Markdown file",
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -546,6 +610,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "validate":
             print(f"OK: README header profile is valid: {args.profile.resolve()}")
             return 0
+        navigation_targets = parse_navigation_targets(args.navigation_target)
         if args.command == "render":
             print(
                 render_header(
@@ -556,6 +621,7 @@ def main(argv: list[str] | None = None) -> int:
                     branch=args.branch,
                     license_path=args.license_path,
                     allow_missing_languages=args.allow_missing_languages,
+                    navigation_targets=navigation_targets,
                 )
             )
             return 0
@@ -567,6 +633,7 @@ def main(argv: list[str] | None = None) -> int:
             branch=args.branch,
             license_path=args.license_path,
             allow_missing_languages=args.allow_missing_languages,
+            navigation_targets=navigation_targets,
         )
         print(f"OK: README header matches profile: {args.readme.resolve()}")
         return 0
