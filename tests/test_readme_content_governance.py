@@ -65,7 +65,8 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "现有视觉、图片和其它公开材料的资格：",
             "许可证文件、GitHub 识别与权利边界：",
             "Star History 生产者、输出分支、raw 文件与消费端：",
-            "GitHub About、topics、Issues、Discussions 与 Release 事实：",
+            "GitHub Topics 当前集合、项目事实依据与目标集合：",
+            "GitHub About、Issues、Discussions 与 Release 事实：",
             "本次允许的本地写入、提交、推送和远端元数据动作：",
             "最终停止位置：",
         ):
@@ -82,12 +83,42 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "文档、贡献和反馈分别抵达真实且职责不同的目标",
             "GitHub 识别",
             "零星标仓库可以生成真实的零基线",
-            "About 描述和 topics",
+            "Topics 是公开 GitHub 仓库完整 README 优化的默认交付项",
+            "About 描述只有用户明确要求",
             "远端 HEAD",
             "自动写入全部活动语言 README",
         ):
             with self.subTest(outcome=outcome):
                 self.assertIn(outcome, DELIVERY_TEXT)
+
+    def test_topics_are_default_but_identity_labels_remain_conditional(self) -> None:
+        for fragment in (
+            "Topics 是公开 GitHub 仓库完整 README 优化的默认交付项",
+            "不能因为 Project Steward 被调用就添加",
+            "`codex` 只有在 Codex 确实是项目当前公开的主要运行载体",
+            "Topics 随同一完整交付自动写入",
+            "About 描述只有用户明确要求",
+            "GitHub API 一次替换",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DELIVERY_TEXT)
+
+        for language, text in README_TEXTS.items():
+            with self.subTest(language=language):
+                self.assertIn("Topics", text)
+
+    def test_star_history_precedes_license_and_attribution_in_every_language(self) -> None:
+        legal_headings = {
+            "zh-CN": "## 许可证与第三方来源",
+            "en": "## License and third-party sources",
+            "ja": "## ライセンスと第三者ソース",
+        }
+        for language, text in README_TEXTS.items():
+            with self.subTest(language=language):
+                self.assertLess(
+                    text.index("## Star History"),
+                    text.index(legal_headings[language]),
+                )
 
     def test_text_feedback_preserves_the_other_complete_readme_outputs(self) -> None:
         self.assertIn("只改变正文的写作与验收", DELIVERY_TEXT)

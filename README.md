@@ -98,7 +98,7 @@ Project Steward 还可以研究陌生项目、盘点目录、维护项目模板�
 ~~~text
 使用 $project-steward 优化这个 README。
 检查 Git 和仓库状态、正文与视觉、多语言、许可证、
-Star History、链接和发布，并把真实结果完整交付。
+Star History、GitHub Topics、链接和发布，并把真实结果完整交付。
 ~~~
 
 ## README 完整优化会做什么
@@ -110,6 +110,7 @@ Star History、链接和发布，并把真实结果完整交付。
 - 首屏：按活动配置生成中文、English、日本語、文档、贡献、反馈、个人入口、Stars、Forks 与许可证。
 - 许可证：已有且准确时保持；缺失时先核对授权权利和采用目标，再应用确认后的方案。
 - Star History：对公开 GitHub 仓库运行真实工作流，验证输出分支、亮暗 SVG 和 README 消费端。
+- GitHub Topics：从项目当前身份和真实能力生成最终集合，随完整发布写入并回读，不因使用 Project Steward 自动添加宿主标签。
 - 发布：已有远端且确认包含发布时，精确提交、推送并核对远端 HEAD；不会自动创建远端、改变可见性、强推或删除文件。
 
 完整编排见 [README 完整交付方法](./references/readme-delivery.md)。

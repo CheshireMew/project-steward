@@ -98,7 +98,7 @@ what is worth adopting, and what must not be copied directly.
 ~~~text
 Use $project-steward to improve this README.
 Check Git and repository state, content and visuals, languages, licensing,
-Star History, links, and publication, then deliver the complete result.
+Star History, GitHub Topics, links, and publication, then deliver the complete result.
 ~~~
 
 ## What a complete README improvement includes
@@ -110,6 +110,7 @@ A complete README task checks whether the repository is initialized, whether a R
 - Header: generate 中文, English, 日本語, documentation, contribution, feedback, personal links, Stars, Forks, and license from active facts.
 - License: preserve an accurate existing license; when absent, verify rights and adoption goals before applying the confirmed choice.
 - Star History: run the real workflow for a public GitHub repository and verify both SVGs and the README consumer.
+- GitHub Topics: derive the final set from current project identity and proven capabilities, publish and read it back with the complete result, and never infer host labels merely because Project Steward handled the repository.
 - Publication: for an approved existing remote, commit precisely, push, and verify remote HEAD without silently creating remotes, changing visibility, force-pushing, or deleting files.
 
 See the [complete README delivery method](./references/readme-delivery.md).

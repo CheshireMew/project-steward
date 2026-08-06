@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 # Migrated from oil-oil/beautify-github-readme. See THIRD_PARTY_NOTICES.md.
-"""Audit README structure, prose density, images, SVGs, and managed headers."""
+"""Audit README structure, section order, prose density, images, SVGs, and managed headers."""
 
 from __future__ import annotations
 
@@ -32,6 +32,14 @@ SCOPE_MESSAGE = (
 )
 STRUCTURAL_BLOCK = re.compile(
     r"^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s|>|\||<|!\[|```|~~~)"
+)
+MARKDOWN_HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
+STAR_HISTORY_HEADING = re.compile(r"\bstar\s+history\b", re.I)
+LEGAL_HEADING = re.compile(
+    r"(?:licen[cs](?:e|ing)|许可证|授[權权]|ライセンス|"
+    r"third[\s-]*party|acknowledg|attribution|credits?|notices?|"
+    r"第三方|第三者|致谢|謝辞)",
+    re.I,
 )
 
 
@@ -146,6 +154,48 @@ def audit_prose_density(
     return prose_count, issues
 
 
+def markdown_headings(text: str) -> list[tuple[int, int, str]]:
+    headings: list[tuple[int, int, str]] = []
+    in_fence = False
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if stripped.startswith(("```", "~~~")):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        match = MARKDOWN_HEADING.match(stripped)
+        if match:
+            headings.append((line_number, len(match.group(1)), match.group(2)))
+    return headings
+
+
+def audit_terminal_section_order(text: str) -> list[str]:
+    headings = markdown_headings(text)
+    star_sections = [
+        (line, level, heading)
+        for line, level, heading in headings
+        if STAR_HISTORY_HEADING.search(heading)
+    ]
+    legal_sections = [
+        (line, level, heading)
+        for line, level, heading in headings
+        if LEGAL_HEADING.search(heading)
+    ]
+    if not star_sections or not legal_sections:
+        return []
+
+    first_star = min(star_sections, key=lambda item: item[0])
+    first_legal = min(legal_sections, key=lambda item: item[0])
+    if first_star[0] < first_legal[0]:
+        return []
+    return [
+        "Star History section must appear before license and third-party "
+        "acknowledgements: Star History is at line {} and the first legal "
+        "section is at line {}".format(first_star[0], first_legal[0])
+    ]
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("readme", type=Path)
@@ -203,6 +253,7 @@ def main(argv: list[str] | None = None) -> int:
     sources.extend(HTML_IMAGE.findall(text))
 
     warnings: list[str] = []
+    warnings.extend(audit_terminal_section_order(text))
     prose_checked, prose_issues = audit_prose_density(
         text,
         max_characters=args.max_prose_characters,

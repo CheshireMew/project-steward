@@ -449,6 +449,53 @@ class ReadmeAuditTests(unittest.TestCase):
                 missing_managed_target.stderr,
             )
 
+    def test_star_history_must_precede_license_and_attribution(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-section-order-"
+        ) as temporary:
+            root = Path(temporary)
+            readme = root / "README.md"
+            readme.write_text(
+                (
+                    "# Fixture\n\n"
+                    "## 许可证与第三方致谢\n\n"
+                    "Project license and notices.\n\n"
+                    "## Star History\n\n"
+                    "Repository growth chart.\n"
+                ),
+                encoding="utf-8",
+            )
+
+            failed = run(
+                [sys.executable, str(SCRIPT), str(readme)],
+                root,
+                check=False,
+            )
+            self.assertEqual(1, failed.returncode)
+            self.assertIn(
+                "Star History section must appear before license and third-party acknowledgements",
+                failed.stdout,
+            )
+
+            readme.write_text(
+                (
+                    "# Fixture\n\n"
+                    "## Star History\n\n"
+                    "Repository growth chart.\n\n"
+                    "## License and third-party acknowledgements\n\n"
+                    "Project license and notices.\n"
+                ),
+                encoding="utf-8",
+            )
+            passed = run(
+                [sys.executable, str(SCRIPT), str(readme)],
+                root,
+            )
+            self.assertIn(
+                "OK: structural README checks passed",
+                passed.stdout,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
