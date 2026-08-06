@@ -8,9 +8,99 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 PUBLICATION_TEXT = (
     SKILL_ROOT / "references" / "repository-publication.md"
 ).read_text(encoding="utf-8")
+PROJECT_AUDIT_TEXT = (
+    SKILL_ROOT / "references" / "project-audit.md"
+).read_text(encoding="utf-8")
 
 
 class RepositoryPublicationGovernanceTests(unittest.TestCase):
+    def test_github_repository_initialization_is_one_ordered_transaction(
+        self,
+    ) -> None:
+        ordered = (
+            "审计本地物理文件和拟上传候选",
+            "才运行 `git init`",
+            "只把获准清单中的准确路径或内容片段加入索引",
+            "让第 3 节的必要性与隐私检查消费这份真实索引",
+            "才创建首次提交",
+            "才创建空远端",
+            "首次推送必须另有授权",
+            "核对实时远端 HEAD",
+        )
+        initialization = PUBLICATION_TEXT.split(
+            "## 4. 初始化 GitHub 仓库", 1
+        )[1].split("## 5. 本地主页预览", 1)[0]
+        positions = [initialization.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "本地 Git 初始化、首次提交、创建 GitHub 远端和首次推送仍是可分别停止的状态改变",
+            "不创建嵌套 `.git`",
+            "不授权安装客户端、登录账号、创建远端或改变设置",
+            "禁止用 `git add -A`、`git add .` 或等价整树暂存绕过候选账本",
+            "确认所有者、准确仓库名和 public、private",
+            "不根据账号惯例猜可见性",
+            "内容边界已通过 / 本地 Git 已初始化 / 首次提交已创建 / GitHub 空远端已创建 / 首次推送已完成 / 实时远端已验证",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, initialization)
+
+    def test_upload_boundary_checks_privacy_and_unnecessary_files_on_real_surfaces(
+        self,
+    ) -> None:
+        audit = PUBLICATION_TEXT.split(
+            "## 3. 审计 GitHub 上传边界", 1
+        )[1].split("## 4. 初始化 GitHub 仓库", 1)[0]
+        for fragment in (
+            "本地物理文件",
+            "本次获准候选",
+            "Git 索引",
+            "本地提交与可达历史",
+            "实时 GitHub",
+            "Git LFS、Release 资产或 Actions 制品",
+            "用正式消费者判断必要性",
+            "只应留在本机的用户内容、机器配置或运行状态",
+            "生产者、消费者或权利边界尚不明确的未知内容",
+            "检查隐私与敏感内容",
+            "首次提交前还要检查提交作者姓名与邮箱",
+            "工具缺失、命令失败、历史未取得、输入为空或被默认过滤时结论是未知",
+            "必须在进入终端输出、工具结果、对话、报告或日志前脱敏",
+            "撤销或轮换凭据作为第一处置",
+            "`.gitignore` 只影响尚未跟踪的匹配路径",
+            "不创建一个随后可能被误推送的半成品远端",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, audit)
+
+    def test_project_audit_consumes_the_shared_github_upload_boundary_read_only(
+        self,
+    ) -> None:
+        github_audit = PROJECT_AUDIT_TEXT.split(
+            "### GitHub 仓库必须审计实际上传边界", 1
+        )[1].split("### 公开验证器必须实际进入保证链", 1)[0]
+        for fragment in (
+            "读取 `repository-publication.md` 的“审计 GitHub 上传边界”",
+            "不在这里建立第二套敏感文件或目录黑名单",
+            "本地物理文件与拟上传候选、Git 索引、当前已跟踪树、本地提交和可达历史",
+            "本地 `origin/*` 也不能代替实时 GitHub 内容",
+            "没有消费者证据才说明它不应进入仓库",
+            "同时核对 Git 提交作者姓名与邮箱的公开暴露",
+            "本维度只能标为部分审查或待确认",
+            "不能报告“没有隐私文件”",
+            "只读综合审计不修改 `.gitignore`、不初始化 Git、不改变索引、不创建远端，也不清理历史",
+            "才可以把 GitHub 上传边界标为已审查",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, github_audit)
+
+        coverage_contract = PROJECT_AUDIT_TEXT.split(
+            "用户要求“全部问题”“所有问题”或“全面检查”", 1
+        )[1].split("## 实施计划符合性审计", 1)[0]
+        self.assertIn(
+            "需要核对的 GitHub 上传候选、索引、历史与实时远端内容边界",
+            coverage_contract,
+        )
+
     def test_clean_checkout_result_defines_repository_contents(self) -> None:
         for fragment in (
             "用干净克隆确定仓库边界",
