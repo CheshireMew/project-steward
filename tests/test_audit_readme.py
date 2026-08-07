@@ -247,7 +247,7 @@ class ReadmeAuditTests(unittest.TestCase):
             name_index = chinese.index('<h1 align="center">Fixture</h1>')
             tagline_index = chinese.index("A fixture readers can understand.")
             language_index = chinese.index("<strong>中文</strong>")
-            social_index = chinese.index("X：@0xCheshire")
+            social_index = chinese.index("img.shields.io/badge/X-")
             repository_index = chinese.index("github/stars/CheshireMew/fixture")
             self.assertLess(identity_index, name_index)
             self.assertLess(name_index, tagline_index)
@@ -264,11 +264,8 @@ class ReadmeAuditTests(unittest.TestCase):
                 chinese,
             )
             self.assertIn("https://x.com/0xCheshire", chinese)
-            self.assertIn(
-                '<a href="https://x.com/0xCheshire">X：@0xCheshire</a>',
-                chinese,
-            )
-            self.assertNotIn("img.shields.io/badge/X-", chinese)
+            self.assertIn('title="X"', chinese)
+            self.assertIn("img.shields.io/badge/X-", chinese)
             self.assertIn("https://t.me/CheshireBTC", chinese)
             self.assertIn("https://blog.blacknico.com/", chinese)
             self.assertIn("https://blacknico.com/", chinese)
@@ -464,7 +461,7 @@ class ReadmeAuditTests(unittest.TestCase):
             root = Path(temporary)
             legacy_profile = root / "legacy-profile.json"
             profile = json.loads(HEADER_PROFILE.read_text(encoding="utf-8"))
-            profile["schema_version"] = 3
+            profile["schema_version"] = 2
             legacy_profile.write_text(
                 json.dumps(profile, ensure_ascii=False),
                 encoding="utf-8",
@@ -481,7 +478,7 @@ class ReadmeAuditTests(unittest.TestCase):
                 check=False,
             )
             self.assertEqual(1, legacy.returncode)
-            self.assertIn("schema_version must be 4", legacy.stderr)
+            self.assertIn("schema_version must be 3", legacy.stderr)
 
             for name in ("README.md", "README.en.md", "README.ja.md"):
                 (root / name).write_text("# Fixture\n", encoding="utf-8")

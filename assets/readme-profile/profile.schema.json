@@ -15,7 +15,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": 4
+      "const": 3
     },
     "applies_to": {
       "type": "object",
@@ -114,7 +114,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "label", "value", "url"],
+        "required": ["id", "label", "url", "badge_src", "alt"],
         "properties": {
           "id": {
             "type": "string",
@@ -124,13 +124,17 @@
             "type": "string",
             "minLength": 1
           },
-          "value": {
-            "type": "string",
-            "minLength": 1
-          },
           "url": {
             "type": "string",
             "pattern": "^https://"
+          },
+          "badge_src": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "alt": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }

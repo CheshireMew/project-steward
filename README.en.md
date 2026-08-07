@@ -15,7 +15,10 @@
 </p>
 
 <p align="center">
-  <a href="https://x.com/0xCheshire">X：@0xCheshire</a> · <a href="https://t.me/CheshireBTC">Telegram：CheshireBTC</a> · <a href="https://blog.blacknico.com/">博客：blog.blacknico.com</a> · <a href="https://blacknico.com/">个人主页：blacknico.com</a>
+  <a href="https://x.com/0xCheshire" title="X"><img src="https://img.shields.io/badge/X-%400xCheshire-000000?logo=x&amp;logoColor=white" alt="X：@0xCheshire"></a>
+  <a href="https://t.me/CheshireBTC" title="Telegram"><img src="https://img.shields.io/badge/Telegram-CheshireBTC-26A5E4?logo=telegram&amp;logoColor=white" alt="Telegram：CheshireBTC"></a>
+  <a href="https://blog.blacknico.com/" title="Blog"><img src="https://img.shields.io/badge/Blog-blog.blacknico.com-2E7D32?logo=rss&amp;logoColor=white" alt="博客：blog.blacknico.com"></a>
+  <a href="https://blacknico.com/" title="Homepage"><img src="https://img.shields.io/badge/Home-blacknico.com-1F6FEB?logo=googlechrome&amp;logoColor=white" alt="个人主页：blacknico.com"></a>
 </p>
 
 <p align="center">

@@ -189,7 +189,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
 
     def test_header_profile_has_one_owner_and_real_consumers(self) -> None:
         profile = json.loads(HEADER_PROFILE_PATH.read_text(encoding="utf-8"))
-        self.assertEqual(4, profile["schema_version"])
+        self.assertEqual(3, profile["schema_version"])
         self.assertEqual(["CheshireMew"], profile["applies_to"]["github_owners"])
         self.assertEqual(
             ["zh-CN", "en", "ja"],
@@ -213,16 +213,10 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             ["x", "telegram", "blog", "homepage"],
             [link["id"] for link in profile["social_links"]],
         )
-        self.assertEqual(
-            ["X", "Telegram", "博客", "个人主页"],
-            [link["label"] for link in profile["social_links"]],
-        )
-        self.assertEqual(
-            ["@0xCheshire", "CheshireBTC", "blog.blacknico.com", "blacknico.com"],
-            [link["value"] for link in profile["social_links"]],
-        )
         for link in profile["social_links"]:
-            self.assertEqual({"id", "label", "value", "url"}, set(link))
+            self.assertEqual(
+                {"id", "label", "url", "badge_src", "alt"}, set(link)
+            )
         self.assertEqual(
             ["stars", "forks", "license"],
             profile["repository_badges"],
@@ -231,7 +225,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         schema = json.loads(
             HEADER_PROFILE_SCHEMA_PATH.read_text(encoding="utf-8")
         )
-        self.assertEqual(4, schema["properties"]["schema_version"]["const"])
+        self.assertEqual(3, schema["properties"]["schema_version"]["const"])
         self.assertEqual(
             ["existing_path", "project_path", "repository_path"],
             schema["properties"]["navigation_links"]["items"]["properties"][
@@ -276,7 +270,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
                 name_index = text.index('<h1 align="center">Project Steward</h1>')
                 tagline_index = text.index(locale_taglines[language])
                 language_index = text.index(current_labels[language])
-                social_index = text.index("X：@0xCheshire")
+                social_index = text.index("img.shields.io/badge/X-")
                 repository_index = text.index(
                     "github/stars/CheshireMew/project-steward"
                 )
@@ -296,7 +290,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
                 self.assertIn("https://t.me/CheshireBTC", text)
                 self.assertIn("博客：blog.blacknico.com", text)
                 self.assertIn("个人主页：blacknico.com", text)
-                self.assertNotIn("img.shields.io/badge/X-", text)
+                self.assertIn("img.shields.io/badge/X-", text)
                 self.assertIn("github/stars/CheshireMew/project-steward", text)
                 self.assertIn("github/forks/CheshireMew/project-steward", text)
                 self.assertIn("github/license/CheshireMew/project-steward", text)

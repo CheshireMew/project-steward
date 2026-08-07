@@ -113,8 +113,8 @@ def validate_profile(profile: object) -> dict:
         optional={"$schema"},
         field="profile",
     )
-    if type(profile["schema_version"]) is not int or profile["schema_version"] != 4:
-        raise HeaderProfileError("schema_version must be 4")
+    if type(profile["schema_version"]) is not int or profile["schema_version"] != 3:
+        raise HeaderProfileError("schema_version must be 3")
 
     applies_to = profile["applies_to"]
     if not isinstance(applies_to, dict):
@@ -230,7 +230,7 @@ def validate_profile(profile: object) -> dict:
             raise HeaderProfileError(f"{field} must be an object")
         _require_exact_keys(
             link,
-            required={"id", "label", "value", "url"},
+            required={"id", "label", "url", "badge_src", "alt"},
             optional=set(),
             field=field,
         )
@@ -241,8 +241,9 @@ def validate_profile(profile: object) -> dict:
             raise HeaderProfileError(f"duplicate social link id: {link_id}")
         link_ids.add(link_id)
         _require_string(link["label"], f"{field}.label")
-        _require_string(link["value"], f"{field}.value")
         _require_https_url(link["url"], f"{field}.url")
+        _require_https_url(link["badge_src"], f"{field}.badge_src")
+        _require_string(link["alt"], f"{field}.alt")
 
     badges = profile["repository_badges"]
     if not isinstance(badges, list):
@@ -452,15 +453,18 @@ def _render_identity(
 def _render_social_row(profile: dict) -> str | None:
     if not profile["social_links"]:
         return None
-    items: list[str] = []
+    lines = ['<p align="center">']
     for link in profile["social_links"]:
         url = html.escape(link["url"], quote=True)
-        label = html.escape(link["label"])
-        value = html.escape(link["value"])
-        items.append(
-            f'<a href="{url}">{label}：{value}</a>'
+        src = html.escape(link["badge_src"], quote=True)
+        alt = html.escape(link["alt"], quote=True)
+        label = html.escape(link["label"], quote=True)
+        lines.append(
+            f'  <a href="{url}" title="{label}">'
+            f'<img src="{src}" alt="{alt}"></a>'
         )
-    return '<p align="center">\n  ' + " · ".join(items) + "\n</p>"
+    lines.append("</p>")
+    return "\n".join(lines)
 
 
 def _quoted_repository(repository: str) -> str:
