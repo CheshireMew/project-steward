@@ -26,18 +26,28 @@ GitHub README 可靠支持 Markdown、表格、链接、代码块、`details`、
 
 GitHub 能播放 GIF，但不会播放 SVG 内部动画。动画任务保留静态 SVG 源和回退。
 
-## 首屏辅助区
+## 首屏身份与辅助区
 
-语言与项目导航共用第一段，个人入口和仓库状态分别使用后续独立的居中段落，让 GitHub 在窄屏自然换行。当前语言使用文本，其它语言使用真实链接；文档、贡献和反馈在语言组后使用竖线分隔，并分别指向当前活动说明、独立贡献指南和已启用的正式反馈渠道。徽章图片由外层 `<a>` 提供点击目标，不依赖徽章服务 URL 中的 `link` 参数，也不把动态数字写进 alt text：
+首屏由同一个管理边界按固定顺序生成：Logo、项目名称、本地化一句话介绍、语言与项目导航、个人入口、仓库状态。项目名称和介绍使用普通 HTML 文本，图片失效时读者仍能理解项目；个人入口使用可读文本链接，不伪装成项目徽章。语言与项目导航共用一段，个人入口和仓库状态分别使用后续独立的居中段落，让 GitHub 在窄屏自然换行。当前语言使用文本，其它语言使用真实链接；文档、贡献和反馈在语言组后使用竖线分隔，并分别指向当前活动说明、独立贡献指南和已启用的正式反馈渠道。仓库状态徽章图片由外层 `<a>` 提供点击目标，不依赖徽章服务 URL 中的 `link` 参数，也不把动态数字写进 alt text：
 
 ```html
 <!-- readme-header:start -->
+<p align="center">
+  <img src="./assets/readme/logo.svg" width="160" alt="PROJECT_NAME">
+</p>
+
+<h1 align="center">PROJECT_NAME</h1>
+
+<p align="center">
+  <strong>一句普通读者能看懂的项目介绍。</strong>
+</p>
+
 <p align="center">
   <strong>中文</strong> · <a href="./README.en.md">English</a> · <a href="./README.ja.md">日本語</a> | <a href="./SKILL.md">文档</a> | <a href="./CONTRIBUTING.md">贡献</a> | <a href="https://github.com/OWNER/REPOSITORY/issues">反馈</a>
 </p>
 
 <p align="center">
-  <a href="https://example.com/profile"><img src="https://img.shields.io/badge/Profile-name-1F6FEB" alt="Profile: name"></a>
+  <a href="https://example.com/profile">Profile：name</a>
 </p>
 
 <p align="center">
@@ -46,7 +56,7 @@ GitHub 能播放 GIF，但不会播放 SVG 内部动画。动画任务保留静�
 <!-- readme-header:end -->
 ```
 
-实际成品由 `scripts/readme_header.py` 消费活动 profile、真实导航目标与目标仓库身份生成，不从示例复制取值。每个链接与图片提供独立含义；远程图片失效时 alt text 和外层链接仍允许读者识别并进入目标。徽章自带可读表面并在 GitHub 深浅背景中核对，必要文字、安装步骤和项目定义仍留在普通 Markdown 中。语言文件、配置的本地导航目标或许可证文件缺失，个人 profile 不适用于目标 owner，或者仓库不是公开 GitHub 项目时，不生成伪入口。
+实际成品由 `scripts/readme_header.py` 消费项目名称、本地化一句话介绍、合格 Logo、活动 profile、真实导航目标与目标仓库身份生成，不从示例复制取值。完整优化缺少这些首屏构件时先补齐真实生产者，再生成成品。每个链接与图片提供独立含义；远程徽章失效时 alt text 和外层链接仍允许读者识别并进入目标。仓库徽章自带可读表面并在 GitHub 深浅背景中核对，必要文字、安装步骤和项目定义仍留在普通 Markdown 中。语言文件、配置的本地导航目标或许可证文件缺失，个人 profile 不适用于目标 owner，或者仓库不是公开 GitHub 项目时，不生成伪入口。
 
 ## SVG 画布
 

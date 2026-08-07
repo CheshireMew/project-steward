@@ -202,6 +202,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--header-profile", type=Path)
     parser.add_argument("--repository", help="OWNER/REPOSITORY")
     parser.add_argument("--language", help="current README language code")
+    parser.add_argument("--project-name")
+    parser.add_argument("--tagline")
+    parser.add_argument("--identity-image")
+    parser.add_argument("--identity-image-width", default="160")
     parser.add_argument("--branch", default="main")
     parser.add_argument("--license-path", default="LICENSE")
     parser.add_argument("--allow-missing-languages", action="store_true")
@@ -224,17 +228,29 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: README not found: {readme}")
         return 2
 
-    if args.header_profile and (not args.repository or not args.language):
+    if args.header_profile and (
+        not args.repository
+        or not args.language
+        or not args.project_name
+        or not args.tagline
+        or not args.identity_image
+    ):
         print(
-            "ERROR: --header-profile requires --repository and --language",
+            "ERROR: --header-profile requires --repository, --language, "
+            "--project-name, --tagline and --identity-image",
             file=sys.stderr,
         )
         return 2
     if not args.header_profile and (
-        args.repository or args.language or args.navigation_target
+        args.repository
+        or args.language
+        or args.project_name
+        or args.tagline
+        or args.identity_image
+        or args.navigation_target
     ):
         print(
-            "ERROR: --repository, --language and --navigation-target "
+            "ERROR: header identity, repository, language and navigation options "
             "require --header-profile",
             file=sys.stderr,
         )
@@ -292,6 +308,10 @@ def main(argv: list[str] | None = None) -> int:
                 profile,
                 repository=args.repository,
                 current_language=args.language,
+                project_name=args.project_name,
+                tagline=args.tagline,
+                identity_image=args.identity_image,
+                identity_image_width=args.identity_image_width,
                 branch=args.branch,
                 license_path=args.license_path,
                 allow_missing_languages=args.allow_missing_languages,

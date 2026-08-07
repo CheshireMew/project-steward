@@ -12,6 +12,14 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = SKILL_ROOT / "scripts" / "audit_readme.py"
 HEADER_SCRIPT = SKILL_ROOT / "scripts" / "readme_header.py"
 HEADER_PROFILE = SKILL_ROOT / "assets" / "readme-profile" / "profile.json"
+FIXTURE_IDENTITY_ARGS = [
+    "--project-name",
+    "Fixture",
+    "--tagline",
+    "A fixture readers can understand.",
+    "--identity-image",
+    "assets/readme/logo.svg",
+]
 
 
 def run(
@@ -169,6 +177,14 @@ class ReadmeAuditTests(unittest.TestCase):
             (root / "CONTRIBUTING.md").write_text(
                 "# Contributing\n", encoding="utf-8"
             )
+            logo = root / "assets" / "readme" / "logo.svg"
+            logo.parent.mkdir(parents=True)
+            logo.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                "<title>Fixture logo</title><circle cx=\"50\" cy=\"50\" r=\"40\"/>"
+                "</svg>\n",
+                encoding="utf-8",
+            )
             language_files = {
                 "zh-CN": root / "README.md",
                 "en": root / "README.en.md",
@@ -189,6 +205,7 @@ class ReadmeAuditTests(unittest.TestCase):
                         "CheshireMew/fixture",
                         "--language",
                         language,
+                        *FIXTURE_IDENTITY_ARGS,
                         "--branch",
                         "main",
                         "--readme-root",
@@ -213,6 +230,7 @@ class ReadmeAuditTests(unittest.TestCase):
                         "CheshireMew/fixture",
                         "--language",
                         language,
+                        *FIXTURE_IDENTITY_ARGS,
                         "--branch",
                         "main",
                         "--readme",
@@ -225,6 +243,17 @@ class ReadmeAuditTests(unittest.TestCase):
                 self.assertIn("OK: README header matches profile", verified.stdout)
 
             chinese = language_files["zh-CN"].read_text(encoding="utf-8")
+            identity_index = chinese.index('./assets/readme/logo.svg')
+            name_index = chinese.index('<h1 align="center">Fixture</h1>')
+            tagline_index = chinese.index("A fixture readers can understand.")
+            language_index = chinese.index("<strong>中文</strong>")
+            social_index = chinese.index("X：@0xCheshire")
+            repository_index = chinese.index("github/stars/CheshireMew/fixture")
+            self.assertLess(identity_index, name_index)
+            self.assertLess(name_index, tagline_index)
+            self.assertLess(tagline_index, language_index)
+            self.assertLess(language_index, social_index)
+            self.assertLess(social_index, repository_index)
             self.assertIn("<strong>中文</strong>", chinese)
             self.assertIn('./README.en.md">English</a>', chinese)
             self.assertIn('./README.ja.md">日本語</a>', chinese)
@@ -235,7 +264,11 @@ class ReadmeAuditTests(unittest.TestCase):
                 chinese,
             )
             self.assertIn("https://x.com/0xCheshire", chinese)
-            self.assertIn('title="X"', chinese)
+            self.assertIn(
+                '<a href="https://x.com/0xCheshire">X：@0xCheshire</a>',
+                chinese,
+            )
+            self.assertNotIn("img.shields.io/badge/X-", chinese)
             self.assertIn("https://t.me/CheshireBTC", chinese)
             self.assertIn("https://blog.blacknico.com/", chinese)
             self.assertIn("https://blacknico.com/", chinese)
@@ -255,6 +288,7 @@ class ReadmeAuditTests(unittest.TestCase):
                     "CheshireMew/fixture",
                     "--language",
                     "zh-CN",
+                    *FIXTURE_IDENTITY_ARGS,
                     "--branch",
                     "main",
                     "--navigation-target",
@@ -284,6 +318,7 @@ class ReadmeAuditTests(unittest.TestCase):
                     "CheshireMew/fixture",
                     "--language",
                     "zh-CN",
+                    *FIXTURE_IDENTITY_ARGS,
                     "--navigation-target",
                     "docs=ARCHITECTURE.md",
                 ],
@@ -304,6 +339,14 @@ class ReadmeAuditTests(unittest.TestCase):
             (root / "CONTRIBUTING.md").write_text(
                 "# Contributing\n", encoding="utf-8"
             )
+            logo = root / "assets" / "readme" / "logo.svg"
+            logo.parent.mkdir(parents=True)
+            logo.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                "<title>Fixture logo</title><circle cx=\"50\" cy=\"50\" r=\"40\"/>"
+                "</svg>\n",
+                encoding="utf-8",
+            )
 
             rendered = run(
                 [
@@ -316,6 +359,7 @@ class ReadmeAuditTests(unittest.TestCase):
                     "CheshireMew/fixture",
                     "--language",
                     "zh-CN",
+                    *FIXTURE_IDENTITY_ARGS,
                     "--readme-root",
                     str(root),
                 ],
@@ -334,6 +378,14 @@ class ReadmeAuditTests(unittest.TestCase):
             root = Path(temporary)
             (root / "README.md").write_text("# Fixture\n", encoding="utf-8")
             (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
+            logo = root / "assets" / "readme" / "logo.svg"
+            logo.parent.mkdir(parents=True)
+            logo.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                "<title>Fixture logo</title><circle cx=\"50\" cy=\"50\" r=\"40\"/>"
+                "</svg>\n",
+                encoding="utf-8",
+            )
             base_command = [
                 sys.executable,
                 str(HEADER_SCRIPT),
@@ -342,6 +394,7 @@ class ReadmeAuditTests(unittest.TestCase):
                 str(HEADER_PROFILE),
                 "--language",
                 "zh-CN",
+                *FIXTURE_IDENTITY_ARGS,
                 "--readme-root",
                 str(root),
             ]
@@ -367,6 +420,43 @@ class ReadmeAuditTests(unittest.TestCase):
             self.assertEqual(1, unowned.returncode)
             self.assertIn("does not apply to GitHub owner", unowned.stderr)
 
+    def test_profile_refuses_a_missing_identity_image(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-identity-"
+        ) as temporary:
+            root = Path(temporary)
+            for name in ("README.md", "README.en.md", "README.ja.md"):
+                (root / name).write_text("# Fixture\n", encoding="utf-8")
+            (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
+            (root / "CONTRIBUTING.md").write_text(
+                "# Contributing\n", encoding="utf-8"
+            )
+
+            missing_logo = run(
+                [
+                    sys.executable,
+                    str(HEADER_SCRIPT),
+                    "render",
+                    "--profile",
+                    str(HEADER_PROFILE),
+                    "--repository",
+                    "CheshireMew/fixture",
+                    "--language",
+                    "zh-CN",
+                    *FIXTURE_IDENTITY_ARGS,
+                    "--readme-root",
+                    str(root),
+                ],
+                root,
+                check=False,
+            )
+
+            self.assertEqual(1, missing_logo.returncode)
+            self.assertIn(
+                "configured identity image is missing: assets/readme/logo.svg",
+                missing_logo.stderr,
+            )
+
     def test_profile_refuses_legacy_schema_and_missing_navigation_targets(self) -> None:
         with tempfile.TemporaryDirectory(
             prefix="project-steward-readme-navigation-"
@@ -374,7 +464,7 @@ class ReadmeAuditTests(unittest.TestCase):
             root = Path(temporary)
             legacy_profile = root / "legacy-profile.json"
             profile = json.loads(HEADER_PROFILE.read_text(encoding="utf-8"))
-            profile["schema_version"] = 2
+            profile["schema_version"] = 3
             legacy_profile.write_text(
                 json.dumps(profile, ensure_ascii=False),
                 encoding="utf-8",
@@ -391,11 +481,19 @@ class ReadmeAuditTests(unittest.TestCase):
                 check=False,
             )
             self.assertEqual(1, legacy.returncode)
-            self.assertIn("schema_version must be 3", legacy.stderr)
+            self.assertIn("schema_version must be 4", legacy.stderr)
 
             for name in ("README.md", "README.en.md", "README.ja.md"):
                 (root / name).write_text("# Fixture\n", encoding="utf-8")
             (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
+            logo = root / "assets" / "readme" / "logo.svg"
+            logo.parent.mkdir(parents=True)
+            logo.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                "<title>Fixture logo</title><circle cx=\"50\" cy=\"50\" r=\"40\"/>"
+                "</svg>\n",
+                encoding="utf-8",
+            )
             missing_project_target = run(
                 [
                     sys.executable,
@@ -407,6 +505,7 @@ class ReadmeAuditTests(unittest.TestCase):
                     "CheshireMew/fixture",
                     "--language",
                     "zh-CN",
+                    *FIXTURE_IDENTITY_ARGS,
                     "--readme-root",
                     str(root),
                     "--navigation-target",
@@ -435,6 +534,7 @@ class ReadmeAuditTests(unittest.TestCase):
                     "CheshireMew/fixture",
                     "--language",
                     "zh-CN",
+                    *FIXTURE_IDENTITY_ARGS,
                     "--readme-root",
                     str(root),
                     "--navigation-target",

@@ -1,18 +1,21 @@
+<!-- readme-header:start -->
+
 <p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="Project Steward 从项目结果中学习，在改动前预防返工，并沿根因完成治理">
+  <img src="./assets/readme/hero.svg" width="160" alt="Project Steward">
 </p>
 
-<!-- readme-header:start -->
+<h1 align="center">Project Steward</h1>
+
+<p align="center">
+  <strong>一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。</strong>
+</p>
 
 <p align="center">
   <strong>中文</strong> · <a href="./README.en.md">English</a> · <a href="./README.ja.md">日本語</a> | <a href="./SKILL.md">文档</a> | <a href="./CONTRIBUTING.md">贡献</a> | <a href="https://github.com/CheshireMew/project-steward/issues">反馈</a>
 </p>
 
 <p align="center">
-  <a href="https://x.com/0xCheshire" title="X"><img src="https://img.shields.io/badge/X-%400xCheshire-000000?logo=x&amp;logoColor=white" alt="X：@0xCheshire"></a>
-  <a href="https://t.me/CheshireBTC" title="Telegram"><img src="https://img.shields.io/badge/Telegram-CheshireBTC-26A5E4?logo=telegram&amp;logoColor=white" alt="Telegram：CheshireBTC"></a>
-  <a href="https://blog.blacknico.com/" title="Blog"><img src="https://img.shields.io/badge/Blog-blog.blacknico.com-2E7D32?logo=rss&amp;logoColor=white" alt="博客：blog.blacknico.com"></a>
-  <a href="https://blacknico.com/" title="Homepage"><img src="https://img.shields.io/badge/Home-blacknico.com-1F6FEB?logo=googlechrome&amp;logoColor=white" alt="个人主页：blacknico.com"></a>
+  <a href="https://x.com/0xCheshire">X：@0xCheshire</a> · <a href="https://t.me/CheshireBTC">Telegram：CheshireBTC</a> · <a href="https://blog.blacknico.com/">博客：blog.blacknico.com</a> · <a href="https://blacknico.com/">个人主页：blacknico.com</a>
 </p>
 
 <p align="center">
@@ -22,10 +25,6 @@
 </p>
 
 <!-- readme-header:end -->
-
-# Project Steward
-
-**把一次项目工作里的成功、返工和纠正，变成下一次更稳的行动。**
 
 Project Steward 是一个项目治理 Skill。它从完整项目过程提炼可复用方法，在改动前检查容易返工的边界，在缺陷发生后沿根因一次迁移生产者、边界和消费者。
 
@@ -163,9 +162,9 @@ python -m unittest discover -s tests -v
 审计三种语言的 README：
 
 ~~~powershell
-python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --project-name "Project Steward" --tagline "一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --project-name "Project Steward" --tagline "A project-governance Skill that helps you understand a codebase, prevent rework, and fix problems at their root." --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --project-name "Project Steward" --tagline "プロジェクトを理解し、手戻りを未然に防ぎ、問題を根本原因から修正するためのプロジェクトガバナンス Skill です。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
 ~~~
 
 ## Star History

@@ -178,6 +178,8 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         for fragment in (
             "不能因一个项目专属目标不同就判定整份 profile 不适用",
             "完整优化时缺少的配置语言是待创建的完整页面",
+            "旧页面缺少哪一项就补齐哪一项",
+            "完整首屏身份链",
             "本次已存在或新建的真实 `CONTRIBUTING.md`",
             "--navigation-target docs=<活动 Markdown>",
             "不能临时改写 profile",
@@ -187,7 +189,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
 
     def test_header_profile_has_one_owner_and_real_consumers(self) -> None:
         profile = json.loads(HEADER_PROFILE_PATH.read_text(encoding="utf-8"))
-        self.assertEqual(3, profile["schema_version"])
+        self.assertEqual(4, profile["schema_version"])
         self.assertEqual(["CheshireMew"], profile["applies_to"]["github_owners"])
         self.assertEqual(
             ["zh-CN", "en", "ja"],
@@ -212,6 +214,16 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             [link["id"] for link in profile["social_links"]],
         )
         self.assertEqual(
+            ["X", "Telegram", "博客", "个人主页"],
+            [link["label"] for link in profile["social_links"]],
+        )
+        self.assertEqual(
+            ["@0xCheshire", "CheshireBTC", "blog.blacknico.com", "blacknico.com"],
+            [link["value"] for link in profile["social_links"]],
+        )
+        for link in profile["social_links"]:
+            self.assertEqual({"id", "label", "value", "url"}, set(link))
+        self.assertEqual(
             ["stars", "forks", "license"],
             profile["repository_badges"],
         )
@@ -219,7 +231,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         schema = json.loads(
             HEADER_PROFILE_SCHEMA_PATH.read_text(encoding="utf-8")
         )
-        self.assertEqual(3, schema["properties"]["schema_version"]["const"])
+        self.assertEqual(4, schema["properties"]["schema_version"]["const"])
         self.assertEqual(
             ["existing_path", "project_path", "repository_path"],
             schema["properties"]["navigation_links"]["items"]["properties"][
@@ -242,6 +254,11 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "en": ("## What it helps you accomplish", "## Say it directly", "## License and third-party sources"),
             "ja": ("## できること", "## そのまま依頼できます", "## ライセンスと第三者ソース"),
         }
+        locale_taglines = {
+            "zh-CN": "一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。",
+            "en": "A project-governance Skill that helps you understand a codebase, prevent rework, and fix problems at their root.",
+            "ja": "プロジェクトを理解し、手戻りを未然に防ぎ、問題を根本原因から修正するためのプロジェクトガバナンス Skill です。",
+        }
 
         for language, text in README_TEXTS.items():
             with self.subTest(language=language):
@@ -250,6 +267,24 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
                 self.assertIn("./assets/readme/hero.svg", text)
                 self.assertIn("<!-- readme-header:start -->", text)
                 self.assertIn("<!-- readme-header:end -->", text)
+                self.assertTrue(text.startswith("<!-- readme-header:start -->"))
+                self.assertEqual(
+                    1, text.count('<h1 align="center">Project Steward</h1>')
+                )
+                self.assertNotIn("\n# Project Steward\n", text)
+                logo_index = text.index('./assets/readme/hero.svg')
+                name_index = text.index('<h1 align="center">Project Steward</h1>')
+                tagline_index = text.index(locale_taglines[language])
+                language_index = text.index(current_labels[language])
+                social_index = text.index("X：@0xCheshire")
+                repository_index = text.index(
+                    "github/stars/CheshireMew/project-steward"
+                )
+                self.assertLess(logo_index, name_index)
+                self.assertLess(name_index, tagline_index)
+                self.assertLess(tagline_index, language_index)
+                self.assertLess(language_index, social_index)
+                self.assertLess(social_index, repository_index)
                 self.assertIn(current_labels[language], text)
                 self.assertIn('./SKILL.md">文档</a>', text)
                 self.assertIn('./CONTRIBUTING.md">贡献</a>', text)
@@ -259,10 +294,14 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
                 )
                 self.assertIn("https://x.com/0xCheshire", text)
                 self.assertIn("https://t.me/CheshireBTC", text)
+                self.assertIn("博客：blog.blacknico.com", text)
+                self.assertIn("个人主页：blacknico.com", text)
+                self.assertNotIn("img.shields.io/badge/X-", text)
                 self.assertIn("github/stars/CheshireMew/project-steward", text)
                 self.assertIn("github/forks/CheshireMew/project-steward", text)
                 self.assertIn("github/license/CheshireMew/project-steward", text)
                 self.assertIn("--navigation-target docs=SKILL.md", text)
+                self.assertIn("--identity-image assets/readme/hero.svg", text)
                 self.assertIn(
                     "npx skills add CheshireMew/project-steward",
                     text,
@@ -302,29 +341,22 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             with self.subTest(retired_wall=retired_wall):
                 self.assertNotIn(retired_wall, chinese)
 
-    def test_shared_hero_is_language_neutral_and_project_specific(self) -> None:
+    def test_shared_logo_is_language_neutral_and_project_specific(self) -> None:
         root = ET.parse(HERO_PATH).getroot()
         text = " ".join(
             (node.text or "").strip()
             for node in root.iter()
             if (node.text or "").strip()
         )
-        for fragment in (
-            "PROJECT GOVERNANCE SKILL",
-            "Project Steward",
-            "LEARN FROM RESULTS",
-            "PREVENT REWORK",
-            "CLOSE ROOT CAUSES",
-            "LEARN",
-            "PREVENT",
-            "REMEDIATE",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, text)
+        self.assertIn("Project Steward logo", text)
+        self.assertIn("Three connected checkpoints", text)
 
         self.assertIsNone(re.search(r"[\u3040-\u30ff\u3400-\u9fff]", text))
         source = HERO_PATH.read_text(encoding="utf-8")
         self.assertIn('id="governance-path"', source)
+        self.assertIn('id="steward-boundary"', source)
+        self.assertIn('viewBox="0 0 240 240"', source)
+        self.assertNotIn("<text", source)
         self.assertNotIn('rx="', source)
         self.assertNotIn("project-card", source)
 

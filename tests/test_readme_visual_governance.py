@@ -154,7 +154,11 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, HERO_TEXT)
 
         for fragment in (
-            "语言与项目导航共用第一段",
+            "同一个管理边界按固定顺序生成",
+            "Logo、项目名称、本地化一句话介绍、语言与项目导航、个人入口、仓库状态",
+            "项目名称和介绍使用普通 HTML 文本",
+            "个人入口使用可读文本链接",
+            "语言与项目导航共用一段",
             "文档、贡献和反馈在语言组后使用竖线分隔",
             "当前语言使用文本，其它语言使用真实链接",
             "徽章图片由外层 `<a>` 提供点击目标",
@@ -164,6 +168,15 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, CANVAS_TEXT)
+
+        self.assertIn(
+            "完整 README 优化还必须交付一个可在首屏独立使用的 Logo",
+            HERO_TEXT,
+        )
+        self.assertIn(
+            "完整优化不能省略 Logo",
+            VISUAL_TEXT,
+        )
 
     def test_hybrid_and_motion_consumers_cannot_restore_card_defaults(self) -> None:
         self.assertIn("消费已经选定的视觉合同", HYBRID_TEXT)

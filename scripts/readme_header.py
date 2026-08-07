@@ -33,6 +33,8 @@ OWNER_PATTERN = re.compile(
 REPOSITORY_NAME_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
 LANGUAGE_CODE_PATTERN = re.compile(r"^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})?$")
 LINK_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+IDENTITY_IMAGE_SUFFIXES = {".gif", ".png", ".svg", ".webp"}
+IDENTITY_IMAGE_WIDTH_PATTERN = re.compile(r"(?:[1-9]\d{0,3}|100%)")
 
 
 class HeaderProfileError(ValueError):
@@ -111,8 +113,8 @@ def validate_profile(profile: object) -> dict:
         optional={"$schema"},
         field="profile",
     )
-    if type(profile["schema_version"]) is not int or profile["schema_version"] != 3:
-        raise HeaderProfileError("schema_version must be 3")
+    if type(profile["schema_version"]) is not int or profile["schema_version"] != 4:
+        raise HeaderProfileError("schema_version must be 4")
 
     applies_to = profile["applies_to"]
     if not isinstance(applies_to, dict):
@@ -228,7 +230,7 @@ def validate_profile(profile: object) -> dict:
             raise HeaderProfileError(f"{field} must be an object")
         _require_exact_keys(
             link,
-            required={"id", "label", "url", "badge_src", "alt"},
+            required={"id", "label", "value", "url"},
             optional=set(),
             field=field,
         )
@@ -239,9 +241,8 @@ def validate_profile(profile: object) -> dict:
             raise HeaderProfileError(f"duplicate social link id: {link_id}")
         link_ids.add(link_id)
         _require_string(link["label"], f"{field}.label")
+        _require_string(link["value"], f"{field}.value")
         _require_https_url(link["url"], f"{field}.url")
-        _require_https_url(link["badge_src"], f"{field}.badge_src")
-        _require_string(link["alt"], f"{field}.alt")
 
     badges = profile["repository_badges"]
     if not isinstance(badges, list):
@@ -405,21 +406,61 @@ def _render_language_row(
     return '<p align="center">\n  ' + content + "\n</p>"
 
 
+def _render_identity(
+    *,
+    project_name: str,
+    tagline: str,
+    identity_image: str,
+    identity_image_width: str,
+    readme_root: Path,
+) -> list[str]:
+    name = _require_string(project_name, "project_name")
+    description = _require_string(tagline, "tagline")
+    image_path = _require_relative_path(identity_image, "identity_image")
+    suffix = PurePosixPath(image_path).suffix.lower()
+    if suffix not in IDENTITY_IMAGE_SUFFIXES:
+        raise HeaderProfileError(
+            "identity_image must be an SVG, PNG, WebP, or GIF file"
+        )
+    if not (readme_root / PurePosixPath(image_path)).is_file():
+        raise HeaderProfileError(
+            f"configured identity image is missing: {image_path}"
+        )
+    width = _require_string(identity_image_width, "identity_image_width")
+    if not IDENTITY_IMAGE_WIDTH_PATTERN.fullmatch(width):
+        raise HeaderProfileError(
+            "identity_image_width must be 100% or an integer from 1 to 9999"
+        )
+    src = html.escape(f"./{quote(image_path, safe='/')}", quote=True)
+    rows = [
+        '<p align="center">\n'
+        f'  <img src="{src}" width="{width}" '
+        f'alt="{html.escape(name, quote=True)}">\n'
+        "</p>"
+    ]
+    rows.extend(
+        [
+            f'<h1 align="center">{html.escape(name)}</h1>',
+            '<p align="center">\n'
+            f"  <strong>{html.escape(description)}</strong>\n"
+            "</p>",
+        ]
+    )
+    return rows
+
+
 def _render_social_row(profile: dict) -> str | None:
     if not profile["social_links"]:
         return None
-    lines = ['<p align="center">']
+    items: list[str] = []
     for link in profile["social_links"]:
         url = html.escape(link["url"], quote=True)
-        src = html.escape(link["badge_src"], quote=True)
-        alt = html.escape(link["alt"], quote=True)
-        label = html.escape(link["label"], quote=True)
-        lines.append(
-            f'  <a href="{url}" title="{label}">'
-            f'<img src="{src}" alt="{alt}"></a>'
+        label = html.escape(link["label"])
+        value = html.escape(link["value"])
+        items.append(
+            f'<a href="{url}">{label}：{value}</a>'
         )
-    lines.append("</p>")
-    return "\n".join(lines)
+    return '<p align="center">\n  ' + " · ".join(items) + "\n</p>"
 
 
 def _quoted_repository(repository: str) -> str:
@@ -486,6 +527,10 @@ def render_header(
     repository: str,
     readme_root: Path,
     current_language: str,
+    project_name: str,
+    tagline: str,
+    identity_image: str,
+    identity_image_width: str = "160",
     branch: str,
     license_path: str,
     allow_missing_languages: bool = False,
@@ -503,13 +548,20 @@ def render_header(
         readme_root=root,
         navigation_targets=navigation_targets or {},
     )
-    rows = [
+    rows = _render_identity(
+        project_name=project_name,
+        tagline=tagline,
+        identity_image=identity_image,
+        identity_image_width=identity_image_width,
+        readme_root=root,
+    )
+    rows.append(
         _render_language_row(
             languages,
             current_language,
             navigation_links,
         )
-    ]
+    )
     social_row = _render_social_row(profile)
     if social_row:
         rows.append(social_row)
@@ -544,6 +596,10 @@ def verify_readme_header(
     *,
     repository: str,
     current_language: str,
+    project_name: str,
+    tagline: str,
+    identity_image: str,
+    identity_image_width: str = "160",
     branch: str,
     license_path: str,
     allow_missing_languages: bool = False,
@@ -559,6 +615,10 @@ def verify_readme_header(
         repository=repository,
         readme_root=readme.parent,
         current_language=current_language,
+        project_name=project_name,
+        tagline=tagline,
+        identity_image=identity_image,
+        identity_image_width=identity_image_width,
         branch=branch,
         license_path=license_path,
         allow_missing_languages=allow_missing_languages,
@@ -574,6 +634,10 @@ def _add_render_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--profile", type=Path, required=True)
     parser.add_argument("--repository", required=True, help="OWNER/REPOSITORY")
     parser.add_argument("--language", required=True, help="current language code")
+    parser.add_argument("--project-name", required=True)
+    parser.add_argument("--tagline", required=True)
+    parser.add_argument("--identity-image", required=True)
+    parser.add_argument("--identity-image-width", default="160")
     parser.add_argument("--branch", default="main")
     parser.add_argument("--license-path", default="LICENSE")
     parser.add_argument("--allow-missing-languages", action="store_true")
@@ -618,6 +682,10 @@ def main(argv: list[str] | None = None) -> int:
                     repository=args.repository,
                     readme_root=args.readme_root,
                     current_language=args.language,
+                    project_name=args.project_name,
+                    tagline=args.tagline,
+                    identity_image=args.identity_image,
+                    identity_image_width=args.identity_image_width,
                     branch=args.branch,
                     license_path=args.license_path,
                     allow_missing_languages=args.allow_missing_languages,
@@ -630,6 +698,10 @@ def main(argv: list[str] | None = None) -> int:
             profile,
             repository=args.repository,
             current_language=args.language,
+            project_name=args.project_name,
+            tagline=args.tagline,
+            identity_image=args.identity_image,
+            identity_image_width=args.identity_image_width,
             branch=args.branch,
             license_path=args.license_path,
             allow_missing_languages=args.allow_missing_languages,
