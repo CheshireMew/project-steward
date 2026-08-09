@@ -593,6 +593,82 @@ class ReadmeAuditTests(unittest.TestCase):
                 passed.stdout,
             )
 
+    def test_explicit_public_identity_exclusions_are_case_insensitive(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-public-identity-"
+        ) as temporary:
+            root = Path(temporary)
+            readme = root / "README.md"
+            readme.write_text(
+                (
+                    "# Portable Agent Skill\n\n"
+                    "Load this skill in Codex and describe the result.\n"
+                ),
+                encoding="utf-8",
+            )
+
+            failed = run(
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    str(readme),
+                    "--forbid-public-term",
+                    "codex",
+                ],
+                root,
+                check=False,
+            )
+            self.assertEqual(1, failed.returncode)
+            self.assertIn(
+                "forbidden public term 'codex' appears at line 3",
+                failed.stdout,
+            )
+
+            readme.write_text(
+                (
+                    "# Portable Agent Skill\n\n"
+                    "Load this skill in a compatible Agent and describe the result.\n"
+                ),
+                encoding="utf-8",
+            )
+            passed = run(
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    str(readme),
+                    "--forbid-public-term",
+                    "codex",
+                ],
+                root,
+            )
+            self.assertIn("Forbidden public terms checked: 1", passed.stdout)
+            self.assertIn("OK: structural README checks passed", passed.stdout)
+
+    def test_empty_public_identity_exclusion_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-empty-public-identity-"
+        ) as temporary:
+            root = Path(temporary)
+            readme = root / "README.md"
+            readme.write_text("# Fixture\n", encoding="utf-8")
+
+            failed = run(
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    str(readme),
+                    "--forbid-public-term",
+                    "   ",
+                ],
+                root,
+                check=False,
+            )
+            self.assertEqual(2, failed.returncode)
+            self.assertIn(
+                "--forbid-public-term values must not be empty",
+                failed.stderr,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

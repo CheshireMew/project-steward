@@ -159,6 +159,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "第一采用读者：",
             "首页读者变化：",
             "项目本体与运行载体：",
+            "宿主依赖证据与公开身份排除：",
             "到访情境：",
             "交给项目什么：",
             "可观察结果：",
@@ -186,6 +187,26 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, CONTENT_TEXT)
+
+    def test_optional_host_adapters_cannot_own_agent_skill_identity(self) -> None:
+        for fragment in (
+            "宿主适配不拥有通用 Skill 身份",
+            "适配文件存在、当前恰好由某个 Agent 执行",
+            "只证明兼容关系，不证明排他依赖",
+            "把项目核定为宿主中立的 Agent Skill",
+            "全部活动语言 README",
+            "--forbid-public-term <名称>",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CONTENT_TEXT)
+
+        for fragment in (
+            "宿主依赖证据、宿主中立结论与公开身份排除项：",
+            "用 `--forbid-public-term` 传给全部活动语言",
+            "宿主中立时增加全部活动语言的公开身份排除审计",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DELIVERY_TEXT)
 
     def test_header_profile_has_one_owner_and_real_consumers(self) -> None:
         profile = json.loads(HEADER_PROFILE_PATH.read_text(encoding="utf-8"))

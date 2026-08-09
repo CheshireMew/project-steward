@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 # Migrated from oil-oil/beautify-github-readme. See THIRD_PARTY_NOTICES.md.
-"""Audit README structure, section order, prose density, images, SVGs, and managed headers."""
+"""Audit README structure, prose, explicit public-term exclusions, and assets."""
 
 from __future__ import annotations
 
@@ -26,7 +26,8 @@ HTML_IMAGE = re.compile(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"'][^>]*>", re.I)
 HTML_ALT = re.compile(r"\balt=[\"']([^\"']*)[\"']", re.I)
 UNSAFE_SVG_TAGS = {"script", "foreignObject"}
 SCOPE_MESSAGE = (
-    "Scope: structural and prose-density checks only; source currency, factual accuracy, "
+    "Scope: structural and prose-density checks, plus explicit public-term "
+    "checks when supplied; source currency, factual accuracy, "
     "remote endpoint availability, visual relevance, and rendered quality "
     "are not evaluated."
 )
@@ -196,6 +197,32 @@ def audit_terminal_section_order(text: str) -> list[str]:
     ]
 
 
+def audit_forbidden_public_terms(text: str, terms: list[str]) -> list[str]:
+    issues: list[str] = []
+    seen: set[str] = set()
+    lines = text.splitlines()
+    for raw_term in terms:
+        term = raw_term.strip()
+        folded = term.casefold()
+        if not term or folded in seen:
+            continue
+        seen.add(folded)
+        matches = [
+            str(line_number)
+            for line_number, line in enumerate(lines, start=1)
+            if folded in line.casefold()
+        ]
+        if matches:
+            issues.append(
+                "forbidden public term {!r} appears at line{} {}".format(
+                    term,
+                    "s" if len(matches) > 1 else "",
+                    ", ".join(matches),
+                )
+            )
+    return issues
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("readme", type=Path)
@@ -218,6 +245,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--max-prose-characters", type=int, default=360)
     parser.add_argument("--max-consecutive-prose", type=int, default=3)
+    parser.add_argument(
+        "--forbid-public-term",
+        action="append",
+        default=[],
+        metavar="TERM",
+        help="fail when TERM appears anywhere in the public README (repeatable)",
+    )
     return parser
 
 
@@ -261,6 +295,12 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
+    if any(not term.strip() for term in args.forbid_public_term):
+        print(
+            "ERROR: --forbid-public-term values must not be empty",
+            file=sys.stderr,
+        )
+        return 2
 
     text = readme.read_text(encoding="utf-8")
     markdown_images = MARKDOWN_IMAGE.findall(text)
@@ -270,6 +310,9 @@ def main(argv: list[str] | None = None) -> int:
 
     warnings: list[str] = []
     warnings.extend(audit_terminal_section_order(text))
+    warnings.extend(
+        audit_forbidden_public_terms(text, args.forbid_public_term)
+    )
     prose_checked, prose_issues = audit_prose_density(
         text,
         max_characters=args.max_prose_characters,
@@ -324,6 +367,11 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Local images checked: {checked}")
     print(f"Prose blocks checked: {prose_checked}")
     print(f"Managed header checked: {'yes' if header_checked else 'no'}")
+    print(
+        "Forbidden public terms checked: {}".format(
+            len({term.strip().casefold() for term in args.forbid_public_term})
+        )
+    )
     print(SCOPE_MESSAGE)
     if warnings:
         print("Issues:")
