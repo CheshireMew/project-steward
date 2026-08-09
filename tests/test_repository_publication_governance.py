@@ -3,7 +3,6 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 PUBLICATION_TEXT = (
     SKILL_ROOT / "references" / "repository-publication.md"
@@ -71,6 +70,53 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, audit)
+
+    def test_history_cleanup_separates_hygiene_sensitive_data_and_cache_layers(
+        self,
+    ) -> None:
+        history = PUBLICATION_TEXT.split(
+            "### 历史清理先冻结类别、结果层和引用平面",
+            1,
+        )[1].split("## 4. 初始化 GitHub 仓库", 1)[0]
+
+        layers = (
+            "第 1 层——当前工作树、索引和新提交",
+            "第 2 层——获准的本地分支、标签与其它引用",
+            "第 3 层——实时远端活动分支、标签和新鲜克隆",
+            "第 4 层——旧提交 SHA 缓存、PR 引用、fork、其它克隆或托管方存储",
+        )
+        positions = [history.index(fragment) for fragment in layers]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "分别判断**上传必要性**和**内容敏感性**",
+            "工具使用了 `--sensitive-data-removal` 等选项",
+            "不能反向证明内容属于凭据、隐私或其它敏感数据",
+            "是不同动作",
+            "枚举本地引用的名称和对象类型",
+            "tree 等快照引用可能继续持有目标 blob",
+            "精确租约或等价条件更新",
+            "新鲜镜像或克隆",
+            "不能据此把已经完成的仓库结果改写成受阻",
+            "不能要求用户提交支持工单",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, history)
+
+        github_audit = PROJECT_AUDIT_TEXT.split(
+            "### GitHub 仓库必须审计实际上传边界",
+            1,
+        )[1].split("### 公开验证器必须实际进入保证链", 1)[0]
+        for fragment in (
+            "同时记录上传必要性与内容敏感性",
+            "不能把两者合并成一个严重程度判断",
+            "不把未知自动升级成敏感",
+            "用户已经接受的准确清理层",
+            "服务器缓存或托管方工单才进入完成条件",
+            "反向扩大原发现",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, github_audit)
 
     def test_project_audit_consumes_the_shared_github_upload_boundary_read_only(
         self,

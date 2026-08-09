@@ -4,7 +4,6 @@ import re
 import unittest
 from pathlib import Path
 
-
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 CI_TEXT = (
@@ -49,6 +48,32 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         )
         self.assertIn("全部 CI 作业消费它", CI_TEXT)
         self.assertIn("文档、许可证、致谢和纯仓库元数据", CI_TEXT)
+
+    def test_generated_artifact_producer_precedes_clean_runner_consumer(
+        self,
+    ) -> None:
+        artifact_order = CI_TEXT.split(
+            "### 生成产物的生产者必须先于消费者",
+            1,
+        )[1].split("本地最终入口与 CI 消费同一验证计划", 1)[0]
+
+        for fragment in (
+            "干净 runner 上必须已经存在",
+            "未被仓库跟踪、由构建生成、通常被忽略或来自另一作业",
+            "正式生产者步骤及其前置输入",
+            "上游 artifact 传递边界",
+            "第一个安装、打包、测试或运行消费者",
+            "不能依赖本机残留、未声明的缓存",
+            "预先生成一次后消费者成功",
+            "不包含这些输出的新鲜检出或等价隔离状态",
+            "消费者不会在生产者之前进入",
+            "实际跨过生产、传递和消费边界",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, artifact_order)
+
+        self.assertIn("derived-artifact-governance.md", artifact_order)
+        self.assertIn("本节只拥有 CI 中的生产顺序和传递事实", artifact_order)
 
     def test_independent_expensive_boundaries_and_control_plane_fail_closed(
         self,
