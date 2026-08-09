@@ -15,12 +15,15 @@ PUBLICATION_TEXT = (ROOT / "references" / "repository-publication.md").read_text
 
 
 class AutomaticPublicationCompletionTests(unittest.TestCase):
-    def test_project_steward_self_evolution_publishes_the_approved_closure(self) -> None:
+    def test_project_steward_self_evolution_publishes_the_entire_worktree(self) -> None:
         for fragment in (
             "references/repository-publication.md",
-            "精确提交并推送本轮获准依赖闭包",
-            "核对远端 HEAD 后才完成",
-            "远端、认证、分支保护、分叉或未获准依赖阻塞",
+            "整个工作区按实际影响验证",
+            "使用 `git add -A`",
+            "已跟踪修改、未跟踪文件和现有删除",
+            "核对远端 HEAD 和工作区无遗漏后才完成",
+            "任何一项不能共同发布时保留完整工作区",
+            "不退回选择性提交",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, SKILL_TEXT)
@@ -59,6 +62,26 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
+
+    def test_self_evolution_full_worktree_is_an_explicit_publication_exception(self) -> None:
+        section = PUBLICATION_TEXT.split(
+            "### Project Steward 自我进化使用整仓发布合同",
+            1,
+        )[1].split("### 本地提交与远端状态分层交付", 1)[0]
+        for fragment in (
+            "整个当前工作区是一个不可拆分的发布范围",
+            "工作区不干净不是跳过文件、缩小历史调查或拒绝修改的理由",
+            "全部已跟踪修改、未跟踪文件和现有删除",
+            "不按任务、来源、文件或内容片段选择性排除",
+            "本地尚未推送提交",
+            "保留完整工作区并停止",
+            "使用 `git add -A`",
+            "创建为一个新提交",
+            "远端 HEAD 与本地 HEAD 相同",
+            "工作区没有遗漏",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
 
     def test_public_install_entry_finishes_at_the_remote_consumer(self) -> None:
         for fragment in (

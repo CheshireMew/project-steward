@@ -634,6 +634,27 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
+    def test_native_model_and_host_capabilities_are_not_reimplemented(self) -> None:
+        ordered = (
+            "先排除模型与宿主已经拥有的职责",
+            "当前原生边界已经能完成同一用户结果时",
+            "结论是**不吸收**",
+            "只有当前原生能力无法表达一项已经证明必要的持久项目合同",
+        )
+        positions = [LEARNING_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "上下文选择、方案比较、步骤规划和工具选择",
+            "工具协议、Agent 编排、任务连续性和产品适配",
+            "业务事实、稳定身份、schema、权限、原子写入与恢复",
+            "第二套编排器、集成注册表、扩展市场、持久工作流",
+            "模型偶尔犯错",
+            "都不能单独证明需要新的持久机制",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LEARNING_TEXT)
+
 
     def test_reference_features_require_target_object_and_entry_evidence(
         self,

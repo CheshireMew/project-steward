@@ -175,6 +175,33 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_project_steward_self_evolution_publishes_the_whole_worktree(self) -> None:
+        section = PUBLICATION_TEXT.split(
+            "### Project Steward 自我进化使用整仓发布合同",
+            1,
+        )[1].split("### 本地提交与远端状态分层交付", 1)[0]
+        ordered = (
+            "整个当前工作区是一个不可拆分的发布范围",
+            "全部已跟踪修改、未跟踪文件和现有删除",
+            "根据整个工作区的实际影响范围建立验证账本",
+            "使用 `git add -A`",
+            "创建为一个新提交",
+            "只向当前跟踪分支执行非强制推送",
+            "远端 HEAD 与本地 HEAD 相同",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不按任务、来源、文件或内容片段选择性排除",
+            "保留完整工作区并停止",
+            "不能遗漏该项、退回最小依赖闭包",
+            "工作区没有未暂存或新出现的遗漏",
+            "不拆分工作区绕过阻塞",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_local_commits_and_remote_state_are_reported_separately(self) -> None:
         for fragment in (
             "本地提交与远端状态分层交付",

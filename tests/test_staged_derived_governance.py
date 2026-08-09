@@ -93,6 +93,31 @@ class StagedResultGovernanceTests(unittest.TestCase):
 
 
 class DerivedArtifactGovernanceTests(unittest.TestCase):
+    def test_multiple_artifacts_choose_one_explicit_evolution_contract(
+        self,
+    ) -> None:
+        ordered = (
+            "多份产物先选择演化合同",
+            "权威产物及其稳定身份",
+            "允许回流",
+            "向前留档",
+            "维护活真源",
+            "三种关系没有全局默认",
+        )
+        positions = [DERIVED_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "独立事实、派生结果还是不可变历史",
+            "重要理由由哪个真源保留",
+            "不能按目录序号、修改时间或最近出现文件猜测",
+            "不能在整体重写时丢失",
+            "不增加模式字段、状态文件、目录层级、工作流引擎或人工门槛",
+            "同一结果由多份规格、计划、任务或研究产物表达",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DERIVED_TEXT + MAIN_TEXT)
+
     def test_cache_key_uses_the_consumed_projection(self) -> None:
         for fragment in (
             "生产者实际消费的规范输入投影",
