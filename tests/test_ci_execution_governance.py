@@ -206,6 +206,21 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(reference=reference):
                 self.assertTrue((SKILL_ROOT / reference).is_file())
 
+    def test_repeated_lifecycle_costs_use_multiplicative_phase_evidence(
+        self,
+    ) -> None:
+        for fragment in (
+            "应用构造、资源发现、缓存或清理扫描",
+            "执行次数 × 代表性阶段成本",
+            "启动或构造、核心操作、关闭或清理",
+            "普通用户也会承担该成本",
+            "修复产品所有权、受管理命名空间或生命周期边界",
+            "不能靠跨命令共享实例、复用污染状态、跳过关闭或删除覆盖",
+            "刷新历史耗时权重后再重新分片",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CI_TEXT)
+
 
 if __name__ == "__main__":
     unittest.main()

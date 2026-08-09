@@ -199,6 +199,21 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         self.assertIn("不能保留前半段高速结果", DIAGNOSTIC_TEXT)
         self.assertIn("文件存在或非空不能代表成功", DIAGNOSTIC_TEXT)
 
+    def test_comparative_fast_path_benchmarks_hold_backend_identity_constant(
+        self,
+    ) -> None:
+        for fragment in (
+            "两边除目标变量外使用同一实际生产者、后端、资格状态和输入身份",
+            "最终选中的身份写入证据",
+            "结果已经被后端差异混杂",
+            "冻结同一个合格后端再比较目标变量",
+            "把后端作为显式矩阵",
+            "资格与正确性判定要同性能选择分开",
+            "不能同时决定采用哪个生产者并充当该生产者更快的证明",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
     def test_large_immutable_content_reuses_only_bound_validation_receipts(self) -> None:
         for fragment in (
             "成为不可变对象时",
