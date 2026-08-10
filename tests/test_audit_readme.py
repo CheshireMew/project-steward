@@ -454,6 +454,53 @@ class ReadmeAuditTests(unittest.TestCase):
                 missing_logo.stderr,
             )
 
+    def test_profile_refuses_a_full_width_identity_image(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix="project-steward-readme-identity-width-"
+        ) as temporary:
+            root = Path(temporary)
+            for name in ("README.md", "README.en.md", "README.ja.md"):
+                (root / name).write_text("# Fixture\n", encoding="utf-8")
+            (root / "LICENSE").write_text("Fixture license\n", encoding="utf-8")
+            (root / "CONTRIBUTING.md").write_text(
+                "# Contributing\n", encoding="utf-8"
+            )
+            logo = root / "assets" / "readme" / "logo.svg"
+            logo.parent.mkdir(parents=True)
+            logo.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                '<title>Fixture logo</title><circle cx="50" cy="50" r="40"/>'
+                "</svg>\n",
+                encoding="utf-8",
+            )
+
+            full_width = run(
+                [
+                    sys.executable,
+                    str(HEADER_SCRIPT),
+                    "render",
+                    "--profile",
+                    str(HEADER_PROFILE),
+                    "--repository",
+                    "CheshireMew/fixture",
+                    "--language",
+                    "zh-CN",
+                    *FIXTURE_IDENTITY_ARGS,
+                    "--identity-image-width",
+                    "100%",
+                    "--readme-root",
+                    str(root),
+                ],
+                root,
+                check=False,
+            )
+
+            self.assertEqual(1, full_width.returncode)
+            self.assertIn(
+                "identity_image_width must be an integer from 1 to 480",
+                full_width.stderr,
+            )
+
     def test_profile_refuses_legacy_schema_and_missing_navigation_targets(self) -> None:
         with tempfile.TemporaryDirectory(
             prefix="project-steward-readme-navigation-"

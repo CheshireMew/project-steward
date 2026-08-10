@@ -34,7 +34,8 @@ REPOSITORY_NAME_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
 LANGUAGE_CODE_PATTERN = re.compile(r"^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})?$")
 LINK_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 IDENTITY_IMAGE_SUFFIXES = {".gif", ".png", ".svg", ".webp"}
-IDENTITY_IMAGE_WIDTH_PATTERN = re.compile(r"(?:[1-9]\d{0,3}|100%)")
+IDENTITY_IMAGE_WIDTH_PATTERN = re.compile(r"[1-9]\d{0,2}")
+MAX_IDENTITY_IMAGE_WIDTH = 480
 
 
 class HeaderProfileError(ValueError):
@@ -428,9 +429,12 @@ def _render_identity(
             f"configured identity image is missing: {image_path}"
         )
     width = _require_string(identity_image_width, "identity_image_width")
-    if not IDENTITY_IMAGE_WIDTH_PATTERN.fullmatch(width):
+    if (
+        not IDENTITY_IMAGE_WIDTH_PATTERN.fullmatch(width)
+        or int(width) > MAX_IDENTITY_IMAGE_WIDTH
+    ):
         raise HeaderProfileError(
-            "identity_image_width must be 100% or an integer from 1 to 9999"
+            "identity_image_width must be an integer from 1 to 480"
         )
     src = html.escape(f"./{quote(image_path, safe='/')}", quote=True)
     rows = [

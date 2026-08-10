@@ -188,6 +188,22 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, CONTENT_TEXT)
 
+    def test_project_definition_rejects_defensive_filler_in_every_language(self) -> None:
+        for fragment in (
+            "项目定义直接说明项目是什么、接收什么、做什么和交付什么",
+            "防御性分类或反事实说明",
+            "改变读者的采用选择、安装、操作或结果解释",
+            "不能用它给正向定义补尾",
+            "全部活动语言执行同一判断",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CONTENT_TEXT)
+
+        self.assertIn(
+            "项目定义是否使用正向事实",
+            CONTENT_TEXT,
+        )
+
     def test_optional_host_adapters_cannot_own_agent_skill_identity(self) -> None:
         for fragment in (
             "宿主适配不拥有通用 Skill 身份",

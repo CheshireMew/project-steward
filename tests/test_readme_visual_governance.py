@@ -177,6 +177,31 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
             VISUAL_TEXT,
         )
 
+    def test_logo_precedes_expression_visuals_and_full_width_identity_is_rejected(self) -> None:
+        for fragment in (
+            "Logo 与 hero 是两个职责不同的素材",
+            "全宽 hero、机制图、结果图或展示图不能充当 Logo",
+            "完整首屏管理区和正向项目定义之后出现",
+            "第一个图片节点是否仍是紧凑 Logo",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, HERO_TEXT)
+
+        for fragment in (
+            "Logo 是 README 的第一个图片节点",
+            "identity_image_width` 只接受 `1–480` 的整数",
+            "全宽 hero、机制图、结果图和展示图不能作为身份图",
+            "全宽 hero、机制图、结果图和展示图属于正文",
+            "紧跟所解释章节的引入文字",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CANVAS_TEXT)
+
+        self.assertLess(
+            CANVAS_TEXT.index("## 首屏身份与辅助区"),
+            CANVAS_TEXT.index("## 表达性视觉的落点"),
+        )
+
     def test_hybrid_and_motion_consumers_cannot_restore_card_defaults(self) -> None:
         self.assertIn("消费已经选定的视觉合同", HYBRID_TEXT)
         self.assertIn("合同没有网格或容器时不补加", HYBRID_TEXT)
