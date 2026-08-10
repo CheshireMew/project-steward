@@ -95,11 +95,19 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "## 对话学习与自我进化",
             1,
         )[0]
+        ordered = (
+            "每个用户回合、内部轮次、自动续跑和上下文压缩恢复开始时",
+            "任何工具调用或状态改变前",
+            "最近一次明确用户动作",
+            "尚未完成的结果、范围、权限和停止位置",
+        )
+        positions = [shared.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
         for fragment in (
-            "只从用户最近一次明确动作及其尚未完成的结果恢复合同",
+            "同一结果仍未交付",
+            "只读结果已经交付、没有新的明确动作",
             "审计发现、助手建议、内部计划、目标名称、待办清单和自动提示",
             "都不能补造新结果或写入权限",
-            "原结果已经交付",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, shared)
@@ -113,7 +121,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         for fragment in (
             "普通业务功能仍由当前开发任务负责",
             "联网、下载、安装、运行、生成、写入、移动、归档、删除、提交、推送和发布分别授权",
-            "内部轮次、自动续跑和上下文压缩不是新的授权边界",
+            "任何工具调用或状态改变前",
             "工作从短动作扩展为多阶段",
             "新的独立请求替换尚未完成的结果",
             "逐项保留输出、错误和退出状态",
@@ -1529,9 +1537,26 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "无损缓存增量并在快照提交后重放",
             "用受控屏障暂停正式快照生产者",
             "最终同时包含基线内容和实时增量",
+            "覆盖其完整责任范围的快照",
+            "只改变已列字段的补丁",
+            "字段省略表示保持当前值",
+            "显式清空必须使用合同内可区分的值或操作",
+            "消费者不得把补丁当快照",
+            "旧 generation、倒退版本或责任范围不匹配",
+            "先发布包含多个字段的完整快照",
+            "只更新一个高频指标的补丁",
+            "证明其它字段仍然保留",
+            "交错一个旧 generation 或倒退版本的补丁",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
+
+        root_cause_route = MAIN_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性",
+            1,
+        )[0]
+        self.assertIn("局部状态、心跳或遥测更新", root_cause_route)
+        self.assertIn("完整快照与局部补丁", root_cause_route)
 
         for fragment in (
             "权威状态正确但活动界面仍旧",

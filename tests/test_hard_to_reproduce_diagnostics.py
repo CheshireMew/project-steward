@@ -340,6 +340,32 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         self.assertIn("一个进程已经消失不能替其它进程退出", DIAGNOSTIC_TEXT)
         self.assertIn("不启动争用同一资源的重复任务", DIAGNOSTIC_TEXT)
 
+    def test_validator_drains_child_output_without_hiding_results(self) -> None:
+        validator = DIAGNOSTIC_TEXT.split("### 验证器与测试驱动干扰", 1)[1]
+        ordered = (
+            "从子进程启动起为两条流分别登记消费所有者",
+            "并发排空到 EOF",
+            "等待子进程终态的线程不能先停止读取",
+            "任一未消费管道写满",
+            "外层超时只证明验证器破坏了运行条件",
+            "产品状态保持未知",
+        )
+        positions = [validator.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "stdout 或 stderr",
+            "受控文件、有界日志接收器或空设备",
+            "结构化结果、致命错误和终态仍使用独立无损通道",
+            "不能为了避免管道阻塞把权威结果静默丢弃",
+            "持续高频输出的受控子进程",
+            "对比有无并发排空",
+            "正式消费者读取结构化结果",
+            "不能拿来给产品失败背书",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, validator)
+
     def test_reference_is_cross_project_and_remains_a_leaf_method(self) -> None:
         self.assertNotIn("references/", DIAGNOSTIC_TEXT)
         self.assertNotRegex(DIAGNOSTIC_TEXT, r"[A-Za-z]:\\")
