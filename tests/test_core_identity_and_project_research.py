@@ -65,7 +65,7 @@ class CoreIdentityTests(unittest.TestCase):
         positions = [router.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
 
-    def test_bare_repository_uses_project_explanation(self) -> None:
+    def test_bare_repository_explains_value_and_minimum_mechanism(self) -> None:
         self.assertIn(
             "看懂仓库、目录或源码包",
             SKILL_TEXT,
@@ -92,6 +92,31 @@ class CoreIdentityTests(unittest.TestCase):
             "上层已经选择实际效果、可靠性、上下文噪音、适用性或采用判断时",
             PROJECT_RESEARCH_TEXT,
         )
+        for fragment in (
+            "默认结果不是只讲用途",
+            "最小机制闭环",
+            "用户动作 → 入口 → 决策或编排者 → 实际执行者 → 存储或外部边界 → 正式消费者 → 用户可见结果",
+            "谁决定下一步、谁真正执行",
+            "机制确实不同的必要分支",
+            "框架名称和模块清单不能代替原理说明",
+            "项目宣传比源码更强",
+            "源码能证明到哪一层",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_RESEARCH_TEXT)
+
+        self.assertNotIn(
+            "默认看懂项目只形成用途与使用情境说明",
+            PROJECT_RESEARCH_TEXT,
+        )
+        ordered = (
+            "先找出项目带来的价值变化",
+            "默认结果不是只讲用途",
+            "最小机制闭环",
+            "默认看懂仍不等于完整架构审计",
+        )
+        positions = [PROJECT_RESEARCH_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
         self.assertIn("understand or organize a codebase", SKILL_TEXT)
         self.assertNotIn("one-off explanation", SKILL_TEXT)
 
