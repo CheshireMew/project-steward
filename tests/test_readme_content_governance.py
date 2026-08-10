@@ -62,7 +62,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "准确项目根与上层 Git 边界：",
             "README 是否存在、当前动作与活动语言：",
             "公开安装入口、已验证的最短命令与实际安装验证等级：",
-            "现有视觉、图片和其它公开材料的资格：",
+            "项目活动真源与图片排除边界：",
             "许可证文件、GitHub 识别与权利边界：",
             "Star History 生产者、输出分支、raw 文件与消费端：",
             "GitHub Topics 当前集合、项目事实依据与目标集合：",
@@ -76,7 +76,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         for outcome in (
             "当前是否已经初始化 Git",
             "README 不存在时选择新写",
-            "桌面宽度、窄屏和深浅主题",
+            "设计和写作不打开、查看、渲染、OCR、取色或分析任何图片",
             "配置的完整语言页和贡献指南已经交付",
             "缺少 `README.en.md`、`README.ja.md`",
             "单个项目专属入口不成立时不影响其它组",
@@ -166,7 +166,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "第一步：",
             "后续读者：",
             "场景证据：",
-            "公开事实与合格材料：",
+            "公开事实与图片排除边界：",
         ):
             with self.subTest(field=field):
                 self.assertIn(field, CONTENT_TEXT)
@@ -187,6 +187,26 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, CONTENT_TEXT)
+
+    def test_readme_writing_uses_only_project_truth_and_never_reads_images(self) -> None:
+        for fragment in (
+            "图片退出写作真源",
+            "项目是这三类任务的唯一真源",
+            "不得打开、查看、截图、渲染、OCR、取色、临摹或分析",
+            "不得从图片推断项目事实、主题、结构、语气或措辞",
+            "图片内容始终排除",
+            "找不到非图片证据就不写",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CONTENT_TEXT)
+
+        for fragment in (
+            "项目事实、语义概念、几何合同、素材源码结构",
+            "视觉验收不得打开、查看、截图或渲染最终候选",
+            "报告必须明确没有进行人工画面判断",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DELIVERY_TEXT)
 
     def test_project_definition_rejects_defensive_filler_in_every_language(self) -> None:
         for fragment in (

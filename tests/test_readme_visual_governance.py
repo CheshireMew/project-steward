@@ -28,18 +28,23 @@ MOTION_TEXT = (
 
 
 class ReadmeVisualGovernanceTests(unittest.TestCase):
-    def test_visual_method_owns_the_visual_evidence_decision(self) -> None:
-        self.assertIn("建立视觉证据合同", VISUAL_TEXT)
-        self.assertIn("证据等级：已有体系 / 原生材料充分 / 证据不足", VISUAL_TEXT)
-        self.assertIn("按证据等级选择一次视觉路径", VISUAL_TEXT)
+    def test_visual_method_owns_the_image_blind_source_boundary(self) -> None:
+        self.assertIn("锁定图片盲输入边界", VISUAL_TEXT)
+        self.assertIn("事实等级：项目事实充分 / 项目事实不足", VISUAL_TEXT)
+        self.assertIn("项目是唯一真源", VISUAL_TEXT)
         self.assertIn(
-            "当前 README 视觉、仓库内部图片和同批次生成的素材无论数量多少",
+            "现有、旧版、参考、生成、远程和用户附带的图片全部退出输入集合",
             VISUAL_TEXT,
         )
-        self.assertIn("证明项目已有视觉体系", VISUAL_TEXT)
-        self.assertIn("没有明确家族合同的项目按独立项目处理", VISUAL_TEXT)
-        self.assertIn("才能进入视觉合同", VISUAL_TEXT)
-        self.assertIn("不重新选择证据等级或恢复已退出材料", VISUAL_TEXT)
+        self.assertIn(
+            "不得打开、查看、截图、渲染、OCR、取色、临摹、比较或分析",
+            VISUAL_TEXT,
+        )
+        self.assertIn("没有明确的非图片家族合同", VISUAL_TEXT)
+        self.assertIn("项目就按独立项目处理", VISUAL_TEXT)
+        self.assertIn("旧 Logo、现有 hero、机制图、结果图", VISUAL_TEXT)
+        self.assertIn("不能给新素材提供母题", VISUAL_TEXT)
+        self.assertIn("不让任何图片进入后续步骤", VISUAL_TEXT)
 
         readme_route = SKILL_TEXT.split("## README 与主页", 1)[1].split(
             "## 许可证治理",
@@ -57,23 +62,21 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
         self.assertLess(hero_index, canvas_index)
         self.assertLess(canvas_index, svg_index)
 
-    def test_existing_visuals_require_current_source_qualification(self) -> None:
+    def test_images_cannot_reenter_through_reuse_or_role_transfer(self) -> None:
         for fragment in (
-            "合格项目证据与适用状态：",
-            "不采用材料及原因：",
-            "只有上层已经核定来源、适用项目状态和公开职责的材料才能选择“复用已有”",
-            "文件存在、链接有效、画面完整或曾在 README 出现都不构成复用资格",
-            "Material basis:",
-            "不恢复内容方法已经判定为过时或未验证的产物",
-            "内部图片、旧截图或历史流程图不因文件存在而重新获得资格",
+            "图片排除边界：",
+            "保留现有引用但不读取内容",
+            "不得向新素材贡献任何表面选择",
+            "hero、机制图、结果图和旧 Logo 都不能向它捐赠母题、配色或构图",
+            "不得读取当前 SVG、旧 Logo、hero、参考图、截图或生成图",
+            "旧源码也不向新设计提供形状、颜色或构图",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, VISUAL_TEXT + HERO_TEXT)
+                self.assertIn(fragment, VISUAL_TEXT + HERO_TEXT + SVG_TEXT)
 
-        self.assertIn(
-            "整页模式必须明确选择复用已有、制作新的、排版表达或跳过",
-            VISUAL_TEXT,
-        )
+        for retired in ("复用已有 / 制作新的", "已有体系 / 原生材料充分"):
+            with self.subTest(retired=retired):
+                self.assertNotIn(retired, VISUAL_TEXT)
 
     def test_project_category_no_longer_selects_a_surface_style(self) -> None:
         retired_defaults = (
@@ -87,20 +90,24 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
             with self.subTest(retired=retired):
                 self.assertNotIn(retired, combined)
 
-        self.assertIn("至少两个候选方向", VISUAL_TEXT)
+        self.assertIn("至少两个只用文字描述的候选方向", VISUAL_TEXT)
         self.assertIn("至少有三项实质不同", VISUAL_TEXT)
-        self.assertIn("每个候选至少由两项项目特有证据支持", VISUAL_TEXT)
+        self.assertIn("每个候选至少由两项项目特有事实支持", VISUAL_TEXT)
         self.assertIn("仓库类型、技术栈、流行风格", VISUAL_TEXT)
         self.assertIn("不能单独支持", VISUAL_TEXT)
+        self.assertIn("语义概念合同", VISUAL_TEXT)
+        self.assertIn("冻结几何合同", VISUAL_TEXT)
 
     def test_cards_are_selected_by_content_boundaries(self) -> None:
         self.assertIn("从内容关系决定形状", VISUAL_TEXT)
         self.assertIn("多个独立、可比较或本身有明确表面的对象", VISUAL_TEXT)
         self.assertIn("连续阶段使用路径、轴线、编号或渐进空间", VISUAL_TEXT)
         self.assertIn("卡片是一种内容边界", VISUAL_TEXT)
-        self.assertIn("真实界面本身采用卡片时，可以保留", VISUAL_TEXT)
+        self.assertIn("活动接口或数据合同确实定义独立容器", VISUAL_TEXT)
 
     def test_every_surface_value_has_project_provenance(self) -> None:
+        self.assertIn("Project basis:", VISUAL_TEXT)
+        self.assertIn("Image exclusion:", VISUAL_TEXT)
         for field in (
             "Palette:",
             "Typography:",
@@ -115,7 +122,7 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
                 self.assertIn(field, VISUAL_TEXT)
 
         self.assertIn("以及各自来源", VISUAL_TEXT)
-        self.assertIn("不沿用示范代码或上一项目的取值", VISUAL_TEXT)
+        self.assertIn("不沿用示范代码、上一项目或任何图片的取值", VISUAL_TEXT)
 
     def test_svg_skeleton_carries_no_surface_defaults(self) -> None:
         self.assertIsNone(re.search(r"#[0-9a-fA-F]{3,8}\b", SVG_TEXT))
@@ -135,13 +142,14 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
         self.assertIn('id="composition"', SVG_TEXT)
         self.assertIn("背景、位置、圆角、描边、颜色和分组数量来自上游视觉合同", SVG_TEXT)
 
-    def test_hero_and_canvas_expose_observable_anti_convergence_checks(self) -> None:
-        self.assertIn("去文字轮廓检查", HERO_TEXT)
-        self.assertIn("没有项目材料也成立的技术面板", HERO_TEXT)
+    def test_hero_and_canvas_use_structural_anti_convergence_checks(self) -> None:
+        self.assertIn("去文字语义检查", HERO_TEXT)
+        self.assertIn("没有项目事实也成立的技术面板", HERO_TEXT)
         self.assertIn("三步卡片、仪表盘或左右分栏占位结构", HERO_TEXT)
         self.assertIn("同一任务处理多个没有家族合同的项目", HERO_TEXT)
         self.assertIn("不选择背景明暗、配色、字体角色、构图或容器样式", CANVAS_TEXT)
-        self.assertIn("背景可以是浅色、深色或经双主题验证的透明表面", CANVAS_TEXT)
+        self.assertIn("不得打开图片做桌面、窄屏或深浅主题预览", CANVAS_TEXT)
+        self.assertIn("结构检查不能证明对比度或深浅主题观感", CANVAS_TEXT)
 
     def test_clickable_and_live_header_content_stays_outside_hero(self) -> None:
         for fragment in (
@@ -203,23 +211,28 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
         )
 
     def test_hybrid_and_motion_consumers_cannot_restore_card_defaults(self) -> None:
-        self.assertIn("消费已经选定的视觉合同", HYBRID_TEXT)
+        self.assertIn("消费已经冻结的非图片项目事实、语义概念、几何合同和视觉合同", HYBRID_TEXT)
         self.assertIn("合同没有网格或容器时不补加", HYBRID_TEXT)
         self.assertIn("不增加卡片、容器、配色或装饰", MOTION_TEXT)
+        self.assertIn("图片输入集合为空", HYBRID_TEXT)
+        self.assertIn("不打开生成结果", HYBRID_TEXT)
+        self.assertIn("不得打开、播放、查看或截图", MOTION_TEXT)
+        self.assertIn("不查看 GIF 或帧图", MOTION_TEXT)
         self.assertNotIn('"id": "project-card"', MOTION_TEXT)
         self.assertNotIn("圆角满幅背景", MOTION_TEXT)
 
-    def test_existing_readme_visual_capabilities_remain_active(self) -> None:
+    def test_visual_outputs_keep_structural_and_consumer_validation(self) -> None:
         for role in ("结果证据", "机制解释", "身份支持"):
             with self.subTest(role=role):
                 self.assertIn(role, VISUAL_TEXT)
 
         for fragment in (
-            "真实界面、输出、截图、数据图或端到端产物",
-            "证据不足分支只使用排版、比例和留白",
-            "实际渲染 SVG",
-            "`900px` 和 `360px`",
-            "GitHub 深浅页面周围的对比度",
+            "入口、输出合同、数据结构或端到端行为",
+            "项目事实不足分支只使用排版、比例和留白",
+            "不打开或渲染 SVG",
+            "XML 能解析",
+            "README、本地文件、提交 blob、远端 raw 内容和 GitHub 页面引用消费同一内容身份",
+            "没有进行人工画面判断",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, VISUAL_TEXT + HERO_TEXT + SVG_TEXT)
