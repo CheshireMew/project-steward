@@ -247,6 +247,39 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         self.assertIn("计划影响范围误当成实际变更事实", remediation_route)
         self.assertIn("references/change-prevention.md", remediation_route)
 
+    def test_observation_scope_is_the_smallest_provably_closed_set(self) -> None:
+        for fragment in (
+            "能够证明覆盖全部合同内副作用的最小稳定身份集合",
+            "形成隐藏的性能耦合",
+            "全聚合观察可以作为诊断基线",
+            "沿规划、权威读取、提交、实际变更计算",
+            "不能靠漏观察、跳过事件或放宽门槛换取速度",
+            "同时证明最小闭合范围、正确持久化、下游消费和代表性耗时",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+    def test_adapters_bind_explicit_inputs_before_defaults(self) -> None:
+        ordered = (
+            "稳定字段身份及其全部显式输入来源",
+            "显式输入完成绑定后的规范命令",
+            "只对仍缺失字段生效的默认值及注入位置",
+            "消费规范命令的规划器、提交边界和最终结果",
+        )
+        positions = [PREVENTION_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "两个来源同时提供不等价值时在适配器边界明确拒绝",
+            "在显式输入绑定完成前不得写入规范字段",
+            "省略与显式空值不能由消费者事后猜测",
+            "默认值只补充仍然缺失的字段",
+            "仅位置参数、仅命名或正文参数、合法显式空值",
+            "直接构造已经正确的命令对象只能证明下游",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
     def test_structured_message_capacity_preserves_atomic_replay(self) -> None:
         prevention_route = SKILL_TEXT.split("## 改动前预防", 1)[1].split(
             "## 根因治理", 1

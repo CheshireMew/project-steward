@@ -1144,6 +1144,18 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
+    def test_architecture_guards_separate_rules_from_target_inputs(self) -> None:
+        for fragment in (
+            "规则定义控制面与被检查的活动对象分开",
+            "活动源码、脚本、验证器和公共合同等目标根",
+            "规则定义中的哨兵文本不能被当成活动调用",
+            "不能为了消除自命中而排除整个测试目录或脚本目录",
+            "区分声明文本与活动语义的结构化扫描",
+            "用另一个表面不同的代表性目标注入同类残留",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, ARCHITECTURE_TEXT)
+
 
     def test_migration_test_failures_stay_bound_to_findings_and_target_behavior(
         self,
