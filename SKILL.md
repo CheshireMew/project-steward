@@ -76,7 +76,7 @@ Project Steward 自我进化时必须执行主文件约束：
 - 项目级 CI 的验证计划、执行环境缓存、测试资源分层、耗时分片、早失败和精准重跑：`references/ci-execution-governance.md`
 - 运行中配置会重建共享服务、provider、存储根或组合图：`references/runtime-generation-governance.md`
 - 难复现、时序、并发、背压或昂贵完整链：`references/hard-to-reproduce-diagnostics.md`
-- 外部、持久化、模型或进程 JSON 存在多处解析或合同歧义：`references/structured-data-boundary.md`
+- 外部、持久化、模型、网络或进程 JSON 存在多处解析、容量、原子分片、重放游标或合同歧义：`references/structured-data-boundary.md`
 - 模型参与任务判断、状态表达、运行时事件或结构化回复，需要核对消息来源、角色、路由、线请求与呈现职责：`references/model-mediated-operation-governance.md`
 - 以外部源码为一次性起点建立独立产品，或选择性吸收其扩展生态：`references/source-fork-and-ecosystem-adoption.md`；实际复制代码时同时读取 `references/license-governance.md`
 - 产品体验或界面：`references/product-experience-governance.md`；需要设计或交互方法时再读 `references/ux-design.md`
@@ -94,10 +94,11 @@ Project Steward 自我进化时必须执行主文件约束：
 - 项目级 CI 反复慢测、环境准备浪费、分片失衡、跨平台预检过晚或失败后无差别重跑：`references/ci-execution-governance.md`
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
-- 结构化 JSON 的编码、资源预算、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
+- 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
 - 可视层级、变换或动效所有权：`references/interaction-motion.md`；需要实际运行画面验收时再读 `references/implementation-review.md`
 - 工具、路径别名、执行环境或长任务：`references/user-environment-governance.md`
+- 事件、版本、历史或缓存把计划影响范围误当成实际变更事实：`references/change-prevention.md` 的“计划范围与实际变更事实分离”合同
 - 源码、README、脚本、测试或配置硬编码本机与部署事实：`references/change-prevention.md` 的项目运行配置边界；用户机器事实同时读取 `references/user-environment-governance.md`
 - 内聚、耦合、语义重复或上帝模块：`references/architecture-cohesion-governance.md`
 

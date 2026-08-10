@@ -15,6 +15,7 @@ SKILL_TEXT = read("SKILL.md")
 DURABLE_TEXT = read("references/durable-operation-governance.md")
 PREVENTION_TEXT = read("references/change-prevention.md")
 REMEDIATION_TEXT = read("references/root-cause-remediation.md")
+STRUCTURED_TEXT = read("references/structured-data-boundary.md")
 DESKTOP_TEXT = read("references/desktop-app-governance.md")
 IMPLEMENTATION_TEXT = read("references/implementation-review.md")
 AGENT_TEXT = read("agents/openai.yaml")
@@ -210,6 +211,69 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
+
+    def test_planned_scope_and_actual_change_facts_are_distinct(self) -> None:
+        for fragment in (
+            "计划范围与实际变更事实分离",
+            "用户意图与授权范围",
+            "冲突集合",
+            "观察集合",
+            "实际变更集",
+            "前三类是执行输入，不能直接成为已经发生的事实",
+            "操作合法但没有改变权威事实时，实际变更集为空",
+            "观察集合必须对合同内副作用闭合",
+            "不能共用一个笼统的 `affected` 列表",
+            "只消费实际变更集及其提交版本",
+            "一次带关联副作用的真实修改",
+            "一次合法无变化操作",
+            "一次提交前冲突拒绝",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        for fragment in (
+            "事件或版本前进但权威事实没有对应变化",
+            "提交前后权威状态",
+            "计划目标或冲突集合直接被写成事件事实",
+            "观察集合遗漏移动、拆分、重排等合同内副作用",
+            "本路径只定位第一次混淆发生的位置",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
+        remediation_route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        self.assertIn("计划影响范围误当成实际变更事实", remediation_route)
+        self.assertIn("references/change-prevention.md", remediation_route)
+
+    def test_structured_message_capacity_preserves_atomic_replay(self) -> None:
+        prevention_route = SKILL_TEXT.split("## 改动前预防", 1)[1].split(
+            "## 根因治理", 1
+        )[0]
+        remediation_route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        for route in (prevention_route, remediation_route):
+            with self.subTest(route=route[:40]):
+                self.assertIn("references/structured-data-boundary.md", route)
+                self.assertIn("原子分片", route)
+                self.assertIn("重放游标", route)
+
+        for fragment in (
+            "逻辑消息容量必须穿过完整传输链",
+            "最大合法逻辑消息",
+            "每一跳都要在明确余量内承载最大合法消息",
+            "版本化分片协议",
+            "稳定逻辑消息身份",
+            "持久重放游标只在完整逻辑消息通过重组",
+            "不能让同一条永久不可交付记录把游标卡住",
+            "接近上限和最大合法规模的真实消息",
+            "从真实游标重放同一消息",
+            "消费端手写大对象",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, STRUCTURED_TEXT)
 
     def test_runtime_authority_precedes_recovery_and_scheduling(self) -> None:
         ordered = (

@@ -178,6 +178,32 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, CI_TEXT)
 
+    def test_parallelism_uses_the_tightest_resource_headroom(self) -> None:
+        for fragment in (
+            "并发数由最紧瓶颈余量决定",
+            "物理内存",
+            "虚拟或提交内存及其系统上限",
+            "进程和句柄",
+            "显存或设备会话",
+            "共享基线",
+            "系统与用户保留量",
+            "单个并发单元的保守峰值",
+            "全部有限资源结果中的最小值",
+            "当前命令的资源收口门槛仍然失败",
+            "不能继续提高并发",
+            "同一节点隔离运行通过",
+            "不能用全局串行长期遮住生命周期缺口",
+            "限制并发的资源、容量来源、保留量、代表性峰值、最终工作数",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, CI_TEXT)
+
+        bottleneck = CI_TEXT.split("### 并发数由最紧瓶颈余量决定", 1)[1].split(
+            "## 5. 按历史耗时分片", 1
+        )[0]
+        self.assertLess(bottleneck.index("物理内存"), bottleneck.index("不能证明"))
+        self.assertIn("CPU 和物理内存充足但另一项资源余量不足时降低并发", bottleneck)
+
     def test_preflight_and_failed_scope_rerun_preserve_failure_evidence(
         self,
     ) -> None:
