@@ -164,17 +164,28 @@ class CoreIdentityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, common_boundaries)
 
-    def test_metadata_and_first_use_expose_the_core_route(self) -> None:
+    def test_first_use_defaults_to_bounded_research_and_gates_absorption(
+        self,
+    ) -> None:
         self.assertIn(
             "治理项目变更、根因、README、仓库发布与可迁移经验",
             AGENT_TEXT,
         )
-        self.assertIn(
-            "使用 $project-steward 完整研究这个开源代码项目",
-            AGENT_TEXT,
+        for fragment in (
+            "使用 $project-steward 研究我提供的代码项目",
+            "如果我没有说明更具体目标",
+            "项目价值、最小机制闭环和证据边界后停止",
+            "只有我明确要求时",
+            "能力吸收、原始上游、许可证和复用关系",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, AGENT_TEXT)
+
+        self.assertNotIn("完整研究这个开源代码项目", AGENT_TEXT)
+        self.assertLess(
+            AGENT_TEXT.index("如果我没有说明更具体目标"),
+            AGENT_TEXT.index("只有我明确要求时"),
         )
-        self.assertIn("判断值得吸收的能力、原始上游和复用关系", AGENT_TEXT)
-        self.assertIn("明确要求时再自我进化", AGENT_TEXT)
         self.assertNotIn("综合审计", AGENT_TEXT)
 
     def test_complete_capability_absorption_has_a_bounded_research_handoff(

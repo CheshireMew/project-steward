@@ -182,6 +182,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
     ) -> None:
         for fragment in (
             "目标 Skill 当前承担什么：",
+            "职能边界",
             "历史中反复出现的用户最终结果：",
             "哪些相邻能力构成同一个上层角色：",
             "当前职能过窄、过宽还是适当：",
@@ -194,9 +195,6 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
-
-
-        self.assertIn("职能边界", AGENT_TEXT)
 
     def test_self_evolution_reports_the_actual_validation_level(self) -> None:
         ordered = (
@@ -924,7 +922,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertIn("失败、纠正、保护拦截、临时绕行或残留", MAIN_TEXT)
         self.assertIn("只有成功结果且不存在这些信号时，不加载根因方法", MAIN_TEXT)
 
-    def test_default_prompt_is_a_short_confirmation_first_entry(self) -> None:
+    def test_default_prompt_is_a_bounded_research_entry(self) -> None:
         prompt_line = next(
             line
             for line in AGENT_TEXT.splitlines()
@@ -934,14 +932,22 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertLessEqual(len(prompt), 140)
         for fragment in (
             "$project-steward",
-            "先展示",
-            "职能边界",
-            "并停下",
-            "确认后",
-            "自我进化",
+            "研究我提供的代码项目",
+            "如果我没有说明更具体目标",
+            "项目价值、最小机制闭环和证据边界后停止",
+            "只有我明确要求时",
+            "能力吸收、原始上游、许可证和复用关系",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, prompt)
+
+        self.assertNotIn("完整研究这个开源代码项目", prompt)
+        self.assertNotIn("确认后实施", prompt)
+        self.assertNotIn("自我进化", prompt)
+        self.assertLess(
+            prompt.index("如果我没有说明更具体目标"),
+            prompt.index("只有我明确要求时"),
+        )
 
         for unrelated_specialty in (
             "持久意图",
