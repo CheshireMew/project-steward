@@ -221,6 +221,46 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_explicit_project_steward_implementation_defaults_to_remote_completion(
+        self,
+    ) -> None:
+        section = PUBLICATION_TEXT.split(
+            "### 明确点名 Project Steward 的实施默认完成到远端",
+            1,
+        )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
+        ordered = (
+            "实施改动并沿真实消费者验证",
+            "求出普通项目的获准依赖闭包",
+            "核对最终候选与远端新鲜状态",
+            "精确暂存并创建提交",
+            "向当前跟踪分支执行非强制推送",
+            "最后重新获取远端并完成远端验收",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "准确项目根已是 Git 仓库",
+            "当前分支存在已配置 upstream",
+            "只改本地",
+            "不要提交",
+            "不要推送",
+            "只提交不推送",
+            "本地验证后不再询问是否推送",
+            "远端 HEAD 与本地提交一致",
+            "本轮关键 blob 已进入远端",
+            "当前分支含不属于本次结果的既有未推送提交",
+            "未获授权的删除",
+            "不能为了自动推送扩大范围",
+            "分支分叉或远端变化",
+            "工作树出现来源不明的并发变化",
+            "发现凭据",
+            "认证失败或分支保护拒绝",
+            "不猜测远端、不拆分或强推绕过阻塞",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_project_steward_self_evolution_publishes_the_whole_worktree(self) -> None:
         section = PUBLICATION_TEXT.split(
             "### Project Steward 自我进化使用整仓发布合同",

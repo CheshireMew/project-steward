@@ -63,6 +63,40 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_explicit_project_steward_implementation_finishes_at_remote_by_default(
+        self,
+    ) -> None:
+        for fragment in (
+            "只有本节随后明确列出的默认完成合同",
+            "明确点名 Project Steward（包括调用 `$project-steward`）",
+            "明确要求对现有 Git 项目实施修改、修复、治理、更新或优化",
+            "当前分支存在已配置 upstream",
+            "精确提交、非强制推送当前跟踪分支",
+            "本地验证后不再第二次询问是否推送",
+            "只读请求、隐式路由、无 upstream",
+            "references/repository-publication.md",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, SKILL_TEXT)
+
+        section = PUBLICATION_TEXT.split(
+            "### 明确点名 Project Steward 的实施默认完成到远端",
+            1,
+        )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
+        for fragment in (
+            "修改、验证、精确提交、向当前跟踪分支非强制推送和远端验收",
+            "只读请求或隐式路由仍保持只读",
+            "本地验证后不再询问是否推送",
+            "普通项目仍只发布获准依赖闭包",
+            "不纳入无关工作树变化",
+            "不创建远端、不改变可见性、不实施删除、不强制推送、不改写历史、不打包、不部署",
+            "缺少 upstream",
+            "验证失败",
+            "保留准确本地状态并停止",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_self_evolution_full_worktree_is_an_explicit_publication_exception(self) -> None:
         section = PUBLICATION_TEXT.split(
             "### Project Steward 自我进化使用整仓发布合同",
