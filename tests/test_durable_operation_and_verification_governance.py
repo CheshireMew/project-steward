@@ -81,6 +81,33 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         )
         self.assertIn("同一操作先失败后成功", DURABLE_TEXT)
 
+    def test_all_completion_paths_validate_results_inside_lifecycle_owner(
+        self,
+    ) -> None:
+        ordered = (
+            "列出实际存在的完成路径矩阵",
+            "所有正式生产者的返回值都先进入同一个结果接收边界",
+            "结果校验必须位于当前操作生命周期所有者的异常边界内",
+            "在正式生产者返回后、接受成功或写入终态之前执行",
+            "校验失败形成稳定的结果合同失败终态",
+            "同一执行器提交一个合法操作并证明它正常完成",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "即时同步、队列 worker、后台线程或进程、延期回调或聚合、显式重试和重启恢复",
+            "不为形式完整补造分支",
+            "不能逃逸并结束 worker 主循环",
+            "不能让操作留在 `running` 或等价非终态",
+            "不得分别复制校验与错误映射",
+            "正式任务入口注册一个受控但真实的结果生产者",
+            "由账本等待唯一失败终态",
+            "不能证明结果合同、持久终态和执行器存活已经共同收口",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
     def test_conflicted_rebinding_uses_a_strict_plan_and_commit_boundary(
         self,
     ) -> None:
