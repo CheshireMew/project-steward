@@ -92,6 +92,8 @@ Project Steward 自我进化时必须执行主文件约束：
 
 先读取 `references/root-cause-remediation.md`。诊断停在证据、影响范围与最终修法；实施才一次迁移全部生产者、边界和消费者，并退出旧架构。按问题叠加：
 
+修复承接本任务先前的综合审计，或用户明确要求修复该审计中的全部问题时，原审计交接账本继续作为结项合同；写入前固定读取 `references/change-prevention.md`，最后一次相关修改后返回 `references/project-audit.md`，从原覆盖范围和当前已接受合同重新生成覆盖与发现账本。单点缺陷不会仅因历史中存在无关审计而扩张到这条链。
+
 - 持久操作、恢复，或常驻有状态服务的会话准入与释放竞争：`references/durable-operation-governance.md`
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`

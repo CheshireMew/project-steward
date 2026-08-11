@@ -1087,6 +1087,32 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
+    def test_audit_derived_remediation_keeps_the_full_completion_chain(
+        self,
+    ) -> None:
+        route = MAIN_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性",
+            1,
+        )[0]
+        ordered = (
+            "修复承接本任务先前的综合审计",
+            "原审计交接账本继续作为结项合同",
+            "references/change-prevention.md",
+            "最后一次相关修改后",
+            "references/project-audit.md",
+            "重新生成覆盖与发现账本",
+        )
+        positions = [route.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn(
+            "单点缺陷不会仅因历史中存在无关审计而扩张到这条链",
+            route,
+        )
+
+        self.assertIn("原诊断结论成为本轮结项合同", REMEDIATION_TEXT)
+        self.assertIn("修复后再回到本方法全新复查", PROJECT_AUDIT_TEXT)
+        self.assertIn("新增写入能力先建立副作用激活图", PREVENTION_TEXT)
+
     def test_comprehensive_audit_emits_a_remediation_handoff_ledger(self) -> None:
         ordered = (
             "综合审计必须交付修复交接账本",
