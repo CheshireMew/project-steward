@@ -29,6 +29,8 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 
 只点名本 Skill 时按现有材料选择最匹配路径；材料不足时给出一个贴近上下文的直接请求示例并停下。
 
+主路径选定后，在任何项目写入或专项实施前建立路由账本：用户最终结果、主路径、固定必读方法、条件专项及其触发证据、动作门槛、正式消费者、验收和停止位置。固定必读方法不能因为局部修改看起来明显而跳过；条件专项只有取得适用证据才叠加。同一请求后来增加验收项时更新原账本，不用最新症状替换仍有效的范围。
+
 ## 共同边界
 
 - 普通业务功能仍由当前开发任务负责；用户只要求解释单条报错、单个函数或局部行为时，在回答该结果后停止，不升级为项目级改造。只有请求本身要求预防、治理、迁移、自我进化或项目级结果时才进入相应路径。
@@ -56,6 +58,8 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 先完整读取 `references/conversation-learning-and-self-evolution.md`。
 
 任一用户结果含失败、纠正、保护拦截、临时绕行或残留时，再读取 `references/root-cause-remediation.md`。读取顺序固定为：按结果恢复完整过程，沿因果层级确定主要学习主题和独立次级结果，再恢复其中会改变未来治理的具体细节并按共同边界逐项比较目标能力，之后才提炼共同机制和特殊维度、判断可迁移性、职能边界和正式所有者，最后判断历史责任。绕行与残留不得覆盖更早且证据成立的可控根因；后续纠正改变主要原因时，现有方案与确认立即失效。只有成功结果且不存在这些信号时，不加载根因方法。
+
+能力比较必须先区分“方法缺失”和“已有方法没有被路由、执行或验收”。前者只原位强化唯一方法所有者；后者只修最早失效的主路由、动作门槛、正式消费者或验证，不在其它文件增加同义规则。方案按所有者和消费链组织，不按对话出现顺序堆叠补丁。
 
 用户只要求分析时保持只读。明确要求吸收、自我进化、更新、优化或迭代 Project Steward 时，先交付未来行为、职能边界、代表性输出、影响文件和验证方式并停下；用户确认该方案后才修改活动 Skill。确认方案未声明只改本地时，同时读取 `references/repository-publication.md`；当前跟踪远端存在时，把整个工作区按实际影响验证，使用 `git add -A` 将已跟踪修改、未跟踪文件和现有删除一起提交并推送当前跟踪分支，核对远端 HEAD 和工作区无遗漏后才完成。远端、认证、分支保护、分叉、验证失败或任何一项不能共同发布时保留完整工作区并停在准确边界，不退回选择性提交。
 
@@ -126,15 +130,14 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## 产品体验与界面治理
 
-先读取 `references/product-experience-governance.md`，再按实际任务选择：
+先读取 `references/product-experience-governance.md`，再按以下固定入口和条件专项执行：
 
-- 体验诊断与设计：`references/ux-design.md`、`references/design-method.md`、`references/interface-experience-quality.md`、`references/interface-problem-patterns.md`
+- 界面诊断、评价、优化或重建固定读取：`references/ux-design.md`、`references/interface-experience-quality.md`、`references/interface-problem-patterns.md`、`references/implementation-review.md`。修改前先冻结全部相关窗口、页面、面板、覆盖层、主要状态和用户旅程；不能把截图中最醒目的局部问题当成完整审查范围。
+- 从零设计或改变视觉方向：`references/design-method.md`、`references/visual-direction.md`、`references/surface-registers.md`
 - 布局、设计系统、交互和动效：`references/layout-responsive.md`、`references/design-system-alignment.md`、`references/interface-guidelines.md`、`references/interaction-motion.md`
-- 视觉方向与表面：`references/visual-direction.md`、`references/surface-registers.md`
 - 参考界面忠实重建：`references/reference-interface-reconstruction.md`
-- 桌面、Tauri/Vue 或本地文件工作区：`references/desktop-app-governance.md`、`references/tauri-vue-governance.md`、`references/local-file-workspace-governance.md`
+- 已确认是桌面、Tauri/Vue 或本地文件工作区时，对应读取 `references/desktop-app-governance.md`、`references/tauri-vue-governance.md`、`references/local-file-workspace-governance.md`；项目形态已经成立时不得因当前反馈只提到颜色、间距或文案而省略平台外壳。
 - 任务状态或进度：`references/task-progress-governance.md`
-- 实施复核：`references/implementation-review.md`
 
 依赖既有定位或设计系统时，每个任务最多运行一次 `scripts/context.mjs`；忠实重建参考界面时由 `assets/reference-reconstruction/component-spec.md` 承担组件规格。
 

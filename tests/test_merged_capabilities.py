@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import unittest
 from pathlib import Path
 
@@ -28,6 +29,11 @@ PROJECT_RESEARCH_REFERENCES = (
 
 
 class MergedCapabilityTests(unittest.TestCase):
+    def test_every_active_reference_has_a_main_route(self) -> None:
+        active = {path.name for path in (SKILL_ROOT / "references").glob("*.md")}
+        routed = set(re.findall(r"references/([A-Za-z0-9._-]+\.md)", SKILL_TEXT))
+        self.assertEqual(active, routed)
+
     def test_main_router_owns_every_merged_design_resource(self) -> None:
         for name in DESIGN_REFERENCES:
             with self.subTest(name=name):
@@ -64,6 +70,28 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertTrue((SKILL_ROOT / "references" / name).is_file())
                 self.assertIn(f"references/{name}", SKILL_TEXT)
+
+    def test_interface_review_has_a_non_optional_core_route(self) -> None:
+        section = SKILL_TEXT.split(
+            "## 产品体验与界面治理", 1
+        )[1].split("## 仓库建立与发布", 1)[0]
+        core_route = section.split("- 从零设计或改变视觉方向", 1)[0]
+
+        self.assertIn("固定入口和条件专项", section)
+        self.assertNotIn("再按实际任务选择", section)
+        for owner in (
+            "references/product-experience-governance.md",
+            "references/ux-design.md",
+            "references/interface-experience-quality.md",
+            "references/interface-problem-patterns.md",
+            "references/implementation-review.md",
+        ):
+            with self.subTest(core_owner=owner):
+                self.assertIn(owner, core_route)
+
+        self.assertIn("窗口、页面、面板、覆盖层、主要状态和用户旅程", core_route)
+        self.assertIn("references/desktop-app-governance.md", section)
+        self.assertIn("不得因当前反馈只提到颜色、间距或文案", section)
 
     def test_user_environment_resources_have_one_active_route(self) -> None:
         reference = (

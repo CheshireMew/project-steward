@@ -128,6 +128,54 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LEARNING_TEXT)
 
+        learning_route = MAIN_TEXT.split(
+            "## 对话学习与自我进化", 1
+        )[1].split("## 改动前预防", 1)[0]
+        for fragment in (
+            "方法缺失",
+            "已有方法没有被路由、执行或验收",
+            "只修最早失效的主路由、动作门槛、正式消费者或验证",
+            "不在其它文件增加同义规则",
+            "方案按所有者和消费链组织",
+        ):
+            with self.subTest(route_fragment=fragment):
+                self.assertIn(fragment, learning_route)
+
+    def test_self_evolution_maps_consumption_before_adding_capability(self) -> None:
+        consumption = LEARNING_TEXT.split(
+            "再为每项候选画出一条活动消费链", 1
+        )[1].split("模板只接收某类项目", 1)[0]
+        ordered = (
+            "用户最终结果与语义触发",
+            "主路径",
+            "固定必读方法所有者",
+            "有适用证据才叠加的条件专项",
+            "动作门槛",
+            "正式消费者与输出",
+            "验收和停止位置",
+        )
+        positions = [consumption.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "方法完整，但主路径没有固定加载",
+            "路由已经加载，但动作绕过方法",
+            "正式消费者或验收没有覆盖",
+            "同一机制只能有一个方法所有者",
+            "没有正式消费者、没有主路由入口",
+            "复杂度结算：新增 / 原位强化 / 合并 / 退出 / 保持不变",
+            "不能再用全局 `assertIn` 代替路由位置和消费关系",
+        ):
+            with self.subTest(ownership_fragment=fragment):
+                self.assertIn(fragment, consumption + LEARNING_TEXT.split(
+                    "写入方案和最终差异按所有者组织", 1
+                )[1].split("### 自我进化同时治理主文件体积", 1)[0])
+
+        self.assertEqual(
+            1,
+            LEARNING_TEXT.count("同一机制只能有一个方法所有者"),
+        )
+
 
     def test_learning_attribution_requires_the_skill_to_have_been_active(
         self,
