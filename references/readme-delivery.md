@@ -95,7 +95,11 @@ README 包含 Star History 时，该章节必须位于许可证和第三方致�
 
 Topics 是公开 GitHub 仓库完整 README 优化的默认交付项。先从当前仓库的公开定义、第一采用读者、主要用户结果、真实输入输出、稳定技术生态和活动文件建立最终集合；现有准确 Topics 可以保留，已经失真或只属于旧身份的 Topics 必须退出。不能从个人 profile、流行标签或另一个仓库复制集合，也不能因为 Project Steward 被调用就添加 Project Steward、Codex 或其它宿主标签。`codex` 只有在 Codex 确实是项目当前公开的主要运行载体、安装入口或目标读者入口时才成立；`agent-skill` 等类别标签也必须由项目本体证明。
 
-只读审计只报告当前集合、目标集合和依据；用户明确要求只改本地时，在交付报告中保留拟写入集合但不改变远端。用户要求优化、重写或完整处理 README，目标又是已有公开 GitHub 仓库且没有排除远端发布时，Topics 随同一完整交付自动写入，不再要求第二次专项确认。先完成最终集合，再通过 GitHub API 一次替换；写入后回读准确集合并在仓库首页核对可见结果。仓库非公开、不是 GitHub 仓库、没有现有远端、缺少权限或远端发生并发变化时停在准确边界，其余 README 结果继续完成。
+只读审计先运行 `python scripts/github_topics.py inspect --repository OWNER/REPOSITORY`，报告当前集合、默认分支 HEAD、目标集合和逐项事实依据；用户明确要求只改本地时，在交付报告中保留拟写入集合但不改变远端。工具只拥有仓库身份、并发保护、GitHub API 替换、回读和首页可见性验证；它不从 README 热词、仓库名或流行集合猜 Topics。项目事实到最终集合的语义判断只由本节拥有，调用方必须把已经核定的完整集合逐项传入 `--topic`。
+
+用户要求优化、重写或完整处理 README，目标又是已有公开 GitHub 仓库且没有排除远端发布时，Topics 随同一完整交付自动写入，不再要求第二次专项确认。远端 README 身份提交完成后，先用 inspect 取得新鲜默认分支 HEAD，再运行 `python scripts/github_topics.py apply --repository OWNER/REPOSITORY --expected-head FULL_SHA --topic TOPIC ...`。apply 只在 HEAD、公开可见性和写入权限仍成立时通过 GitHub API 一次替换；随后重新读取仓库身份、HEAD 和准确 Topics，并从 GitHub 仓库主页 HTML 回读同一集合。只有命令成功返回 `api_verified`、`homepage_verified` 和 `verified` 均为 `true`，最终集合与逐项事实依据完整，才能关闭 Topics 交付项。不能用规则文字、测试中的预期集合、一次 PUT 成功或消费端手写结果代替该工具的真实输出。
+
+仓库非公开、不是 GitHub 仓库、没有现有远端、缺少权限、远端发生并发变化，或者 API 与主页结果仍不一致时停在准确边界，其余 README 结果继续完成。Topics 工具失败后不得改用另一段临时 API 命令制造完成证据；先按它报告的身份、权限、并发、API 或主页层修复同一正式入口，再重新执行。
 
 About 描述只有用户明确要求仓库描述也属于本次交付时才修改，并使用一句公开定义。Release、CI、下载、Discussions 或贡献徽章只有对应生产者和点击目标真实存在、且会改变采用判断时才建议或加入。
 
@@ -113,7 +117,7 @@ About 描述只有用户明确要求仓库描述也属于本次交付时才修�
 | 项目导航 | 文档、贡献和反馈各自的真实目标、职责与可达结果 |
 | 许可证 | 正式文本、范围说明、README 链接与 GitHub 识别 |
 | Star History | 工作流成功、API 数量、输出分支、两个 raw SVG 和 README 消费 |
-| GitHub Topics | 项目事实到最终集合的对应、GitHub API 写入与准确回读、仓库首页可见结果 |
+| GitHub Topics | 项目事实到最终集合的逐项对应、`scripts/github_topics.py apply` 的成功 JSON、GitHub API 准确回读、同一默认分支 HEAD 与仓库首页可见结果 |
 | About 与其它元数据 | 用户明确纳入时，GitHub API 回读的准确描述或目标状态 |
 | 发布 | 获准提交树、推送结果、远端 HEAD 与关键 blob |
 
@@ -121,7 +125,7 @@ About 描述只有用户明确要求仓库描述也属于本次交付时才修�
 
 README、许可证和纯仓库元数据不触发无关产品端到端测试。路由、脚本或公共测试合同发生变化时先运行目标测试；跨越多个活动消费者或目标测试暴露系统性影响时运行完整回归。关键测试先通过正式收集入口确认身份唯一。
 
-发布消费 `repository-publication.md`。只暂存本次确认的依赖闭包；推送前重新读取远端分支，推送后核对远端 HEAD。Star History 需要远端工作流时，提交和推送只是中间状态，必须继续到远端图表和 README 消费成立。Topics 在远端 README 提交与项目身份一致后写入并回读。创建远端、改变可见性、强制推送、删除和来源不明的工作树变化不随 README 优化自动获得授权。
+发布消费 `repository-publication.md`。只暂存本次确认的依赖闭包；推送前重新读取远端分支，推送后核对远端 HEAD。Star History 需要远端工作流时，提交和推送只是中间状态，必须继续到远端图表和 README 消费成立。Topics 在远端 README 提交与项目身份一致后通过 `scripts/github_topics.py apply` 写入，工具返回的 HEAD、API 集合和首页集合进入同一交付账本；任一缺失都不能报告完整优化完成。创建远端、改变可见性、强制推送、删除和来源不明的工作树变化不随 README 优化自动获得授权。
 
 ## 7. 交付报告
 

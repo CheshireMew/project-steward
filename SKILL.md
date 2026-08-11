@@ -144,7 +144,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## README 与主页
 
-先读取 `references/readme-delivery.md`，用一份交付账本检查 Git 边界、README、正文、视觉、多语言、许可证、Star History、仓库元数据、验证与停止位置；只读请求停在同一账本，明确要求优化、重写或完整处理时才实施。随后按账本读取 `references/content-architecture.md`；需要表达性视觉时再读取 `references/visual-direction.md`，并依次读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时，读取 `assets/readme-profile/profile.json`；完整优化把配置的语言与贡献指南作为交付项，由 `scripts/readme_header.py` 消费真实文件、仓库身份、许可证和明确解析的项目导航，单个项目入口不成立时不能使其它 profile 结果退出。按需选择：
+先读取 `references/readme-delivery.md`，用一份交付账本检查 Git 边界、README、正文、视觉、多语言、许可证、Star History、GitHub Topics、仓库元数据、验证与停止位置；只读请求停在同一账本，明确要求优化、重写或完整处理时才实施。随后按账本读取 `references/content-architecture.md`；需要表达性视觉时再读取 `references/visual-direction.md`，并依次读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时，读取 `assets/readme-profile/profile.json`；完整优化把配置的语言与贡献指南作为交付项，由 `scripts/readme_header.py` 消费真实文件、仓库身份、许可证和明确解析的项目导航，单个项目入口不成立时不能使其它 profile 结果退出。公开 GitHub 仓库的最终 Topics 通过 `scripts/github_topics.py` 在远端 README 身份提交后一次替换、回读并核对仓库首页；缺少该工具的成功结果不能完成整项交付。按需选择：
 
 - SVG 与混合视觉：`references/svg-production.md`、`references/hybrid-svg-production.md`
 - 动效：`references/motion-production.md`

@@ -52,6 +52,8 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         self.assertIn("references/repository-publication.md", route)
         self.assertIn("scripts/readme_header.py", route)
         self.assertIn("scripts/audit_readme.py", route)
+        self.assertIn("scripts/github_topics.py", route)
+        self.assertIn("缺少该工具的成功结果不能完成整项交付", route)
         self.assertIn(
             "README 不作为每项内部治理规则的第二份活动真源",
             route,
@@ -99,6 +101,12 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "Topics 随同一完整交付自动写入",
             "About 描述只有用户明确要求",
             "GitHub API 一次替换",
+            "scripts/github_topics.py inspect",
+            "scripts/github_topics.py apply",
+            "--expected-head FULL_SHA",
+            "api_verified",
+            "homepage_verified",
+            "不能用规则文字、测试中的预期集合、一次 PUT 成功",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DELIVERY_TEXT)
