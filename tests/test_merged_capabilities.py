@@ -153,6 +153,43 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, quality)
 
+    def test_compact_layout_and_localized_projection_keep_user_contracts(
+        self,
+    ) -> None:
+        guidelines = (
+            SKILL_ROOT / "references" / "interface-guidelines.md"
+        ).read_text(encoding="utf-8")
+        layout = (
+            SKILL_ROOT / "references" / "layout-responsive.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "先退出无职责导航、重复容器、并行技术路径、说明和空白",
+            "字号、行高、图标光学尺寸和命中范围是保护项",
+            "不能把全部元素同比缩小当成紧凑",
+            "收紧无职责间距，重排或合并区域",
+        ):
+            with self.subTest(owner="layout", fragment=fragment):
+                self.assertIn(fragment, layout)
+
+        for fragment in (
+            "用户标题随当前界面语言从同一显示投影产生",
+            "稳定身份、协议键和存储值不翻译",
+            "列表、当前选择、任务、历史、错误和重新打开后的回显",
+            "不能退回内部 ID、文件名或协议值",
+        ):
+            with self.subTest(owner="guidelines", fragment=fragment):
+                self.assertIn(fragment, guidelines)
+
+        all_design_text = "\n".join(
+            (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+            for name in DESIGN_REFERENCES
+        )
+        self.assertEqual(
+            all_design_text.count("不能把全部元素同比缩小当成紧凑"),
+            1,
+        )
+
     def test_usage_binding_and_reusable_resources_have_distinct_owners(
         self,
     ) -> None:
@@ -578,6 +615,45 @@ class MergedCapabilityTests(unittest.TestCase):
                 self.assertIn(fragment, review)
 
         self.assertIn("references/interaction-motion.md", SKILL_TEXT)
+        self.assertIn("references/implementation-review.md", SKILL_TEXT)
+
+    def test_desktop_launch_prewarm_and_audio_modes_have_real_acceptance(
+        self,
+    ) -> None:
+        desktop = (
+            SKILL_ROOT / "references" / "desktop-app-governance.md"
+        ).read_text(encoding="utf-8")
+        review = (
+            SKILL_ROOT / "references" / "implementation-review.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "进程树可见表面合同",
+            "不能只隐藏第一层启动器",
+            "实际宿主解析并经过正常用户入口执行",
+            "昂贵资源准备与活动设备会话分离",
+            "被动准备与活动会话",
+            "不能借“预热”提前取得这些活动设备和外部副作用",
+            "说完后播放模式必须按",
+            "播放期间的输出不能再次成为新一段输入",
+            "环境噪音不会独立触发播放或形成反馈循环",
+        ):
+            with self.subTest(owner="desktop", fragment=fragment):
+                self.assertIn(fragment, desktop)
+
+        for fragment in (
+            "GUI 正常入口、完整进程树及允许和禁止的可见表面",
+            "主窗口、辅助窗口、托盘、通知、控制台、终端标签和脚本宿主错误框",
+            "活动会话仍是停止状态",
+            "不触发开始操作的情况下等待正式准备所有者",
+            "环境底噪、短促脉冲和一段有效语音",
+            "输出期间不能接受播放声形成的新语段",
+            "不能证明回声环路已经断开",
+        ):
+            with self.subTest(owner="review", fragment=fragment):
+                self.assertIn(fragment, review)
+
+        self.assertIn("references/desktop-app-governance.md", SKILL_TEXT)
         self.assertIn("references/implementation-review.md", SKILL_TEXT)
 
     def test_project_research_capability_is_fully_migrated(self) -> None:
