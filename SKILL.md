@@ -74,7 +74,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 先读取 `references/change-prevention.md`，由它负责目标行为、唯一真源、影响图、最终接口、旧路径退出和真实用户链验收。按问题叠加：
 
-- 持久操作、恢复、重启、成组产物，或常驻有状态服务中可发现会话与共享资源的并发准入、释放和关闭：`references/durable-operation-governance.md`
+- 持久操作、队列或调度器的有界批次与积压排空、恢复、重启、成组产物，或常驻有状态服务中可发现会话与共享资源的并发准入、释放和关闭：`references/durable-operation-governance.md`
 - 任务状态、进度或自动续跑：`references/task-progress-governance.md`
 - 高成本结果需要分阶段展示、确认、连续自动执行或按上游变化失效：`references/staged-result-governance.md`
 - 同一结果由多份规格、计划、任务或研究产物表达且需决定演化关系，或涉及派生产物、语义缓存、工作单元切分、资源池利用或重复 Agent 编排：`references/derived-artifact-governance.md`
@@ -94,7 +94,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 修复承接本任务先前的综合审计，或用户明确要求修复该审计中的全部问题时，原审计交接账本继续作为结项合同；写入前固定读取 `references/change-prevention.md`，最后一次相关修改后返回 `references/project-audit.md`，从原覆盖范围和当前已接受合同重新生成覆盖与发现账本。单点缺陷不会仅因历史中存在无关审计而扩张到这条链。
 
-- 持久操作、恢复，或常驻有状态服务的会话准入与释放竞争：`references/durable-operation-governance.md`
+- 持久操作、队列或调度器的有界批次与积压排空、恢复，或常驻有状态服务的会话准入与释放竞争：`references/durable-operation-governance.md`
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
 - 返工来自多份产物关系不明、理由在重新生成时丢失、全量重算、错误缓存失效、危险切分、资源误判或编排往返：`references/derived-artifact-governance.md`
