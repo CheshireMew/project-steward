@@ -149,12 +149,12 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## README 与主页
 
-先读取 `references/readme-delivery.md`，用一份交付账本检查 Git 边界、README、正文、视觉、多语言、许可证、Star History、GitHub Topics、仓库元数据、验证与停止位置；只读请求停在同一账本，明确要求优化、重写或完整处理时才实施。随后按账本读取 `references/content-architecture.md`；需要表达性视觉时再读取 `references/visual-direction.md`，并依次读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时，读取 `assets/readme-profile/profile.json`；完整优化把配置的语言与贡献指南作为交付项，由 `scripts/readme_header.py` 消费真实文件、仓库身份、许可证和明确解析的项目导航，单个项目入口不成立时不能使其它 profile 结果退出。公开 GitHub 仓库的最终 Topics 通过 `scripts/github_topics.py` 在远端 README 身份提交后一次替换、回读并核对仓库首页；缺少该工具的成功结果不能完成整项交付。按需选择：
+先读取 `references/readme-delivery.md`，用一份交付账本检查 Git 边界、README、正文、视觉、多语言、许可证、Star History、GitHub Topics、仓库元数据、验证与停止位置；只读请求停在同一账本，明确要求优化、重写或完整处理时才实施。随后读取 `references/content-architecture.md`；完整优化或涉及 Logo、hero 时读取 `references/visual-direction.md`，先完成代码优先的正式身份源调查，再按需读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时读取 `assets/readme-profile/profile.json`，由 `scripts/readme_header.py` 消费真实文件、仓库身份、许可证和明确解析的项目导航。已有公开 GitHub 仓库的完整 README 优化把 Star History 与 Topics 都作为默认交付项：Star History 读取 `references/github-star-history.md` 和 `references/repository-publication.md`，Topics 通过 `scripts/github_topics.py` 写入并回读；除非用户明确退出或目标客观不适用，缺少任一真实消费者的成功结果都不能完成整项交付。按需选择：
 
 - SVG 与混合视觉：`references/svg-production.md`、`references/hybrid-svg-production.md`
 - 动效：`references/motion-production.md`
 - 平台边界：`references/platform-guidelines.md`
-- 自托管 Star History：`references/github-star-history.md`；只问失效原因或现状时保持只读，实施时同时读取 `references/repository-publication.md`，精确提交并推送调用仓库改动，手动运行工作流，再沿 API、生成器、输出分支、raw SVG 和 README 消费端的真实链路验收
+- 自托管 Star History 的专项诊断或接入：`references/github-star-history.md`；只问失效原因或现状时保持只读，实施时精确提交并推送调用仓库改动，手动运行工作流，再沿 API、生成器、输出分支、raw SVG 和 README 消费端的真实链路验收
 
 README 不作为每项内部治理规则的第二份活动真源；自我进化只有改变公开身份、读者路径、主要入口或维护导航时才更新 README。完成后运行 `scripts/audit_readme.py`，并在实际渲染表面核对。
 

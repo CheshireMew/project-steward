@@ -98,6 +98,33 @@ class ReadmeVisualGovernanceTests(unittest.TestCase):
         self.assertIn("语义概念合同", VISUAL_TEXT)
         self.assertIn("冻结几何合同", VISUAL_TEXT)
 
+    def test_logo_discovery_prefers_formal_code_producers(self) -> None:
+        for fragment in (
+            "先调查项目已有的正式身份源",
+            "判断 Logo 缺失、形成新概念或调用任何素材制作方法前",
+            "先从真实消费端反查生产者",
+            "应用标题栏与外壳",
+            "绘图或 Canvas 代码",
+            "不能只搜索包含 `logo`、`icon` 或品牌名的文件名",
+            "都不是“没有 Logo”的证据",
+            "正式身份消费者及入口：",
+            "代码或配置生产者：",
+            "从代码确定性派生",
+            "派生结果必须由测试或等价结构检查与生产者保持同步",
+            "调查后确认缺失并新建设计",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, VISUAL_TEXT)
+
+        for fragment in (
+            "Logo 正式身份源结论与同步验证：",
+            "本页不重新寻找或裁决身份源",
+            "优先复用或确定性派生并保留同步验证",
+            "只有上游确认身份源缺失时",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, HERO_TEXT)
+
     def test_cards_are_selected_by_content_boundaries(self) -> None:
         self.assertIn("从内容关系决定形状", VISUAL_TEXT)
         self.assertIn("多个独立、可比较或本身有明确表面的对象", VISUAL_TEXT)

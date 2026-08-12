@@ -139,6 +139,10 @@ class GitHubStarHistoryTests(unittest.TestCase):
         self.assertIn("references/github-star-history.md", readme_section)
         self.assertIn("只读", readme_section)
         self.assertIn("真实链路", readme_section)
+        self.assertIn("Star History 与 Topics 都作为默认交付项", readme_section)
+        self.assertIn("完整 README 优化", REFERENCE_TEXT)
+        self.assertIn("默认交付，不等待用户再次点名 Star History", REFERENCE_TEXT)
+        self.assertIn("不得把失败重新解释为“不需要”", REFERENCE_TEXT)
         self.assertIn("github.token", REFERENCE_TEXT)
         self.assertIn("60", REFERENCE_TEXT)
 

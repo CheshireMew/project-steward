@@ -53,7 +53,9 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         self.assertIn("scripts/readme_header.py", route)
         self.assertIn("scripts/audit_readme.py", route)
         self.assertIn("scripts/github_topics.py", route)
-        self.assertIn("缺少该工具的成功结果不能完成整项交付", route)
+        self.assertIn("代码优先的正式身份源调查", route)
+        self.assertIn("Star History 与 Topics 都作为默认交付项", route)
+        self.assertIn("缺少任一真实消费者的成功结果都不能完成整项交付", route)
         self.assertIn(
             "README 不作为每项内部治理规则的第二份活动真源",
             route,
@@ -65,6 +67,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "README 是否存在、当前动作与活动语言：",
             "公开安装入口、已验证的最短命令与实际安装验证等级：",
             "项目活动真源与图片排除边界：",
+            "Logo 正式生产者、现有消费端、复用 / 派生 / 新建设计结论：",
             "许可证文件、GitHub 识别与权利边界：",
             "Star History 生产者、输出分支、raw 文件与消费端：",
             "GitHub Topics 当前集合、项目事实依据与目标集合：",
@@ -80,11 +83,13 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "README 不存在时选择新写",
             "设计和写作不打开、查看、渲染、OCR、取色或分析任何图片",
             "配置的完整语言页和贡献指南已经交付",
+            "判断 Logo 缺失前已经先调查代码、配置、正式资源声明与消费端",
             "缺少 `README.en.md`、`README.ja.md`",
             "单个项目专属入口不成立时不影响其它组",
             "文档、贡献和反馈分别抵达真实且职责不同的目标",
             "GitHub 识别",
             "零星标仓库可以生成真实的零基线",
+            "现有公开 GitHub 仓库的完整 README 优化默认包含 Star History",
             "Topics 是公开 GitHub 仓库完整 README 优化的默认交付项",
             "About 描述只有用户明确要求",
             "远端 HEAD",
@@ -92,6 +97,33 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(outcome=outcome):
                 self.assertIn(outcome, DELIVERY_TEXT)
+
+    def test_star_history_is_automatic_and_cannot_be_silently_dropped(self) -> None:
+        for fragment in (
+            "Star History 是现有公开 GitHub 仓库完整 README 优化的默认交付项",
+            "不等待第二次专项请求",
+            "只有用户明确退出",
+            "不是 GitHub 仓库、不是公开仓库、没有现有远端时才不适用",
+            "权限、Actions、推送或远端链路失败只能标为受阻",
+            "不能静默省略",
+            "受阻时保留准确的未完成状态",
+            "不写空章节、示例图或必然失效的 raw 地址",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DELIVERY_TEXT)
+
+    def test_logo_absence_requires_a_code_first_identity_source_result(self) -> None:
+        for fragment in (
+            "由 `visual-direction.md` 完成代码优先的正式身份源调查",
+            "没有这份结论不得判断 Logo 缺失或开始新设计",
+            "找不到名为 logo 的文件",
+            "都不能证明 Logo 缺失",
+            "代码或配置已经定义标志时优先复用或确定性派生",
+            "建立同步验证",
+            "只有确认不存在正式生产者和可用消费端后",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DELIVERY_TEXT)
 
     def test_topics_are_default_but_identity_labels_remain_conditional(self) -> None:
         for fragment in (
