@@ -138,9 +138,47 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             "不能为了消除自命中而排除整个测试目录或脚本目录",
             "区分声明文本与活动语义的结构化扫描",
             "用另一个表面不同的代表性目标注入同类残留",
+            "准确语义单元和语言作用域",
+            "模块顶层绑定、类型成员、函数局部变量、导入、调用或字符串绑定",
+            "一个真实违规夹具和一个文本相近但语义合法的夹具成对验证",
+            "不会漏报",
+            "不会误报",
+            "与实际目标根使用同一解析和选择路径",
+            "对应边界保持未知",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
+
+    def test_adapter_families_separate_shared_policy_from_source_variants(
+        self,
+    ) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 适配器族先拆开共同政策与合法变体",
+            1,
+        )[1].split("### 测试专用影子实现不算生产覆盖", 1)[0]
+        ordered = (
+            "重复实现族与正式入口",
+            "共同业务政策及顺序",
+            "只有适配器知道的来源事实",
+            "会改变生命周期或失败语义的真实例外",
+            "最终族级所有者、窄适配器接口和正式消费者",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不在“全部合并”和“全部复制”之间二选一",
+            "由一个族级流程、策略或组合所有者维护",
+            "适配器接口只返回来源事实或执行平台专用动作",
+            "标准适配器不得通过覆写重新复制",
+            "输入职责、生命周期或失败语义不同",
+            "不要为了复用建立只有一层转发的基类",
+            "分别运行一个标准适配器和每类真实例外",
+            "新增来源无需复制共同流程",
+            "架构门禁阻止标准适配器重新覆写不变量",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
 
     def test_migration_test_failures_stay_bound_to_findings_and_target_behavior(
         self,
@@ -275,6 +313,7 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             for path in REFERENCES_ROOT.glob("*.md")
         }
         for heading in (
+            "### 适配器族先拆开共同政策与合法变体",
             "### 测试专用影子实现不算生产覆盖",
             "### Repository 边界按聚合所有权验收",
             "### 多入口操作共享一份绑定与请求收口",
