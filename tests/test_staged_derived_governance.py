@@ -194,6 +194,49 @@ class DerivedArtifactGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DERIVED_TEXT)
 
+    def test_selection_constraints_precede_scoring_and_refill(self) -> None:
+        owner = DERIVED_TEXT.split(
+            "### 选择器先冻结约束层级",
+            1,
+        )[1].split("## 8. 为重复 Agent 工作提供紧凑自动化边界", 1)[0]
+        ordered = (
+            "候选资格与拒绝原因",
+            "硬约束、作用范围与显式例外",
+            "软评分、排序、多样性与轮换",
+            "请求数量语义：最大值 / 目标值 / 最小值",
+            "补位或 fallback 允许放宽的软偏好",
+            "最终 selected / deferred / rejected 及原因",
+        )
+        positions = [owner.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "资格和硬约束先过滤",
+            "软评分只给仍合格的候选排序",
+            "最大值是上界",
+            "不能用补位绕过资格、排除项、类别硬上限或其它硬约束",
+            "只能放宽已经列出的软偏好",
+            "候选高度集中在同一类别、候选稀疏",
+            "正式选择入口取得 selected、deferred 和 rejected 身份及原因",
+        ):
+            with self.subTest(owner_fragment=fragment):
+                self.assertIn(fragment, owner)
+
+        prevention_route = MAIN_TEXT.split("## 改动前预防", 1)[1].split(
+            "## 根因治理",
+            1,
+        )[0]
+        remediation_route = MAIN_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性",
+            1,
+        )[0]
+        for fragment, route in (
+            ("候选资格、配额、补位", prevention_route),
+            ("候选硬约束被补位绕过", remediation_route),
+        ):
+            with self.subTest(route_fragment=fragment):
+                self.assertIn(fragment, route)
+
     def test_agent_round_trips_are_reduced_at_the_public_boundary(self) -> None:
         for fragment in (
             "结构化快照",

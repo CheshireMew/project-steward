@@ -77,7 +77,7 @@ Project Steward 自我进化时必须执行主文件约束：
 - 持久操作、队列或调度器的有界批次与积压排空、恢复、重启、成组产物，或常驻有状态服务中可发现会话与共享资源的并发准入、释放和关闭：`references/durable-operation-governance.md`
 - 任务状态、进度或自动续跑：`references/task-progress-governance.md`
 - 高成本结果需要分阶段展示、确认、连续自动执行或按上游变化失效：`references/staged-result-governance.md`
-- 同一结果由多份规格、计划、任务或研究产物表达且需决定演化关系，或涉及派生产物、语义缓存、工作单元切分、资源池利用或重复 Agent 编排：`references/derived-artifact-governance.md`
+- 同一结果由多份规格、计划、任务或研究产物表达且需决定演化关系，或涉及派生产物、语义缓存、工作单元切分、候选资格、配额、补位、资源池利用或重复 Agent 编排：`references/derived-artifact-governance.md`
 - 项目级 CI 的验证计划、执行环境缓存、测试资源分层、耗时分片、早失败和精准重跑：`references/ci-execution-governance.md`
 - 运行中配置会重建共享服务、provider、存储根或组合图：`references/runtime-generation-governance.md`
 - 难复现、时序、并发、背压或昂贵完整链：`references/hard-to-reproduce-diagnostics.md`
@@ -97,7 +97,7 @@ Project Steward 自我进化时必须执行主文件约束：
 - 持久操作、队列或调度器的有界批次与积压排空、恢复，或常驻有状态服务的会话准入与释放竞争：`references/durable-operation-governance.md`
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
-- 返工来自多份产物关系不明、理由在重新生成时丢失、全量重算、错误缓存失效、危险切分、资源误判或编排往返：`references/derived-artifact-governance.md`
+- 返工来自多份产物关系不明、理由在重新生成时丢失、全量重算、错误缓存失效、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
 - 项目级 CI 反复慢测、环境准备浪费、分片失衡、跨平台预检过晚或失败后无差别重跑：`references/ci-execution-governance.md`
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
@@ -116,7 +116,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## 项目研究与讲解
 
-先读取 `references/project-research.md`。只读取回答当前问题所需的项目表面；用户明确要求完整研究或能力采用时才扩展覆盖，并同时读取 `references/source-fork-and-ecosystem-adoption.md`，先追溯原始上游并区分直接复用与方法学习；确认会直接复用代码或资源时再读取 `references/license-governance.md`，把第三方资源与致谢写入目标项目 README。需要衡量效果、失败样本和置信度时读取 `references/project-effectiveness-review.md`；需要保存可复核报告时读取 `references/project-research-report.md`。源码归档先用 `scripts/extract_project_archive.ps1` 和 -DestinationRoot <目标根> 解压到独立目录；没有另行指定目标根时使用 E:\Work\BaiduSyncdisk\Code\Example。脚本返回项目根后立即读取 `references/archive-safety-screening.md` 并运行 `scripts/inspect_extracted_project_safety.py`；只有该方法确认重大隐患时才进入用户输出，否则静默继续原研究。
+先读取 `references/project-research.md`。只读取回答当前问题所需的项目表面；用户明确要求完整研究或能力采用时才扩展覆盖，并同时读取 `references/source-fork-and-ecosystem-adoption.md`，先追溯原始上游并区分直接复用与方法学习；确认会直接复用代码或资源时再读取 `references/license-governance.md`，把第三方资源与致谢写入目标项目 README。完整研究产生的能力台账在后续“开始吧”或实施请求中按稳定身份与接受状态继续消费，并交给改动前预防，不能把独立发现扩成实施范围。需要衡量效果、失败样本和置信度时读取 `references/project-effectiveness-review.md`；需要保存可复核报告时读取 `references/project-research-report.md`。源码归档先用 `scripts/extract_project_archive.ps1` 和 -DestinationRoot <目标根> 解压到独立目录；没有另行指定目标根时使用 E:\Work\BaiduSyncdisk\Code\Example。脚本返回项目根后立即读取 `references/archive-safety-screening.md` 并运行 `scripts/inspect_extracted_project_safety.py`；只有该方法确认重大隐患时才进入用户输出，否则静默继续原研究。
 
 ## 项目目录治理
 

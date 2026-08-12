@@ -242,6 +242,50 @@ class CoreIdentityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, common_boundaries)
 
+    def test_adoption_implementation_reuses_one_bounded_decision_ledger(
+        self,
+    ) -> None:
+        research_route = SKILL_TEXT.split(
+            "## 项目研究与讲解",
+            1,
+        )[1].split("## 项目基线与模板", 1)[0]
+        for fragment in (
+            "后续“开始吧”或实施请求",
+            "按稳定身份与接受状态继续消费",
+            "交给改动前预防",
+            "不能把独立发现扩成实施范围",
+        ):
+            with self.subTest(route_fragment=fragment):
+                self.assertIn(fragment, research_route)
+
+        absorption = PROJECT_RESEARCH_TEXT.split(
+            "### 完整能力吸收研究",
+            1,
+        )[1].split("## 6. 用人话完成解释", 1)[0]
+        mapping = absorption.split(
+            "随后把来源能力逐项映射到目标项目：",
+            1,
+        )[1].split("```text", 1)[1].split("```", 1)[0]
+        ordered = (
+            "候选稳定身份",
+            "当前处置：建议 / 已接受 / 已拒绝 / 待确认",
+            "获准实施范围及其必需依赖闭包",
+            "独立发现、范围外问题与重新授权条件",
+            "完成证据与最终状态",
+        )
+        positions = [mapping.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不自动等于实施授权",
+            "对唯一一组紧邻的建议说“开始吧”“实施上述”",
+            "不覆盖独立发现、范围外问题或更大重构",
+            "同一来源能力台账作为完成合同",
+            "未经重新授权不得静默加入实施范围",
+        ):
+            with self.subTest(handoff_fragment=fragment):
+                self.assertIn(fragment, absorption)
+
     def test_self_evolution_is_explicit_and_project_paths_stop_at_result(
         self,
     ) -> None:

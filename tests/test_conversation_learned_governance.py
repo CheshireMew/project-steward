@@ -2170,6 +2170,48 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
+    def test_relational_table_rebuild_owns_data_and_schema_closure(self) -> None:
+        owner = PREVENTION_TEXT.split(
+            "### 关系表重建先冻结数据与模式闭包",
+            1,
+        )[1].split("### 跨项目根共享合同与交付账本", 1)[0]
+        ordered = (
+            "数据闭包：正常行、孤儿行、可保留异常行与明确不可迁移行",
+            "关系闭包：父表、子表、连接表、级联语义与迁移顺序",
+            "目标模式闭包：表、列、主键、外键、唯一、检查、默认值、索引、触发器、视图、生成对象与依赖查询",
+            "旧到新稳定身份映射",
+            "失败、回滚、重试、幂等与关闭重开合同",
+        )
+        positions = [owner.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "先从旧表本身清点全部稳定行身份和模式对象",
+            "不能用新外键、内连接",
+            "需要保留的孤儿行",
+            "旧版本正式生产者 → 正式迁移器 → 当前消费者关闭并重开",
+            "用模式自省核对列、键、约束、索引、触发器、视图和依赖查询",
+            "失败注入必须保留可恢复原状态",
+            "重试得到同一目标身份与对象集合",
+        ):
+            with self.subTest(owner_fragment=fragment):
+                self.assertIn(fragment, owner)
+
+        persistence = REMEDIATION_TEXT.split(
+            "## 5. 持久化和临时状态迁移",
+            1,
+        )[1].split("## 6. 真实验收矩阵", 1)[0]
+        self.assertIn(
+            "直接消费 `change-prevention.md` 的“关系表重建先冻结数据与模式闭包”唯一合同",
+            persistence,
+        )
+        self.assertIn("只定位第一次遗漏", persistence)
+        self.assertNotIn("旧到新稳定身份映射，以及每类排除行的处置证据：", persistence)
+        self.assertEqual(
+            1,
+            PREVENTION_TEXT.count("### 关系表重建先冻结数据与模式闭包"),
+        )
+
 
     def test_structured_json_has_one_strict_boundary_and_direct_routes(
         self,
