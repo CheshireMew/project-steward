@@ -90,6 +90,29 @@ class RuntimeGenerationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, RUNTIME_TEXT)
 
+    def test_coalescing_preserves_every_accepted_completion_obligation(
+        self,
+    ) -> None:
+        for fragment in (
+            "只能合并物理执行和最终补丁",
+            "不能合并已经对调用者成立的完成责任",
+            "每个已受理意图保留稳定身份和自己的完成接收者",
+            "分别取得且只取得一次完成、失败、被替代或取消终态",
+            "不能靠移除队列项、丢弃回调或永久保留忙碌状态表达",
+            "先停止接收新修改，再排空全部已受理意图及其完成投递",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, RUNTIME_TEXT)
+
+        acceptance = RUNTIME_TEXT.split("## 6. 真实验收", 1)[1]
+        for fragment in (
+            "共享一次物理提交但保留各自身份和完成接收者",
+            "每个已受理意图都恰好取得一个可消费终态",
+            "忙碌计数也能归零",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, acceptance)
+
     def test_acceptance_uses_real_graphs_leases_and_consumers(self) -> None:
         for fragment in (
             "用受控屏障让真实操作在旧代完成读取后暂停",
