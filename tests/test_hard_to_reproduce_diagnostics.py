@@ -64,6 +64,22 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
+    def test_precedence_fixtures_make_competing_values_deterministic(
+        self,
+    ) -> None:
+        for fragment in (
+            "候选 A 应优先于回退 B",
+            "显式构造两个可区分的竞争值",
+            "在主断言前先证明它们确实不同",
+            "不能依靠短睡眠、连续读取墙钟或文件系统时间戳分辨率",
+            "显式设置并回读该值",
+            "正式消费者选择",
+            "竞争值意外相同应让夹具前置条件失败",
+            "未执行的优先级判断伪装成通过或随机失败",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DIAGNOSTIC_TEXT)
+
 
     def test_chronological_latest_uses_a_formal_total_order_under_clock_collision(
         self,

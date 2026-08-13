@@ -75,6 +75,28 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         self.assertIn("derived-artifact-governance.md", artifact_order)
         self.assertIn("本节只拥有 CI 中的生产顺序和传递事实", artifact_order)
 
+    def test_workspace_package_runners_resolve_the_current_contract_identity(
+        self,
+    ) -> None:
+        artifact_order = CI_TEXT.split(
+            "### 生成产物的生产者必须先于消费者",
+            1,
+        )[1].split("本地最终入口与 CI 消费同一验证计划", 1)[0]
+
+        for fragment in (
+            "多包或工作区仓库",
+            "根级测试入口、包级 test script、局部测试配置与 alias",
+            "实际加载的包与测试配置",
+            "最终解析到的绝对目标和内容身份",
+            "应读取本轮源码还是由本轮生产者生成的输出",
+            "根级测试通过、构建步骤已经运行或目标路径存在",
+            "旧 `dist`、另一份副本或错误层级",
+            "从实际包入口启动",
+            "验证计划声明的当前合同身份",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, artifact_order)
+
     def test_independent_expensive_boundaries_and_control_plane_fail_closed(
         self,
     ) -> None:
