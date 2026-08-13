@@ -307,6 +307,40 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_optional_capability_contracts_follow_independent_support(self) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 可选能力按独立支持面拆分公共合同",
+            1,
+        )[1].split("### 多入口操作共享一份绑定与请求收口", 1)[0]
+        ordered = (
+            "核心必需合同",
+            "独立可选能力",
+            "支持与不可用证据",
+            "生命周期和失败语义",
+            "迁移状态与旧回退退出条件",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "全部正式实现都必须履行",
+            "被独立支持、独立配置、独立失效",
+            "分别建立窄接口或能力端口",
+            "这种组合不能反向成为每个实现都必须满足的宽前提",
+            "成员缺失时返回乐观默认",
+            "生产实现、平台适配器、组合根、测试替身和 fixture",
+            "修正替身或共享夹具",
+            "只注入对应窄端口并保留“部分能力”身份",
+            "不能为了让旧替身继续通过而恢复产品动态回退",
+            "一个完整能力实现",
+            "一个只支持部分可选能力的实现",
+            "一个不支持该可选能力的实现",
+            "核心路径不因可选能力缺失而被误判失效",
+            "不能只因类型声明存在就标为已迁移",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_new_architecture_contracts_have_one_reference_owner(self) -> None:
         reference_texts = {
             path.name: path.read_text(encoding="utf-8")
@@ -316,6 +350,7 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             "### 适配器族先拆开共同政策与合法变体",
             "### 测试专用影子实现不算生产覆盖",
             "### Repository 边界按聚合所有权验收",
+            "### 可选能力按独立支持面拆分公共合同",
             "### 多入口操作共享一份绑定与请求收口",
         ):
             owners = [name for name, text in reference_texts.items() if heading in text]
