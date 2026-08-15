@@ -195,6 +195,40 @@ class RuntimeAndAuditGovernanceTests(unittest.TestCase):
             STRUCTURED_DATA_TEXT,
         )
 
+    def test_model_gates_preserve_error_precedence_and_stable_test_dispatch(
+        self,
+    ) -> None:
+        response_gate = MODEL_OPERATION_TEXT.split(
+            "## 5. 正式响应通道和恢复语义",
+            1,
+        )[1].split("## 6. 迁移到一条活动调用链", 1)[0]
+        for fragment in (
+            "冻结 route 内部的语义校验优先级",
+            "引用对象是否存在及其固有类型或所有者",
+            "本轮候选集或权限中的资格",
+            "只返回合同中优先级最高且最具体的稳定类别、字段路径和恢复动作",
+            "不能遮蔽已经成立的错误类型、对象种类或引用身份",
+            "重叠无效输入矩阵",
+            "一组只违反新规则，一组只违反既有规则，至少一组同时违反两者",
+        ):
+            with self.subTest(gate_fragment=fragment):
+                self.assertIn(fragment, response_gate)
+
+        verification = MODEL_OPERATION_TEXT.split(
+            "## 7. 从实际线请求验证到用户结果",
+            1,
+        )[1].split("## 8. 输出与停止位置", 1)[0]
+        for fragment in (
+            "结构化的 request purpose、route、schema 版本、工具身份或显式调用序号",
+            "不能搜索 system prompt、用户文案或示例中的自然语言短语",
+            "prompt 快照只验证生产提示的内容与边界，不拥有测试分流",
+            "只改提示词措辞而请求合同不变时",
+            "provider 序列化后的正式字段",
+            "提示词等义改写不会改变分流",
+        ):
+            with self.subTest(verification_fragment=fragment):
+                self.assertIn(fragment, verification)
+
     def test_full_record_and_bounded_model_context_have_distinct_owners(
         self,
     ) -> None:
