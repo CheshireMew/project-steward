@@ -9,6 +9,9 @@ SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 CI_TEXT = (
     SKILL_ROOT / "references" / "ci-execution-governance.md"
 ).read_text(encoding="utf-8")
+SELF_EVOLUTION_TEXT = (
+    SKILL_ROOT / "references" / "skill-self-evolution-governance.md"
+).read_text(encoding="utf-8")
 
 
 class CiExecutionGovernanceTests(unittest.TestCase):
@@ -58,6 +61,65 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             "完整覆盖率、完整端到端矩阵、性能与视觉矩阵、打包、签名和发布检查",
             "用户明确要求、代码冻结、发布候选",
             "超过十五分钟按长验证处理并取得用户确认",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_test_command_scope_is_expanded_before_execution(self) -> None:
+        section = CI_TEXT.split(
+            "### 测试命令先展开再取得运行资格",
+            1,
+        )[1].split("## 2. 按成本和信息量排列阶段", 1)[0]
+        for fragment in (
+            "在启动测试进程前",
+            "实际会收集的唯一测试身份",
+            "外部 CLI、真实子进程、浏览器、桌面运行时",
+            "预检不得执行测试正文",
+            "不能代替实际展开结果",
+            "必需、辅助或范围外",
+            "完全落入获准的必需与辅助范围",
+            "改用测试框架正式支持的文件、节点、资源档位或分片过滤",
+            "不得先执行整库命令再事后解释哪些测试无关",
+            "只能降低执行风险",
+            "不能让与本轮受影响链无关的外部集成取得运行资格",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_test_control_plane_change_uses_representative_nodes_first(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "### 测试命令先展开再取得运行资格",
+            1,
+        )[1].split("## 2. 按成本和信息量排列阶段", 1)[0]
+        for fragment in (
+            "不自动让全部产品测试变成相关测试",
+            "先运行控制面自己的规则测试",
+            "选择能够区分新旧行为的代表性节点",
+            "影响无法按正式身份和资源档位界定",
+            "才扩大到受影响的完整验证族",
+            "完整仓库套件仍须满足",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_skill_evolution_validation_is_isolated_from_governed_projects(
+        self,
+    ) -> None:
+        section = SELF_EVOLUTION_TEXT.split(
+            "Project Steward 自我进化的验证只消费",
+            1,
+        )[1].split("写入方案和最终差异按所有者组织", 1)[0]
+        for fragment in (
+            "准确 Skill Git 根内",
+            "被治理项目可以提供学习证据",
+            "都不是 Skill 改动的验证消费者",
+            "不得为证明 Project Steward 已经进化而启动",
+            "为两个结果分别建立验证计划",
+            "目标项目只运行自身改动所需的最小检查",
+            "Project Steward 只运行自身检查",
+            "不能替另一方背书或扩大另一方的测试范围",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
