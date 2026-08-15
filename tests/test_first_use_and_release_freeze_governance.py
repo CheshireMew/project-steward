@@ -62,7 +62,7 @@ class FirstUseAndReleaseFreezeGovernanceTests(unittest.TestCase):
     ) -> None:
         ordered = (
             "冻结准确提交 SHA、目标分支、版本和发布合同",
-            "同一 SHA 上全部必需本地检查与远程 CI 完成并成功",
+            "同一 SHA 上全部必需本地检查成功，并已有满足合同的远程 CI 结果",
             "构建最终资产",
             "在一次性副本执行 smoke",
             "计算最终资产摘要",
@@ -77,6 +77,8 @@ class FirstUseAndReleaseFreezeGovernanceTests(unittest.TestCase):
             "不在正式资产根上直接 smoke",
             "原候选清单和内容身份没有变化",
             "不创建面向用户的正式标签、Release 或上传资产",
+            "推送或派发对应运行后立即停止",
+            "只有用户在运行已经结束后明确继续发布",
             "已公开标签和同名资产默认保持不变",
             "不因下载数量为零",
         ):

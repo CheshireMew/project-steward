@@ -54,9 +54,10 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
 
     def test_default_publication_keeps_existing_scope_guards(self) -> None:
         for fragment in (
-            "不在本地验证后再次请求同一发布授权",
-            "推送成功就是普通实施任务的停止位置",
-            "不随之获得等待或监控授权",
+            "普通项目只有在用户明确要求提交或推送",
+            "只处理获准依赖闭包",
+            "在推送成功后停止",
+            "不等待 GitHub Actions、部署或其它远端验证",
             "获准依赖闭包",
             "创建远端",
             "改变可见性",
@@ -66,43 +67,38 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
-    def test_explicit_project_steward_implementation_stops_after_push_by_default(
+    def test_project_steward_invocation_does_not_publish_the_target_project(
         self,
     ) -> None:
-        for fragment in (
-            "只有本节随后明确列出的默认完成合同",
-            "明确点名 Project Steward（包括调用 `$project-steward`）",
-            "明确要求对现有 Git 项目实施修改、修复、治理、更新或优化",
-            "当前分支存在已配置 upstream",
-            "精确提交并非强制推送当前跟踪分支",
-            "推送成功立即停止",
-            "不轮询 GitHub Actions",
-            "提交或推送不自动授权等待 GitHub Actions",
-            "只读请求、隐式路由、无 upstream",
-            "references/repository-publication.md",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, SKILL_TEXT)
-
-        section = PUBLICATION_TEXT.split(
-            "### 明确点名 Project Steward 的实施默认推送即停止",
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
             1,
-        )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
+        )[0]
         for fragment in (
-            "修改、验证、精确提交和向当前跟踪分支非强制推送",
-            "只读请求或隐式路由仍保持只读",
-            "本地验证后不再询问是否推送",
-            "推送命令成功后立即停止",
-            "不重新获取 Actions run",
-            "普通项目仍只发布获准依赖闭包",
-            "不纳入无关工作树变化",
-            "不创建远端、不改变可见性、不实施删除、不强制推送、不改写历史、不打包、不部署",
-            "缺少 upstream",
-            "验证失败",
-            "保留准确本地状态并停止",
+            "点名 Project Steward 只选择治理方法",
+            "不授予目标项目提交、推送或发布权限",
+            "普通目标项目修改在本机相关验证后停止",
+            "只有用户明确要求提交或推送",
+            "Project Steward 自我进化与 Star History 分别按各自主路径处理",
+            "不能互相补造权限",
+            "提交或推送不自动授权等待 GitHub Actions",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, section)
+                self.assertIn(fragment, shared)
+
+        for fragment in (
+            "调用 Project Steward、允许修改目标项目或确认治理方案，都不自动授权提交和推送该目标项目",
+            "普通项目只有在用户明确要求提交或推送",
+            "Star History 使用其叶子方法的独立展示优化合同",
+            "都不能为普通目标项目补造发布权限",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
+        self.assertNotIn(
+            "### 明确点名 Project Steward 的实施默认推送即停止",
+            PUBLICATION_TEXT,
+        )
 
     def test_self_evolution_full_worktree_is_an_explicit_publication_exception(self) -> None:
         section = PUBLICATION_TEXT.split(

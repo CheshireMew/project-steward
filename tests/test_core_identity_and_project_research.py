@@ -29,6 +29,9 @@ PROJECT_RESEARCH_TEXT = (
 EFFECTIVENESS_TEXT = (
     SKILL_ROOT / "references" / "project-effectiveness-review.md"
 ).read_text(encoding="utf-8")
+CI_EXECUTION_TEXT = (
+    SKILL_ROOT / "references" / "ci-execution-governance.md"
+).read_text(encoding="utf-8")
 
 
 class CoreIdentityTests(unittest.TestCase):
@@ -165,14 +168,23 @@ class CoreIdentityTests(unittest.TestCase):
         )[0]
         for fragment in (
             "验证按改动风险选择层级",
+            "references/ci-execution-governance.md",
+            "最近一次已完成的公开仓库失败",
             "直接覆盖本次改动和验收主张的目标检查",
-            "文档、许可证、致谢或纯元数据",
-            "不启动无关浏览器或端到端链路",
-            "公共合同、核心运行时、跨仓库边界、发布",
-            "才升级为完整回归和真实用户链",
+            "其它平台、完整回归、远端 CI 与真实用户链",
+            "用户明确要求、代码冻结或目标检查证明系统性影响时才进入",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, common_boundaries)
+
+        for fragment in (
+            "文档、许可证、致谢和纯仓库元数据变化只选择相应维护入口",
+            "公共合同、核心运行时、跨平台能力、跨仓库边界和发布承诺",
+            "完整覆盖率、完整端到端矩阵、性能与视觉矩阵、打包、签名和发布检查",
+            "超过十五分钟按长验证处理并取得用户确认",
+        ):
+            with self.subTest(method_fragment=fragment):
+                self.assertIn(fragment, CI_EXECUTION_TEXT)
 
     def test_first_use_defaults_to_bounded_research_and_gates_absorption(
         self,

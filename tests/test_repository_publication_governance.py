@@ -133,6 +133,9 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
         for fragment in (
             "读取 `repository-publication.md` 的“审计 GitHub 上传边界”",
             "不在这里建立第二套敏感文件或目录黑名单",
+            "不会仅为取得“全面”称谓扫描全部历史、其它分支、标签、Release 资产和 Actions 制品",
+            "完整上传边界、隐私或历史暴露审计只有在用户明确要求发布、公开、上传边界审计或历史清理",
+            "未展开的历史平面记录为待验证",
             "本地物理文件与拟上传候选、Git 索引、当前已跟踪树、本地提交和可达历史",
             "本地 `origin/*` 也不能代替实时 GitHub 内容",
             "没有消费者证据才说明它不应进入仓库",
@@ -244,46 +247,23 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
-    def test_explicit_project_steward_implementation_defaults_to_push_and_stop(
+    def test_project_steward_invocation_is_not_target_project_publish_authority(
         self,
     ) -> None:
-        section = PUBLICATION_TEXT.split(
-            "### 明确点名 Project Steward 的实施默认推送即停止",
-            1,
-        )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
-        ordered = (
-            "实施改动并沿当前机器的真实消费者验证",
-            "求出普通项目的获准依赖闭包",
-            "核对最终候选与推送前远端新鲜状态",
-            "精确暂存并创建提交",
-            "向当前跟踪分支执行非强制推送",
-            "推送命令成功后立即停止",
-        )
-        positions = [section.index(fragment) for fragment in ordered]
-        self.assertEqual(positions, sorted(positions))
-
         for fragment in (
-            "准确项目根已是 Git 仓库",
-            "当前分支存在已配置 upstream",
-            "只改本地",
-            "不要提交",
-            "不要推送",
-            "只提交不推送",
-            "本地验证后不再询问是否推送",
-            "不重新获取 Actions run",
-            "不轮询 required checks",
-            "用户另行明确要求远端验收",
-            "当前分支含不属于本次结果的既有未推送提交",
-            "未获授权的删除",
-            "不能为了自动推送扩大范围",
-            "分支分叉或远端变化",
-            "工作树出现来源不明的并发变化",
-            "发现凭据",
-            "认证失败或分支保护拒绝",
-            "不猜测远端、不拆分或强推绕过阻塞",
+            "调用 Project Steward、允许修改目标项目或确认治理方案，都不自动授权提交和推送该目标项目",
+            "普通项目只有在用户明确要求提交或推送",
+            "独立专项路径已经把精确提交与推送写入其确认结果",
+            "Star History 使用其叶子方法的独立展示优化合同",
+            "都不能为普通目标项目补造发布权限",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, section)
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
+        self.assertNotIn(
+            "### 明确点名 Project Steward 的实施默认推送即停止",
+            PUBLICATION_TEXT,
+        )
 
     def test_project_steward_self_evolution_publishes_the_whole_worktree(self) -> None:
         section = PUBLICATION_TEXT.split(
