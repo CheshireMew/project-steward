@@ -142,6 +142,21 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
+    def test_shell_evidence_route_reaches_the_unique_platform_method(self) -> None:
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
+            1,
+        )[0]
+        environment_route = SKILL_TEXT.split(
+            "## 用户环境档案与执行环境",
+            1,
+        )[1].split("## 项目综合审计", 1)[0]
+
+        self.assertIn("Shell 后句可能遮蔽前序失败", shared)
+        self.assertIn("先进入“用户环境档案与执行环境”", shared)
+        self.assertIn("references/user-environment-governance.md", environment_route)
+        self.assertNotIn("$LASTEXITCODE", shared)
+
 
     def test_skill_main_file_stays_within_budget(self) -> None:
         self.assertLessEqual(len(SKILL_TEXT.splitlines()), 220)

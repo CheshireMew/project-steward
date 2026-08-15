@@ -278,10 +278,13 @@ class CoreIdentityTests(unittest.TestCase):
         )[1].split("```text", 1)[1].split("```", 1)[0]
         ordered = (
             "候选稳定身份",
+            "不可弱化的用户结果与验收子项",
+            "建议实现机制与允许替代方案",
             "当前处置：建议 / 已接受 / 已拒绝 / 待确认",
             "获准实施范围及其必需依赖闭包",
             "独立发现、范围外问题与重新授权条件",
-            "完成证据与最终状态",
+            "有意偏离、重新分类或受阻条件及其确认来源",
+            "各验收子项的完成证据与最终状态",
         )
         positions = [mapping.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
@@ -294,6 +297,25 @@ class CoreIdentityTests(unittest.TestCase):
             "未经重新授权不得静默加入实施范围",
         ):
             with self.subTest(handoff_fragment=fragment):
+                self.assertIn(fragment, absorption)
+
+    def test_adoption_handoff_preserves_non_weakenable_acceptance_items(
+        self,
+    ) -> None:
+        absorption = PROJECT_RESEARCH_TEXT.split(
+            "### 完整能力吸收研究",
+            1,
+        )[1].split("## 6. 用人话完成解释", 1)[0]
+        for fragment in (
+            "候选标题只是稳定索引，不是完成单位",
+            "候选标题不能替它下面的验收子项报完成",
+            "替代方案必须继续满足全部不可弱化的用户结果",
+            "把对应子项标为受阻或重新分类",
+            "说明差异并取得新的明确确认",
+            "总测试通过替未逐项关闭的子项背书",
+            "按稳定子项身份逐项回写完成证据与最终状态",
+        ):
+            with self.subTest(fragment=fragment):
                 self.assertIn(fragment, absorption)
 
     def test_adoption_subtracts_owned_capabilities_and_prices_operating_burden(

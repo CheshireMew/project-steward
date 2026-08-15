@@ -127,6 +127,25 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
+    def test_compound_packages_verify_every_integrity_layer_before_commit(
+        self,
+    ) -> None:
+        for fragment in (
+            "文件与传输层",
+            "结构合同层",
+            "领域语义层",
+            "引用谱系层",
+            "状态提交层",
+            "目标项目的唯一规范投影或领域构造器",
+            "不能信任清单自报的哈希、行数或身份",
+            "保持文件格式和必需元数据合法",
+            "重新计算全部外层文件哈希与传输清单",
+            "目标正式状态仍与验证前相同",
+            "没有独立领域语义身份时停在它实际拥有的层",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
     def test_cross_root_contracts_have_independent_delivery_evidence(
         self,
     ) -> None:

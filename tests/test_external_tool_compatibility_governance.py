@@ -214,6 +214,27 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
 
+    def test_external_agent_plan_truth_is_distinct_from_host_lifecycle(
+        self,
+    ) -> None:
+        for fragment in (
+            "任务计划、宿主阶段和追加要求必须分别陈述",
+            "执行者任务计划",
+            "宿主执行生命周期",
+            "追加要求或 steer 请求",
+            "宿主验收事实",
+            "带稳定任务身份和版本的机器可读计划",
+            "正式的接受、拒绝或修订合同",
+            "不能称为任务特定计划",
+            "只能证明要求已经提交给准确任务",
+            "不能证明执行者已经生成、接受或持久化修订后的计划",
+            "把该验收子项标为受阻或重新分类",
+            "重新取得确认",
+            "只有追加要求入口、没有计划合同的适配器",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, COMPATIBILITY_TEXT)
+
     def test_tool_event_ledger_preserves_failures_and_explicit_recovery(
         self,
     ) -> None:

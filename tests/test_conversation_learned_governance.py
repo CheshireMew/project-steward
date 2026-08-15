@@ -39,7 +39,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "工作从短动作扩展为多阶段",
             "新的独立请求替换尚未完成的结果",
             "逐项保留输出、错误和退出状态",
-            "任何一项会让整批提前中止时改为独立执行",
+            "Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”",
             "只把被遮蔽、未执行或状态未知的项目单独补跑",
         ):
             with self.subTest(fragment=fragment):
