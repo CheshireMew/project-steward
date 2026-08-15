@@ -92,6 +92,27 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
         )
         self.assertIn("同一操作先失败后成功", DURABLE_TEXT)
 
+    def test_error_after_physical_effect_is_reconciled_once(self) -> None:
+        ordered = (
+            "生产者返回错误、连接中断或确认超时",
+            "以操作身份、执行前基线和正式目标重新读取物理事实",
+            "从权威事实重建同一结果合同",
+            "交给既有的唯一结果接收边界并立即结束当前完成路径",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不能单独证明物理操作没有发生",
+            "可读取的成功后置条件、确定未发生的证据和冲突条件",
+            "生产者只执行一次且账本只有一个成功终态",
+            "前者得到唯一无产物失败，后者保持未决或冲突",
+            "不得继续落入通用错误处理",
+            "显式重试仍创建新的执行批次",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
     def test_all_completion_paths_validate_results_inside_lifecycle_owner(
         self,
     ) -> None:

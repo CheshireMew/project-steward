@@ -4,6 +4,43 @@ from governance_text_fixtures import *
 
 
 class DesktopAndInteractionGovernanceTests(unittest.TestCase):
+    def test_nested_scroll_surfaces_prove_their_own_responsive_geometry(
+        self,
+    ) -> None:
+        for fragment in (
+            "根页面没有溢出不代表内部表面成立",
+            "内在最小尺寸可能把真实内容面撑宽",
+            "实际滚动面的 `clientWidth`、`scrollWidth`",
+            "只能证明根节点自身，不能替代嵌套表面",
+            "长本地化标签、不换行路径或代码、宽工具栏",
+            "几何证据说明是哪一层扩大",
+            "两者必须来自同一状态和视口",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LAYOUT_RESPONSIVE_TEXT)
+
+    def test_command_discovery_uses_stable_identity_across_locales(self) -> None:
+        interface_text = (
+            SKILL_ROOT / "references" / "interface-guidelines.md"
+        ).read_text(encoding="utf-8")
+        ordered = (
+            "每项行动使用一个稳定身份执行",
+            "匹配投影由同一规范元数据确定性生成",
+            "分别用本地化词和稳定语义别名找到同一行动",
+            "由同一稳定身份执行正确结果",
+        )
+        positions = [interface_text.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "不能只索引当前翻译",
+            "不能让每种语言、每个入口各自维护同义词表",
+            "用显示文字充当执行身份",
+            "内部协议 ID 不因参与关联而自动成为可见标签",
+            "遵守当前上下文可用性",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, interface_text)
+
     def test_committed_state_reaches_the_current_live_projection(self) -> None:
         ordered = (
             "唯一提交边界、聚合身份与提交版本",
