@@ -18,6 +18,9 @@ CONTENT_TEXT = (
 LEARNING_TEXT = (
     SKILL_ROOT / "references" / "conversation-learning-and-self-evolution.md"
 ).read_text(encoding="utf-8")
+LEARNING_TEXT += (
+    SKILL_ROOT / "references" / "skill-self-evolution-governance.md"
+).read_text(encoding="utf-8")
 README_TEXTS = {
     "zh-CN": (SKILL_ROOT / "README.md").read_text(encoding="utf-8"),
     "en": (SKILL_ROOT / "README.en.md").read_text(encoding="utf-8"),

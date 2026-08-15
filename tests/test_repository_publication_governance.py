@@ -7,8 +7,14 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 PUBLICATION_TEXT = (
     SKILL_ROOT / "references" / "repository-publication.md"
 ).read_text(encoding="utf-8")
+PUBLICATION_TEXT += (
+    SKILL_ROOT / "references" / "repository-publication-execution.md"
+).read_text(encoding="utf-8")
 PROJECT_AUDIT_TEXT = (
     SKILL_ROOT / "references" / "project-audit.md"
+).read_text(encoding="utf-8")
+PROJECT_AUDIT_TEXT += (
+    SKILL_ROOT / "references" / "project-audit-release-and-evidence.md"
 ).read_text(encoding="utf-8")
 
 

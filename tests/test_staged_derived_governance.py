@@ -78,6 +78,31 @@ class StagedResultGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, STAGED_TEXT)
 
+    def test_continuous_high_cost_work_forecasts_wall_clock_before_start(
+        self,
+    ) -> None:
+        forecast = STAGED_TEXT.index("连续高成本工作先说明预计时间")
+        execution = STAGED_TEXT.index("自动执行仍逐阶段生成成果")
+        self.assertLess(forecast, execution)
+
+        for fragment in (
+            "用户已经授权连续自动执行，且完整生产与验证明显昂贵时",
+            "在开始第一个昂贵动作前给出预计墙钟时间范围、关键路径、估算依据和主要不确定性",
+            "不能把各阶段简单相加而忽略并行关系",
+            "总耗时仍未知",
+            "验证阶段的选择、耗时证据和重跑范围由 `ci-execution-governance.md` 负责",
+            "立即更新预计范围并说明原估算中的哪项事实失效",
+            "普通波动没有改变这些事实时不反复改口",
+            "不能等到用户追问后才解释工作为何扩张",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, STAGED_TEXT)
+
+        self.assertIn(
+            "普通低成本、确定性、一步完成且没有实质用户选择的工作不增加阶段确认",
+            STAGED_TEXT,
+        )
+
     def test_stage_validation_uses_real_producers_and_distinct_surfaces(
         self,
     ) -> None:

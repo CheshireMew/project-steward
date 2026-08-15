@@ -9,6 +9,16 @@ from pathlib import Path
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
+
+
+def read_reference(name: str, *companions: str) -> str:
+    text = (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+    return text + "".join(
+        (SKILL_ROOT / "references" / companion).read_text(encoding="utf-8")
+        for companion in companions
+    )
+
+
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 AGENT_TEXT = (
     SKILL_ROOT / "agents" / "openai.yaml"
@@ -289,17 +299,20 @@ class CoreIdentityTests(unittest.TestCase):
     def test_self_evolution_is_explicit_and_project_paths_stop_at_result(
         self,
     ) -> None:
-        learning = (
-            SKILL_ROOT
-            / "references"
-            / "conversation-learning-and-self-evolution.md"
-        ).read_text(encoding="utf-8")
-        prevention = (
-            SKILL_ROOT / "references" / "change-prevention.md"
-        ).read_text(encoding="utf-8")
-        remediation = (
-            SKILL_ROOT / "references" / "root-cause-remediation.md"
-        ).read_text(encoding="utf-8")
+        learning = read_reference(
+            "conversation-learning-and-self-evolution.md",
+            "skill-self-evolution-governance.md",
+        )
+        prevention = read_reference(
+            "change-prevention.md",
+            "change-prevention-state-and-capability.md",
+            "change-prevention-delivery-boundaries.md",
+            "change-prevention-verification.md",
+        )
+        remediation = read_reference(
+            "root-cause-remediation.md",
+            "root-cause-verification-and-closure.md",
+        )
 
         self.assertIn("按用户最终结果分组", learning)
         self.assertIn("先完整覆盖过程证据", learning)
@@ -351,11 +364,10 @@ class CoreIdentityTests(unittest.TestCase):
     def test_learning_updates_the_skill_and_preserves_project_truth(
         self,
     ) -> None:
-        learning = (
-            SKILL_ROOT
-            / "references"
-            / "conversation-learning-and-self-evolution.md"
-        ).read_text(encoding="utf-8")
+        learning = read_reference(
+            "conversation-learning-and-self-evolution.md",
+            "skill-self-evolution-governance.md",
+        )
         for fragment in (
             "先完整覆盖过程证据",
             "再按用户最终结果分组",

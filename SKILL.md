@@ -55,7 +55,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 
 ## 对话学习与自我进化
 
-先完整读取 `references/conversation-learning-and-self-evolution.md`。
+先完整读取 `references/conversation-learning-and-self-evolution.md` 和 `references/skill-self-evolution-governance.md`。
 
 任一用户结果含失败、纠正、保护拦截、临时绕行或残留时，再读取 `references/root-cause-remediation.md`。读取顺序固定为：按结果恢复完整过程，沿因果层级确定主要学习主题和独立次级结果，再恢复其中会改变未来治理的具体细节并按共同边界逐项比较目标能力，之后才提炼共同机制和特殊维度、判断可迁移性、职能边界和正式所有者，最后判断历史责任。绕行与残留不得覆盖更早且证据成立的可控根因；后续纠正改变主要原因时，现有方案与确认立即失效。只有成功结果且不存在这些信号时，不加载根因方法。
 
@@ -63,16 +63,16 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 
 用户只要求分析时保持只读。明确要求吸收、自我进化、更新、优化或迭代 Project Steward 时，先交付未来行为、职能边界、代表性输出、影响文件和验证方式并停下；用户确认该方案后才修改活动 Skill。确认方案未声明只改本地时，同时读取 `references/repository-publication.md`；当前跟踪远端存在时，把整个工作区按实际影响验证，使用 `git add -A` 将已跟踪修改、未跟踪文件和现有删除一起提交并推送当前跟踪分支，核对远端 HEAD 和工作区无遗漏后才完成。远端、认证、分支保护、分叉、验证失败或任何一项不能共同发布时保留完整工作区并停在准确边界，不退回选择性提交。
 
-Project Steward 自我进化时必须执行主文件约束：
+Project Steward 自我进化时必须执行活动文本约束：
 
-- 写入前记录 SKILL.md 的行数、字符数和直接 reference 集合，并给每条新增规则指定唯一活动所有者。
+- 写入前运行 `scripts/check_file_budgets.py .`，记录全部活动 UTF-8 文本文件的外层工具预算和直接 reference 集合，并给每条新增规则指定唯一活动所有者。
 - SKILL.md 只拥有路由、触发条件、读取顺序、权限、输出和停止位置；完整方法、表格、检查清单与例外由对应 reference 唯一拥有，主文件只保留直达链接。
-- 写入后 SKILL.md 不得超过 220 行或 14,000 个字符，并保持全部活动能力可直接到达。新路由使预算超限时，必须在同一次改动中迁移或合并旧细节。
-- 无法在预算内保留既有能力、正式消费者和验证时，停止写入、重新规划，不得宣称完成。
+- 写入后 SKILL.md 仍不得超过 220 行或 14,000 个字符，并且每个活动文本文件按 UTF-8 字节数除以四向上取整的外层工具估算不得超过 9,000 tokens。归档、依赖、缓存、构建与运行产物、二进制媒体和不作为模型输入的媒体运行资源不参与文本门槛。
+- 超限时按唯一职责迁移完整章节、函数族或测试主题并同步全部路由、公共入口、正式消费者和测试身份；不得删减能力、必要方法、完整示例或协议细节，也不得提高上限、拆行或压成不可维护文本。无法完整保留时停止写入、重新规划，不得宣称完成。
 
 ## 改动前预防
 
-先读取 `references/change-prevention.md`，由它负责目标行为、唯一真源、影响图、最终接口、旧路径退出和真实用户链验收。按问题叠加：
+先依次读取 `references/change-prevention.md`、`references/change-prevention-state-and-capability.md`、`references/change-prevention-delivery-boundaries.md` 和 `references/change-prevention-verification.md`，由它们共同负责目标行为、唯一真源、影响图、最终接口、旧路径退出和真实用户链验收。按问题叠加：
 
 - 持久操作、队列或调度器的有界批次与积压排空、恢复、重启、成组产物，或常驻有状态服务中可发现会话与共享资源的并发准入、释放和关闭：`references/durable-operation-governance.md`
 - 任务状态、进度或自动续跑：`references/task-progress-governance.md`
@@ -90,7 +90,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## 根因治理
 
-先读取 `references/root-cause-remediation.md`。诊断停在证据、影响范围与最终修法；实施才一次迁移全部生产者、边界和消费者，并退出旧架构。按问题叠加：
+先读取 `references/root-cause-remediation.md` 和 `references/root-cause-verification-and-closure.md`。诊断停在证据、影响范围与最终修法；实施才一次迁移全部生产者、边界和消费者，并退出旧架构。按问题叠加：
 
 修复承接本任务先前的综合审计，或用户明确要求修复该审计中的全部问题时，原审计交接账本继续作为结项合同；写入前固定读取 `references/change-prevention.md`，最后一次相关修改后返回 `references/project-audit.md`，从原覆盖范围和当前已接受合同重新生成覆盖与发现账本。单点缺陷不会仅因历史中存在无关审计而扩张到这条链。
 
@@ -103,7 +103,7 @@ Project Steward 自我进化时必须执行主文件约束：
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
 - 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
-- 可视层级、变换或动效所有权：`references/interaction-motion.md`；需要实际运行画面验收时再读 `references/implementation-review.md`
+- 可视层级、变换或动效所有权：`references/interaction-motion.md` 和 `references/interaction-navigation-and-media-lifecycle.md`；需要实际运行画面验收时再读 `references/implementation-review.md` 与 `references/implementation-review-visual-evidence.md`
 - 工具、路径别名、执行环境或长任务：`references/user-environment-governance.md`
 - 事件、版本、历史或缓存把计划影响范围误当成实际变更事实：`references/change-prevention.md` 的“计划范围与实际变更事实分离”合同
 - 局部状态、心跳或遥测更新覆盖、清空了未声明字段，或者消费者无法区分完整快照与局部补丁：`references/change-prevention.md` 的活动投影更新合同
@@ -134,7 +134,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 先读取 `references/product-experience-governance.md`，再按以下固定入口和条件专项执行：
 
-- 界面诊断、评价、优化或重建固定读取：`references/ux-design.md`、`references/interface-experience-quality.md`、`references/interface-problem-patterns.md`、`references/implementation-review.md`。修改前先冻结全部相关窗口、页面、面板、覆盖层、主要状态和用户旅程；不能把截图中最醒目的局部问题当成完整审查范围。
+- 界面诊断、评价、优化或重建固定读取：`references/ux-design.md`、`references/interface-experience-quality.md`、`references/interface-problem-patterns.md`、`references/implementation-review.md`、`references/implementation-review-visual-evidence.md`。修改前先冻结全部相关窗口、页面、面板、覆盖层、主要状态和用户旅程；不能把截图中最醒目的局部问题当成完整审查范围。
 - 从零设计或改变视觉方向：`references/design-method.md`、`references/visual-direction.md`、`references/surface-registers.md`
 - 布局、设计系统、交互和动效：`references/layout-responsive.md`、`references/design-system-alignment.md`、`references/interface-guidelines.md`、`references/interaction-motion.md`
 - 参考界面忠实重建：`references/reference-interface-reconstruction.md`
@@ -145,7 +145,7 @@ Project Steward 自我进化时必须执行主文件约束：
 
 ## 仓库建立与发布
 
-读取 `references/repository-publication.md`。区分初始化、提交、远端创建、推送、可见性、检查与部署；每一步只执行已经授权的停止位置，并在状态改变前后核对准确仓库身份、索引、分支、远端和并发变化。
+依次读取 `references/repository-publication.md` 和 `references/repository-publication-execution.md`。区分初始化、提交、远端创建、推送、可见性、检查与部署；每一步只执行已经授权的停止位置，并在状态改变前后核对准确仓库身份、索引、分支、远端和并发变化。
 
 ## README 与主页
 
@@ -172,7 +172,7 @@ README 不作为每项内部治理规则的第二份活动真源；自我进化�
 
 ## 项目综合审计
 
-读取 `references/project-audit.md`。用户询问实施计划完成度时，先从原计划建立逐项符合性账本；获准修复后必须从原计划和当前已接受合同重新生成一次全新复查，不沿用旧完成标记，也不从现有测试反推计划范围。全面检查则先按项目形态建立全部适用维度的覆盖账本，再加载这些维度要求的专项；不得只根据已经发现的问题回填审查范围。只读审计不自动治理。需要评估用户效果时追加 `references/project-effectiveness-review.md`，需要检查任务体验时追加 `references/task-experience-audit.md`。
+依次读取 `references/project-audit.md` 和 `references/project-audit-release-and-evidence.md`。用户询问实施计划完成度时，先从原计划建立逐项符合性账本；获准修复后必须从原计划和当前已接受合同重新生成一次全新复查，不沿用旧完成标记，也不从现有测试反推计划范围。全面检查则先按项目形态建立全部适用维度的覆盖账本，再加载这些维度要求的专项；不得只根据已经发现的问题回填审查范围。只读审计不自动治理。需要评估用户效果时追加 `references/project-effectiveness-review.md`，需要检查任务体验时追加 `references/task-experience-audit.md`。
 
 ## 平台模板资源
 

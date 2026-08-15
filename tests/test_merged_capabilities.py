@@ -7,6 +7,21 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+REFERENCE_COMPANIONS = {
+    "implementation-review.md": ("implementation-review-visual-evidence.md",),
+    "interaction-motion.md": ("interaction-navigation-and-media-lifecycle.md",),
+    "root-cause-remediation.md": ("root-cause-verification-and-closure.md",),
+}
+
+
+def read_reference(name: str) -> str:
+    names = (name, *REFERENCE_COMPANIONS.get(name, ()))
+    return "".join(
+        (SKILL_ROOT / "references" / current).read_text(encoding="utf-8")
+        for current in names
+    )
+
+
 DESIGN_REFERENCES = (
     "surface-registers.md",
     "ux-design.md",
@@ -331,9 +346,7 @@ class MergedCapabilityTests(unittest.TestCase):
         guidelines = (
             SKILL_ROOT / "references" / "interface-guidelines.md"
         ).read_text(encoding="utf-8")
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        review = read_reference("implementation-review.md")
 
         for fragment in (
             "先锁定用户感受所在的感知层",
@@ -373,12 +386,8 @@ class MergedCapabilityTests(unittest.TestCase):
         guidelines = (
             SKILL_ROOT / "references" / "interface-guidelines.md"
         ).read_text(encoding="utf-8")
-        interaction = (
-            SKILL_ROOT / "references" / "interaction-motion.md"
-        ).read_text(encoding="utf-8")
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        interaction = read_reference("interaction-motion.md")
+        review = read_reference("implementation-review.md")
 
         for fragment in (
             "让检查范围和取舍可以复核",
@@ -433,9 +442,7 @@ class MergedCapabilityTests(unittest.TestCase):
                 self.assertEqual(all_design_text.count(heading), 1)
 
     def test_ui_automation_uses_stable_identity_and_design_truth(self) -> None:
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        review = read_reference("implementation-review.md")
 
         ordered = (
             "对象身份优先来自稳定对象标识、可访问语义或组件公开身份",
@@ -452,18 +459,14 @@ class MergedCapabilityTests(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
 
     def test_media_surface_governance_is_routed_and_observable(self) -> None:
-        root_cause = (
-            SKILL_ROOT / "references" / "root-cause-remediation.md"
-        ).read_text(encoding="utf-8")
+        root_cause = read_reference("root-cause-remediation.md")
         layout = (
             SKILL_ROOT / "references" / "layout-responsive.md"
         ).read_text(encoding="utf-8")
         patterns = (
             SKILL_ROOT / "references" / "interface-problem-patterns.md"
         ).read_text(encoding="utf-8")
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        review = read_reference("implementation-review.md")
         desktop = (
             SKILL_ROOT / "references" / "desktop-app-governance.md"
         ).read_text(encoding="utf-8")
@@ -498,9 +501,7 @@ class MergedCapabilityTests(unittest.TestCase):
         guidelines = (
             SKILL_ROOT / "references" / "interface-guidelines.md"
         ).read_text(encoding="utf-8")
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        review = read_reference("implementation-review.md")
         design_system = (
             SKILL_ROOT / "references" / "design-system-alignment.md"
         ).read_text(encoding="utf-8")
@@ -533,15 +534,11 @@ class MergedCapabilityTests(unittest.TestCase):
         self.assertIn("不通过破坏语义标记", platform)
 
     def test_collection_preview_and_reorder_contracts_are_active(self) -> None:
-        interaction = (
-            SKILL_ROOT / "references" / "interaction-motion.md"
-        ).read_text(encoding="utf-8")
+        interaction = read_reference("interaction-motion.md")
         layout = (
             SKILL_ROOT / "references" / "layout-responsive.md"
         ).read_text(encoding="utf-8")
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        review = read_reference("implementation-review.md")
 
         for fragment in (
             "已提交选择",
@@ -593,12 +590,8 @@ class MergedCapabilityTests(unittest.TestCase):
                 self.assertIn(fragment, review)
 
     def test_temporal_media_ownership_and_acceptance_are_active(self) -> None:
-        interaction = (
-            SKILL_ROOT / "references" / "interaction-motion.md"
-        ).read_text(encoding="utf-8")
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        interaction = read_reference("interaction-motion.md")
+        review = read_reference("implementation-review.md")
 
         for fragment in (
             "异步切换使用操作身份和原子提交",
@@ -651,9 +644,7 @@ class MergedCapabilityTests(unittest.TestCase):
         desktop = (
             SKILL_ROOT / "references" / "desktop-app-governance.md"
         ).read_text(encoding="utf-8")
-        review = (
-            SKILL_ROOT / "references" / "implementation-review.md"
-        ).read_text(encoding="utf-8")
+        review = read_reference("implementation-review.md")
 
         for fragment in (
             "进程树可见表面合同",

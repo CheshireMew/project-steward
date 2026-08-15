@@ -20,6 +20,17 @@ DESKTOP_TEXT = read("references/desktop-app-governance.md")
 IMPLEMENTATION_TEXT = read("references/implementation-review.md")
 AGENT_TEXT = read("agents/openai.yaml")
 
+PREVENTION_TEXT += "".join(
+    read(f"references/{name}")
+    for name in (
+        "change-prevention-state-and-capability.md",
+        "change-prevention-delivery-boundaries.md",
+        "change-prevention-verification.md",
+    )
+)
+REMEDIATION_TEXT += read("references/root-cause-verification-and-closure.md")
+IMPLEMENTATION_TEXT += read("references/implementation-review-visual-evidence.md")
+
 
 class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
     def test_durable_operation_has_a_direct_conditional_route(self) -> None:
