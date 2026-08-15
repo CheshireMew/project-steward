@@ -282,6 +282,30 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
+    def test_ambiguous_followup_cannot_expand_audit_into_all_fixes(
+        self,
+    ) -> None:
+        section = PROJECT_AUDIT_TEXT.split(
+            "综合审计同时存在两个以上开放发现时",
+            1,
+        )[1].split("## 实施计划符合性审计", 1)[0]
+        ordered = (
+            "不等于修复全部",
+            "展示开放发现的稳定身份、结论、依赖关系和预计影响",
+            "让用户明确选择",
+            "在选择成立前保持只读",
+            "只包含冻结问题账本中已经确认且仍开放的发现",
+            "不包含改进建议、未来成熟度方向、非问题、证据未知项",
+            "新的独立问题必须单独登记",
+            "重新取得范围与写入确认",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for ambiguous_request in ("“修复”", "“继续”", "“开始吧”", "“处理一下”"):
+            with self.subTest(ambiguous_request=ambiguous_request):
+                self.assertIn(ambiguous_request, section)
+        self.assertIn("不能借原来的“全部”持续扩张实现", section)
+
 
     def test_comprehensive_ui_audit_uses_surface_and_journey_inventories(
         self,

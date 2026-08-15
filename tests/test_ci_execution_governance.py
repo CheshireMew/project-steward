@@ -59,11 +59,61 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             "只有用户明确要求另一平台",
             "不轮询、不等待",
             "完整覆盖率、完整端到端矩阵、性能与视觉矩阵、打包、签名和发布检查",
-            "用户明确要求、代码冻结、发布候选",
-            "超过十五分钟按长验证处理并取得用户确认",
+            "经权威来源确认的代码冻结或发布候选",
+            "累计预计超过十五分钟",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_stage_authority_and_cumulative_budget_gate_precede_tests(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "### 阶段资格、累计预算与全量验证上限",
+            1,
+        )[1].split("计划的机器可读输出", 1)[0]
+        ordered = (
+            "项目阶段默认是活跃开发",
+            "只有用户明确确认，或项目正式发布真源",
+            "不能因为局部检查通过",
+            "冻结资格和依赖它取得的昂贵验证授权立即失效",
+            "启动本阶段第一条测试前",
+            "按关键路径累计全部计划检查的预计墙钟时间",
+            "累计预计超过十五分钟",
+            "多条各自短于十五分钟的命令不能绕过累计门槛",
+            "旧确认立即失效",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "环境准备、数据生成、启动、关闭、清理",
+            "计划允许的一次重跑",
+            "并行项按关键路径计算",
+            "候选命令、目的、范围、历史耗时依据和累计预计",
+            "新增动作开始前重新确认",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_full_suite_has_an_authoritative_two_run_ceiling(self) -> None:
+        section = CI_TEXT.split(
+            "### 阶段资格、累计预算与全量验证上限",
+            1,
+        )[1].split("计划的机器可读输出", 1)[0]
+        ordered = (
+            "最多先运行一次获准的完整仓库套件",
+            "只做聚焦诊断、获准修复和受影响检查",
+            "再次由权威来源冻结",
+            "用户重新确认完整验证的命令与累计预算",
+            "最后一次完整套件复跑",
+            "不启动第三次完整套件",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn(
+            "不能反向让原本不适用的全量验证取得运行资格",
+            section,
+        )
 
     def test_test_command_scope_is_expanded_before_execution(self) -> None:
         section = CI_TEXT.split(
@@ -103,6 +153,30 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_expensive_validator_preflights_and_stops_after_second_drift(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "### 昂贵验证器先证明自己的适用合同",
+            1,
+        )[1].split("## 2. 按成本和信息量排列阶段", 1)[0]
+        ordered = (
+            "不执行昂贵正文的预检",
+            "实际非空收集身份",
+            "当前夹具与数据 schema",
+            "最小样本跑一次短探针",
+            "不得先构造代表性大规模输入",
+            "先取得测试基础设施写入权限",
+            "一次精确短探针复跑",
+            "第二个不同的过时假设",
+            "形成独立的测试基础设施发现",
+            "停止当前昂贵验证循环",
+            "产品结论保持未验证",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("不能边修验证器边反复生成大数据", section)
 
     def test_skill_evolution_validation_is_isolated_from_governed_projects(
         self,

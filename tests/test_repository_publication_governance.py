@@ -265,6 +265,35 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             PUBLICATION_TEXT,
         )
 
+    def test_public_visibility_does_not_expand_into_release_infrastructure(
+        self,
+    ) -> None:
+        section = PUBLICATION_TEXT.split(
+            "“公开仓库”“改成 public”或“让别人能看到”",
+            1,
+        )[1].split(
+            "如果普通项目的推送请求承接同一对话",
+            1,
+        )[0]
+        for fragment in (
+            "只授权把已经准确确认的目标远端改变为公开可见",
+            "不会把本地产品升级成发布候选",
+            "不自动授权推送尚未发布的工作区内容",
+            "先报告并分别取得处置权限",
+            "安装器或自动更新器",
+            "签名、打包与 Release 工作流",
+            "GitHub Pages",
+            "分支保护",
+            "Topics",
+            "Star History",
+            "README 重设计",
+            "CI 改造、部署或远端运行等待",
+            "准确结果单独加入本次合同",
+            "不能为了让“公开”显得完整而建设一整套发布基础设施",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_project_steward_self_evolution_publishes_the_whole_worktree(self) -> None:
         section = PUBLICATION_TEXT.split(
             "### Project Steward 自我进化使用整仓发布合同",
