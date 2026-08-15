@@ -76,6 +76,34 @@ class ProviderErrorAndLogSinkGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, LOG_TEXT)
 
+    def test_transport_success_does_not_replace_background_terminal_state(
+        self,
+    ) -> None:
+        human_log_route = SKILL_TEXT.split("## 人性化日志", 1)[1].split(
+            "## 用户环境档案与执行环境", 1
+        )[0]
+        for reference in (
+            "references/log-audit-standard.md",
+            "references/durable-operation-governance.md",
+            "references/task-progress-governance.md",
+        ):
+            with self.subTest(reference=reference):
+                self.assertIn(reference, human_log_route)
+
+        for fragment in (
+            "传输结果不代替业务终态",
+            "它不证明业务操作成功",
+            "接收事件只表达 `request_accepted`、`queued` 或明确拒绝",
+            "只有任务生命周期所有者提交的唯一终态",
+            "后台终态失败仍按 `ERROR`",
+            "高频成功轮询可以在访问日志生产端降级或抑制",
+            "轮询错误、状态版本变化、重试、恢复和任务终态必须保留",
+            "代码已验证，当前用户实例待重启验证",
+            "不能宣称控制台已经修好",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LOG_TEXT)
+
     def test_diagnostic_evidence_projects_fields_and_redacts_credentials_before_output(
         self,
     ) -> None:

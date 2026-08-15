@@ -164,7 +164,7 @@ README 不作为每项内部治理规则的第二份活动真源；自我进化�
 
 ## 人性化日志
 
-读取 `references/log-audit-standard.md`。沿一次真实操作检查生产、上下文、存储、读取和最终查看结果；不以一条漂亮示例替代完整事件链。
+读取 `references/log-audit-standard.md`。涉及访问日志、状态轮询、任务接收或后台终态时，再读取 `references/durable-operation-governance.md` 和 `references/task-progress-governance.md`。沿一次真实操作检查生产、上下文、存储、读取和最终查看结果；不以一条漂亮示例替代完整事件链。
 
 ## 用户环境档案与执行环境
 
