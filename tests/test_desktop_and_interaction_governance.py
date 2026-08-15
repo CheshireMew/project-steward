@@ -720,6 +720,33 @@ class DesktopAndInteractionGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
 
+    def test_sensory_assets_separate_runtime_wiring_from_quality_acceptance(
+        self,
+    ) -> None:
+        for fragment in (
+            "感知素材的运行状态与验收边界",
+            "参考输入、功能占位、检查投影、正式候选或已验收运行时素材",
+            "功能接通与感知质量分别收口",
+            "只记录为缓解措施",
+            "低干扰默认值、独立调节或关闭入口",
+            "视觉与听觉生产仍由相应专业能力负责",
+            "接受状态：参考输入 / 功能占位 / 检查投影 / 正式候选 / 已验收运行时素材",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PRODUCT_EXPERIENCE_TEXT)
+
+        for fragment in (
+            "分别核对功能链与感知质量",
+            "程序音效能够发声、音量数值已经降低",
+            "链路已接通、质量未验收",
+            "缓解措施只验证它降低了当前影响",
+            "本验收层不通过局部补丁替它作出审美决定",
+            "感知素材状态：参考输入、功能占位、检查投影、正式候选与已验收运行时素材",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, IMPLEMENTATION_TEXT)
+
+
     def test_transparent_media_noise_is_governed_across_the_derivative_chain(
         self,
     ) -> None:
