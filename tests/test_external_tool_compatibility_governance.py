@@ -106,6 +106,19 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
 
+    def test_install_success_is_distinct_from_capability_readiness(self) -> None:
+        for fragment in (
+            "取得制品、已安装、能力就绪和连续用户链完成分开记录",
+            "包管理器退出码为零",
+            "代表性最小输入的真实功能冒烟",
+            "安装器、设置页、能力检查器和正常运行时必须消费同一个正式路径解析器",
+            "上游包元数据、示例环境或锁文件",
+            "只有功能冒烟通过后",
+            "不能替连续用户链背书",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, COMPATIBILITY_TEXT)
+
     def test_adapter_contract_owns_protocol_credentials_and_results(self) -> None:
         for fragment in (
             "每个适配器由一份正式配置或类型化描述拥有",

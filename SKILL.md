@@ -116,7 +116,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 
 ## 项目研究与讲解
 
-先读取 `references/project-research.md`。只读取回答当前问题所需的项目表面；用户明确要求完整研究或能力采用时才扩展覆盖，并同时读取 `references/source-fork-and-ecosystem-adoption.md`，先追溯原始上游并区分直接复用与方法学习；确认会直接复用代码或资源时再读取 `references/license-governance.md`，把第三方资源与致谢写入目标项目 README。完整研究产生的能力台账在后续“开始吧”或实施请求中按稳定身份与接受状态继续消费，并交给改动前预防，不能把独立发现扩成实施范围。需要衡量效果、失败样本和置信度时读取 `references/project-effectiveness-review.md`；需要保存可复核报告时读取 `references/project-research-report.md`。源码归档先用 `scripts/extract_project_archive.ps1` 和 -DestinationRoot <目标根> 解压到独立目录；没有另行指定目标根时使用 E:\Work\BaiduSyncdisk\Code\Example。脚本返回项目根后立即读取 `references/archive-safety-screening.md` 并运行 `scripts/inspect_extracted_project_safety.py`；只有该方法确认重大隐患时才进入用户输出，否则静默继续原研究。
+先读取 `references/project-research.md`。只读取回答当前问题所需的项目表面；用户明确要求完整研究或能力采用时才扩展覆盖，并同时读取 `references/source-fork-and-ecosystem-adoption.md`，先追溯原始上游并区分直接复用与方法学习；确认会直接复用代码或资源时再读取 `references/license-governance.md`，把第三方资源与致谢写入目标项目 README。完整研究产生的能力台账在后续“开始吧”或实施请求中按稳定身份与接受状态继续消费，并交给改动前预防，不能把独立发现扩成实施范围。获准候选会把外部模型、运行时、包、CLI、SDK、daemon 或服务带入目标项目的正式安装或运行链时，实施和验收同时读取 `references/external-tool-compatibility.md`；准备安装或把工具、模型与运行时入口持久绑定到用户机器时再读取 `references/user-environment-governance.md`，只读采用建议不因此获得安装或配置权限。需要衡量效果、失败样本和置信度时读取 `references/project-effectiveness-review.md`；需要保存可复核报告时读取 `references/project-research-report.md`。源码归档先用 `scripts/extract_project_archive.ps1` 和 -DestinationRoot <目标根> 解压到独立目录；没有另行指定目标根时使用 E:\Work\BaiduSyncdisk\Code\Example。脚本返回项目根后立即读取 `references/archive-safety-screening.md` 并运行 `scripts/inspect_extracted_project_safety.py`；只有该方法确认重大隐患时才进入用户输出，否则静默继续原研究。
 
 ## 项目目录治理
 

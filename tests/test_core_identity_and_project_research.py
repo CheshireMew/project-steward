@@ -296,6 +296,36 @@ class CoreIdentityTests(unittest.TestCase):
             with self.subTest(handoff_fragment=fragment):
                 self.assertIn(fragment, absorption)
 
+    def test_adoption_subtracts_owned_capabilities_and_prices_operating_burden(
+        self,
+    ) -> None:
+        research_route = SKILL_TEXT.split(
+            "## 项目研究与讲解",
+            1,
+        )[1].split("## 项目基线与模板", 1)[0]
+        for fragment in (
+            "外部模型、运行时、包、CLI、SDK、daemon 或服务",
+            "references/external-tool-compatibility.md",
+            "references/user-environment-governance.md",
+            "只读采用建议不因此获得安装或配置权限",
+        ):
+            with self.subTest(route_fragment=fragment):
+                self.assertIn(fragment, research_route)
+
+        for fragment in (
+            "默认输入条件、必须支持的条件输入和明确排除的输入",
+            "目标结果链中每一阶段的现有所有者",
+            "唯一仍缺少的能力",
+            "候选比较先做能力减法",
+            "账号、协议确认、凭据、联网要求、下载与模型体积、运行时与隐含依赖、平台、许可证、首次使用和升级责任",
+            "候选更完整、更准确或基准更强，不能自动成为默认路径",
+            "条件后端",
+            "这是最终职责边界，不是把结果降级成临时的最小落地方案",
+            "采用位置：默认路径 / 条件后端 / 局部吸收 / 拒绝",
+        ):
+            with self.subTest(research_fragment=fragment):
+                self.assertIn(fragment, PROJECT_RESEARCH_TEXT)
+
     def test_self_evolution_is_explicit_and_project_paths_stop_at_result(
         self,
     ) -> None:
