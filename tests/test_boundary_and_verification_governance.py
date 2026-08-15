@@ -338,6 +338,24 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
         self.assertIn("用户入口实际选择", PREVENTION_TEXT)
         self.assertIn("用户入口实际选择", REMEDIATION_TEXT)
 
+    def test_desktop_remote_configuration_failures_require_the_affected_machine_chain(
+        self,
+    ) -> None:
+        for fragment in (
+            "桌面客户端远程配置获取失败",
+            "发生失败的那台机器",
+            "精确配置端点实际返回的是可消费配置",
+            "当前运行的客户端二进制、版本、代理模式、回环端口和内核进程",
+            "源机浏览器、另一个设备的 `curl` 或只访问同域首页的成功",
+            "不把完整 URL、响应正文或令牌带入日志、命令输出和对话",
+            "监听地址、监听进程身份和目标客户端实际连接的端口",
+            "不能把“端口冲突”写成已确认根因",
+            "源机文件哈希只证明快照内容",
+            "目标机从实际启动入口确认程序加载了预期配置",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
     def test_worker_results_streams_and_runtime_bundles_have_exact_boundaries(
         self,
     ) -> None:
