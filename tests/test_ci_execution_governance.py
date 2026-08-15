@@ -27,6 +27,55 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         self.assertIn(route, remediation)
         self.assertIn("普通单个 CI 报错仍按当前开发任务处理", CI_TEXT)
 
+    def test_local_validation_consumes_one_completed_remote_failure_without_polling(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "### 本地测试前只消费已经完成的远端失败",
+            1,
+        )[1].split("计划的机器可读输出", 1)[0]
+        for fragment in (
+            "启动第一条本地测试前",
+            "至多一次读取",
+            "最近一项已经完成的失败运行",
+            "不在每个 spec、分片或内部轮次前重新访问远端",
+            "产品、测试驱动或夹具、基础设施或外部环境、最终断言",
+            "排队、运行、取消和跳过状态不进入本地完成门槛",
+            "远端查询本身变成测试前置阻塞",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_current_host_and_development_stage_limit_expensive_checks(self) -> None:
+        section = CI_TEXT.split(
+            "### 本地测试前只消费已经完成的远端失败",
+            1,
+        )[1].split("计划的机器可读输出", 1)[0]
+        for fragment in (
+            "默认只验证当前机器和当前操作系统",
+            "只有用户明确要求另一平台",
+            "不轮询、不等待",
+            "完整覆盖率、完整端到端矩阵、性能与视觉矩阵、打包、签名和发布检查",
+            "用户明确要求、代码冻结、发布候选",
+            "超过十五分钟按长验证处理并取得用户确认",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_ordinary_implementation_stops_after_push(self) -> None:
+        section = CI_TEXT.split("## 9. 完成与停止", 1)[1]
+        for fragment in (
+            "当前机器的必需目标检查通过",
+            "非强制推送完成时停止",
+            "不主动取得 run 后持续轮询",
+            "它们尚未结束不会阻止本地实施结果交付",
+            "只有用户明确要求监控或完成 CI",
+            "提交和推送动作仍在触发远端运行后释放当前任务",
+            "异步运行且本任务没有等待的远端检查",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_one_validation_plan_drives_cost_ordered_execution(self) -> None:
         stage_text = CI_TEXT.split("## 2. 按成本和信息量排列阶段", 1)[1].split(
             "## 3. 缓存执行环境，不混入产品缓存",
@@ -120,7 +169,7 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             "本地唯一入口",
             "无资源边界的整库命令",
             "隔离目录、耗时和证据位置",
-            "明确报告为待 CI 证明",
+            "明确报告为异步或待证明",
             "本地完整通过不能被写成这些边界已经通过",
         ):
             with self.subTest(fragment=fragment):

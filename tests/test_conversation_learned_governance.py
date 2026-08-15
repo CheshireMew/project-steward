@@ -259,6 +259,22 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(route_fragment=fragment):
                 self.assertIn(fragment, audit_route)
 
+    def test_active_development_audit_does_not_run_release_candidate_gates(
+        self,
+    ) -> None:
+        for fragment in (
+            "项目阶段：活跃开发 / 集成冻结 / 发布候选 / 已发布维护",
+            "活跃开发中的全面审查",
+            "当前机器上已经形成稳定用户结果的功能片段",
+            "全量覆盖率、完整端到端与视觉或性能矩阵、打包、签名、发布、远端 CI 和非本机平台",
+            "不为证明“审查全面”提前运行",
+            "不能把整份审计账本自动变成实施范围",
+            "默认只在当前机器实际运行验证",
+            "不会自动启动跨平台矩阵",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_AUDIT_TEXT)
+
 
     def test_comprehensive_ui_audit_uses_surface_and_journey_inventories(
         self,

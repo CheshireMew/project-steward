@@ -21,7 +21,8 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
             "整个工作区按实际影响验证",
             "使用 `git add -A`",
             "已跟踪修改、未跟踪文件和现有删除",
-            "核对远端 HEAD 和工作区无遗漏后才完成",
+            "推送成功后停止",
+            "不等待远端检查",
             "任何一项不能共同发布时保留完整工作区",
             "不退回选择性提交",
         ):
@@ -30,12 +31,12 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
 
         self.assertIn("只改本地", SKILL_TEXT)
 
-    def test_star_history_stops_only_after_the_remote_consumer_works(self) -> None:
+    def test_star_history_dispatches_and_stops_without_waiting(self) -> None:
         for fragment in (
             "references/github-star-history.md",
             "references/repository-publication.md",
             "精确提交并推送调用仓库改动",
-            "手动运行工作流",
+            "手动派发工作流后立即停止",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, SKILL_TEXT)
@@ -43,10 +44,10 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
         for fragment in (
             "## 默认完成事务",
             "gh workflow run star-history.yml",
-            "等待该次运行结束",
-            "star-history` 分支、两个 SVG",
-            "两个 raw 地址和 GitHub README",
-            "只有上述远端链路全部成立才报告接入完成",
+            "不运行 `gh run watch`",
+            "派发成功后立即停止",
+            "用户后来明确要求远端验收",
+            "异步未验证",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, STAR_TEXT)
@@ -54,6 +55,8 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
     def test_default_publication_keeps_existing_scope_guards(self) -> None:
         for fragment in (
             "不在本地验证后再次请求同一发布授权",
+            "推送成功就是普通实施任务的停止位置",
+            "不随之获得等待或监控授权",
             "获准依赖闭包",
             "创建远端",
             "改变可见性",
@@ -63,7 +66,7 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
-    def test_explicit_project_steward_implementation_finishes_at_remote_by_default(
+    def test_explicit_project_steward_implementation_stops_after_push_by_default(
         self,
     ) -> None:
         for fragment in (
@@ -71,8 +74,10 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
             "明确点名 Project Steward（包括调用 `$project-steward`）",
             "明确要求对现有 Git 项目实施修改、修复、治理、更新或优化",
             "当前分支存在已配置 upstream",
-            "精确提交、非强制推送当前跟踪分支",
-            "本地验证后不再第二次询问是否推送",
+            "精确提交并非强制推送当前跟踪分支",
+            "推送成功立即停止",
+            "不轮询 GitHub Actions",
+            "提交或推送不自动授权等待 GitHub Actions",
             "只读请求、隐式路由、无 upstream",
             "references/repository-publication.md",
         ):
@@ -80,13 +85,15 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
                 self.assertIn(fragment, SKILL_TEXT)
 
         section = PUBLICATION_TEXT.split(
-            "### 明确点名 Project Steward 的实施默认完成到远端",
+            "### 明确点名 Project Steward 的实施默认推送即停止",
             1,
         )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
         for fragment in (
-            "修改、验证、精确提交、向当前跟踪分支非强制推送和远端验收",
+            "修改、验证、精确提交和向当前跟踪分支非强制推送",
             "只读请求或隐式路由仍保持只读",
             "本地验证后不再询问是否推送",
+            "推送命令成功后立即停止",
+            "不重新获取 Actions run",
             "普通项目仍只发布获准依赖闭包",
             "不纳入无关工作树变化",
             "不创建远端、不改变可见性、不实施删除、不强制推送、不改写历史、不打包、不部署",
@@ -111,20 +118,24 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
             "保留完整工作区并停止",
             "使用 `git add -A`",
             "创建为一个新提交",
-            "远端 HEAD 与本地 HEAD 相同",
+            "推送前核对工作区没有遗漏",
+            "推送命令成功后立即停止",
+            "不再执行状态回读",
+            "不等待 GitHub Actions",
             "工作区没有遗漏",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
-    def test_public_install_entry_finishes_at_the_remote_consumer(self) -> None:
+    def test_public_install_entry_stops_after_push(self) -> None:
         for fragment in (
             "自动同步公开安装入口",
             "公开入口不存在、尚未发布或检查失败时不写占位命令",
             "安装段落、项目清单与发布配置进入同一次获准发布闭包",
-            "推送后回读远端提交中的全部活动语言 README",
+            "推送成功后停止",
             "正式安装消费者",
-            "安装入口仍未完成",
+            "远端消费仍是异步状态",
+            "用户另行明确要求远端验收",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)

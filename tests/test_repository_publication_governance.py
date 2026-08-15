@@ -30,7 +30,7 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "才创建首次提交",
             "才创建空远端",
             "首次推送必须另有授权",
-            "核对实时远端 HEAD",
+            "推送命令成功后记录提交身份并停止",
         )
         initialization = PUBLICATION_TEXT.split(
             "## 4. 初始化 GitHub 仓库", 1
@@ -175,8 +175,10 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "不重复追加",
             "标明 shell 的代码块",
             "同一次获准发布闭包",
-            "推送后回读远端提交中的全部活动语言 README",
-            "不能只因 README 已经出现命令就报告发布可用",
+            "在推送成功后停止",
+            "不等待 GitHub 页面、Actions 或远端安装消费者刷新",
+            "用户另行明确要求远端验收时",
+            "不能反向重跑无关本地检查",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
@@ -198,12 +200,27 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
     ) -> None:
         for fragment in (
             "required checks",
-            "部署任务或其它远端验证已经结束",
+            "推送或派发 required checks、GitHub Actions、部署任务后立即停止",
+            "只有用户明确要求远端验收时",
             "读取状态、日志和失败产物属于只读发布验证",
             "用户另行授权时才执行",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
+
+    def test_self_evolution_stops_at_the_successful_push(self) -> None:
+        section = PUBLICATION_TEXT.split(
+            "### Project Steward 自我进化使用整仓发布合同",
+            1,
+        )[1].split("### 本地提交与远端状态分层交付", 1)[0]
+        for fragment in (
+            "推送前核对工作区没有遗漏",
+            "推送命令成功后立即停止",
+            "不再执行状态回读",
+            "不等待 GitHub Actions 或其它远端消费者",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
 
     def test_commit_or_push_does_not_override_project_deletion_rules(
         self,
@@ -227,20 +244,20 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
-    def test_explicit_project_steward_implementation_defaults_to_remote_completion(
+    def test_explicit_project_steward_implementation_defaults_to_push_and_stop(
         self,
     ) -> None:
         section = PUBLICATION_TEXT.split(
-            "### 明确点名 Project Steward 的实施默认完成到远端",
+            "### 明确点名 Project Steward 的实施默认推送即停止",
             1,
         )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
         ordered = (
-            "实施改动并沿真实消费者验证",
+            "实施改动并沿当前机器的真实消费者验证",
             "求出普通项目的获准依赖闭包",
-            "核对最终候选与远端新鲜状态",
+            "核对最终候选与推送前远端新鲜状态",
             "精确暂存并创建提交",
             "向当前跟踪分支执行非强制推送",
-            "最后重新获取远端并完成远端验收",
+            "推送命令成功后立即停止",
         )
         positions = [section.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
@@ -253,8 +270,9 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "不要推送",
             "只提交不推送",
             "本地验证后不再询问是否推送",
-            "远端 HEAD 与本地提交一致",
-            "本轮关键 blob 已进入远端",
+            "不重新获取 Actions run",
+            "不轮询 required checks",
+            "用户另行明确要求远端验收",
             "当前分支含不属于本次结果的既有未推送提交",
             "未获授权的删除",
             "不能为了自动推送扩大范围",
@@ -279,7 +297,8 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "使用 `git add -A`",
             "创建为一个新提交",
             "只向当前跟踪分支执行非强制推送",
-            "远端 HEAD 与本地 HEAD 相同",
+            "推送前核对工作区没有遗漏",
+            "推送命令成功后立即停止",
         )
         positions = [section.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
@@ -289,6 +308,7 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "保留完整工作区并停止",
             "不能遗漏该项、退回最小依赖闭包",
             "工作区没有未暂存或新出现的遗漏",
+            "不再执行状态回读",
             "不拆分工作区绕过阻塞",
         ):
             with self.subTest(fragment=fragment):
@@ -305,7 +325,7 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "相对上游的 ahead / behind：",
             "远端分支与 HEAD 的实际核对：",
             "尚未执行或尚未验证的推送、打包、部署与远端检查：",
-            "不能先笼统宣称“都做完了”",
+            "不把未等待的远端结果写成已经验证",
             "用户只授权提交时明确说明远端没有变化",
         ):
             with self.subTest(fragment=fragment):
@@ -413,7 +433,8 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             "远端发生变化，立即中止",
             "推送后必须重新获取远端",
             "禁止路径或应归档内容未进入新树",
-            "当前用户结果依赖的远端检查已经完成",
+            "不包含等待 GitHub Actions",
+            "标为异步且未验证并停止",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
