@@ -181,7 +181,7 @@ class CoreIdentityTests(unittest.TestCase):
             "文档、许可证、致谢和纯仓库元数据变化只选择相应维护入口",
             "公共合同、核心运行时、跨平台能力、跨仓库边界和发布承诺",
             "完整覆盖率、完整端到端矩阵、性能与视觉矩阵、打包、签名和发布检查",
-            "超过十五分钟按长验证处理并取得用户确认",
+            "累计预计超过十五分钟就作为长验证",
         ):
             with self.subTest(method_fragment=fragment):
                 self.assertIn(fragment, CI_EXECUTION_TEXT)

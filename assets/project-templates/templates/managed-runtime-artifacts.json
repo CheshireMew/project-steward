@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "id": "managed-runtime-artifacts",
+  "version": "1.0.0",
+  "layer": "capability",
+  "name": "Managed runtime artifacts",
+  "description": "Preflight, ownership, reuse, budget, and finalization contracts for storage-intensive production projects.",
+  "requires": [
+    "base"
+  ],
+  "detection": {
+    "explicit_only": true
+  },
+  "defaults": {
+    "decisions": {
+      "runtime_artifact_roots": "project-or-environment-owned",
+      "runtime_artifact_preflight": "required-and-blocking",
+      "runtime_artifact_reuse": "content-addressed-where-repeatable",
+      "runtime_artifact_finalization": "owned-inventory-required",
+      "runtime_artifact_cleanup": "report-until-authorized"
+    }
+  },
+  "invariants": [
+    {
+      "id": "runtime-artifact-preflight-before-write",
+      "title": "Budget before the first large write",
+      "statement": "Every storage-intensive producer resolves one owned root, estimates peak bytes, checks managed capacity and free-space headroom, and blocks before creating a large artifact when any input is unknown.",
+      "preflight": [
+        "Name the producer, root source, artifact classes, estimate, capacity source, and interruption outcome.",
+        "Run the project storage review before executing the producer."
+      ],
+      "evidence": [
+        "An over-budget run creates no large file.",
+        "A configured root never causes a sibling drive-root or repository-neighbor scratch directory."
+      ]
+    },
+    {
+      "id": "runtime-artifact-owned-finalization",
+      "title": "Every retained byte has an owner and terminal state",
+      "statement": "Successful, failed, and interrupted runs publish an owned inventory that separates truth, deliverables, caches, temporary files, evidence, and cleanup candidates.",
+      "preflight": [
+        "Define the manifest owner and terminal states before production.",
+        "Define whether cleanup is report-only or explicitly authorized."
+      ],
+      "evidence": [
+        "The final inventory matches the real filesystem delta.",
+        "Unknown, active, and unowned paths never enter cleanup candidates."
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "runtime-artifact-contract-present",
+      "type": "path_exists",
+      "path": ".project-steward/storage-contract.json",
+      "severity": "error",
+      "message": "Storage-intensive projects must own a reviewed storage contract."
+    },
+    {
+      "id": "runtime-artifact-preflight-decision",
+      "type": "profile_value",
+      "path": "decisions.runtime_artifact_preflight",
+      "allowed": [
+        "required-and-blocking"
+      ],
+      "severity": "error",
+      "message": "Large writes must be blocked until deterministic storage preflight passes."
+    },
+    {
+      "id": "runtime-artifact-cleanup-decision",
+      "type": "profile_value",
+      "path": "decisions.runtime_artifact_cleanup",
+      "allowed": [
+        "report-until-authorized"
+      ],
+      "severity": "error",
+      "message": "Cleanup remains report-only until exact targets are authorized."
+    }
+  ],
+  "manual_verification": [
+    {
+      "id": "runtime-artifact-real-producer-chain",
+      "title": "Real producer storage chain",
+      "steps": [
+        "Run the real producer once from its public entry and inspect the owned filesystem inventory.",
+        "Run the same content identity again and prove the large reusable object was not duplicated.",
+        "Run with an intentionally insufficient budget and prove rejection occurs before the first large file."
+      ]
+    },
+    {
+      "id": "runtime-artifact-interruption-chain",
+      "title": "Interrupted producer ownership",
+      "steps": [
+        "Interrupt a controlled production run after its manifest exists.",
+        "Prove the owner is no longer active and the remaining objects are reported without automatic deletion."
+      ]
+    }
+  ]
+}

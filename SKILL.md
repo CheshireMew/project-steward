@@ -26,6 +26,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 13. 选择、应用或批量治理许可证与第三方授权：许可证治理。
 14. 建立或消费用户环境档案，检查工具、缓存、SDK、终端或长任务：用户环境档案与执行环境。
 15. 按实施计划逐项核对完成度，或全面检查、判断项目健康状况和排列项目级风险：项目综合审计。
+16. 生产项目会持续写入大型媒体、缓存、测试证据、下载或中间产物，需要在写入前冻结预算并把防线落进真实生产者：生产存储预防与审查。
 
 只点名本 Skill 时按现有材料选择最匹配路径；材料不足时给出一个贴近上下文的直接请求示例并停下。
 
@@ -78,6 +79,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 高成本结果需要分阶段展示、确认、连续自动执行或按上游变化失效：`references/staged-result-governance.md`
 - 同一结果由多份规格、计划、任务或研究产物表达且需决定演化关系，或涉及派生产物、语义缓存、工作单元切分、候选资格、配额、补位、资源池利用或重复 Agent 编排：`references/derived-artifact-governance.md`
 - 项目级 CI 的验证计划、执行环境缓存、测试资源分层、耗时分片、早失败和精准重跑：`references/ci-execution-governance.md`
+- 大型媒体、缓存、测试证据、下载、模型或中间产物会持续写盘，或用户要求把预防能力写进生产项目：`references/production-storage-governance.md`
 - 运行中配置会重建共享服务、provider、存储根或组合图：`references/runtime-generation-governance.md`
 - 难复现、时序、并发、背压或昂贵完整链：`references/hard-to-reproduce-diagnostics.md`
 - 外部、持久化、模型、网络或进程 JSON 存在多处解析、容量、原子分片、重放游标或合同歧义：`references/structured-data-boundary.md`
@@ -104,6 +106,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
 - 可视层级、变换或动效所有权：`references/interaction-motion.md` 和 `references/interaction-navigation-and-media-lifecycle.md`；需要实际运行画面验收时再读 `references/implementation-review.md` 与 `references/implementation-review-visual-evidence.md`
 - 工具、路径别名、执行环境或长任务：`references/user-environment-governance.md`
+- 大型媒体、缓存、测试证据、下载、模型或中间产物造成容量增长、跨根散落或无主残留：`references/production-storage-governance.md`
 - 事件、版本、历史或缓存把计划影响范围误当成实际变更事实：`references/change-prevention.md` 的“计划范围与实际变更事实分离”合同
 - 局部状态、心跳或遥测更新覆盖、清空了未声明字段，或者消费者无法区分完整快照与局部补丁：`references/change-prevention.md` 的活动投影更新合同
 - 源码、README、脚本、测试或配置硬编码本机与部署事实：`references/change-prevention.md` 的项目运行配置边界；用户机器事实同时读取 `references/user-environment-governance.md`

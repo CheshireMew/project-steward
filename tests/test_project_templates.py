@@ -670,7 +670,7 @@ class ProjectTemplateTests(unittest.TestCase):
                 encoding="utf-8",
             )
             digest = hashlib.sha256(base_path.read_bytes()).hexdigest()
-            catalog["catalog_version"] = "2.3.0"
+            catalog["catalog_version"] = "2.4.0"
             catalog["templates"]["base"]["version"] = "1.2.0"
             catalog["templates"]["base"]["sha256"] = digest
             copied_catalog.write_text(
@@ -719,7 +719,7 @@ class ProjectTemplateTests(unittest.TestCase):
                     encoding="utf-8"
                 )
             )
-            self.assertEqual("2.3.0", profile["catalog_version"])
+            self.assertEqual("2.4.0", profile["catalog_version"])
             self.assertEqual("1.2.0", profile["templates"][0]["version"])
             self.assertEqual(
                 "evidence-classified",
