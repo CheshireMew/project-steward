@@ -456,6 +456,19 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
         self.assertIn("修复后再回到本方法全新复查", PROJECT_AUDIT_TEXT)
         self.assertIn("新增写入能力先建立副作用激活图", PREVENTION_TEXT)
 
+    def test_persisted_pass_claims_are_revalidated_after_semantic_change(
+        self,
+    ) -> None:
+        for fragment in (
+            "持久化的“已通过”“安全”“兼容”或“完成”状态属于派生结论",
+            "生产者语义版本、输入身份和当前消费者",
+            "当前正式验证器重新消费代表性历史产物",
+            "运行时读取的是同一份当前规范化或有效结果",
+            "状态保持未验证",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_AUDIT_TEXT)
+
     def test_comprehensive_audit_emits_a_remediation_handoff_ledger(self) -> None:
         ordered = (
             "综合审计必须交付修复交接账本",
@@ -712,6 +725,20 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
+
+    def test_canvas_sampling_and_playback_have_separate_visual_evidence(
+        self,
+    ) -> None:
+        for fragment in (
+            "不能用任意固定像素证明内容存在",
+            "产品合同明确保证该坐标始终由目标内容占据",
+            "支撑区域或完整画布",
+            "同一条受所有者控制的渲染与捕获边界",
+            "透明或背景、内容存在、姿态或状态差异和自主连续播放",
+            "不能代替运行时生命周期与连续播放证据",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
 
     def test_high_cardinality_ui_limits_consumer_fanout_and_stale_writes(

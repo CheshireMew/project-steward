@@ -382,6 +382,21 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, validator)
 
+    def test_test_hook_lifecycle_state_is_classified_before_later_assertions(
+        self,
+    ) -> None:
+        validator = DIAGNOSTIC_TEXT.split("### 验证器与测试驱动干扰", 1)[1]
+        for fragment in (
+            "暂停、定位、替代时钟、视口、缓存、选择",
+            "作用域、退出条件和后续哪些断言会消费它",
+            "能够由公开产品动作到达且属于产品合同",
+            "通过公开动作完成最终验证",
+            "正式复位或换用新鲜上下文",
+            "后续产品结果保持未知",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, validator)
+
     def test_reference_is_cross_project_and_remains_a_leaf_method(self) -> None:
         self.assertNotIn("references/", DIAGNOSTIC_TEXT)
         self.assertNotRegex(DIAGNOSTIC_TEXT, r"[A-Za-z]:\\")
