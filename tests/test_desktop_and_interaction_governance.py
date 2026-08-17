@@ -237,11 +237,29 @@ class DesktopAndInteractionGovernanceTests(unittest.TestCase):
             "统一标为 `content-only`",
             "不能证明 `integrated` 或 `native-explicit`",
             "真实 Windows 整窗证据",
+            "准确原生窗口身份",
+            "应用标题栏与全部窗口按钮完整",
+            "hard-to-reproduce-diagnostics.md",
+            "正式复位或使用新鲜上下文",
+            "外框与内容区差值只证明存在非客户区",
+            "不自动等于系统标题栏",
+            "不可见调整边缘",
+            "按各边内缩和窗口状态解释",
+            "不能要求差值恒为零",
+            "像素阈值固化成通用合同",
+            "未解释的顶部带状区域",
             "不修改产品来迁就测试驱动",
             "两层分别建立证据",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
+
+        shell_evidence = DESKTOP_TEXT.split(
+            "## 2. 窗口呈现状态与系统保留区",
+            1,
+        )[1].split("### 半透明、模糊与系统背景材质", 1)[0]
+        self.assertNotRegex(shell_evidence, r"\b(?:14|16)\s*(?:px|像素)")
+        self.assertIn("正式复位或换用新鲜上下文", HARD_DIAGNOSTIC_TEXT)
 
 
     def test_native_runtime_supply_and_process_isolation_are_governed(
