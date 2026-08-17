@@ -232,6 +232,11 @@ class DesktopAndInteractionGovernanceTests(unittest.TestCase):
             "窗口管理器、系统标题栏、最大化与最小化",
             "DPI 与多显示器迁移、系统背景材质或 Windows 合成器行为",
             "真实 Windows 桌面会话和实际窗口",
+            "稳定身份、创建点、框架配置与默认值",
+            "Playwright `page.screenshot()` 和 `webContents.capturePage()`",
+            "统一标为 `content-only`",
+            "不能证明 `integrated` 或 `native-explicit`",
+            "真实 Windows 整窗证据",
             "不修改产品来迁就测试驱动",
             "两层分别建立证据",
         ):
