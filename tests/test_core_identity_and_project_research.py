@@ -361,6 +361,33 @@ class CoreIdentityTests(unittest.TestCase):
             with self.subTest(research_fragment=fragment):
                 self.assertIn(fragment, PROJECT_RESEARCH_TEXT)
 
+    def test_agent_first_comparison_selects_a_complete_machine_workflow(
+        self,
+    ) -> None:
+        comparison = PROJECT_RESEARCH_TEXT.split(
+            "#### 主要操作者是 Agent",
+            1,
+        )[1].split("### 完整能力吸收研究", 1)[0]
+        for fragment in (
+            "不能把来源产品的菜单、面板和手工工具数量直接改写成目标能力清单",
+            "模型或 Agent 需要作出的判断",
+            "确定性程序必须执行的变更",
+            "仍需人工承担的视觉或专业验收",
+            "inspect、plan 或 dry-run、apply、verify",
+            "稳定对象身份、输入输出 schema、错误与 blocking",
+            "事务、版本、撤销、恢复和并发保护",
+            "接受或拒绝及其正式记录",
+            "不表示只做一条能跑的最短路径",
+            "没有这些边界时，不能把“界面功能已经存在”算作 Agent 已具备该能力",
+            "不能因为 Agent 是主要操作者就移除最终画面预览、人工校准或正式视觉验收",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, comparison)
+
+        self.assertNotIn("PuppetLoom", comparison)
+        self.assertNotIn("Live2D", comparison)
+        self.assertNotIn(".moc3", comparison)
+
     def test_self_evolution_is_explicit_and_project_paths_stop_at_result(
         self,
     ) -> None:

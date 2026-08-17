@@ -25,6 +25,8 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             "inspect external-tool compatibility",
             SKILL_TEXT,
         )
+        route = SKILL_TEXT.split("## 外部工具兼容性", 1)[1].split("##", 1)[0]
+        self.assertIn("官方文件格式、作者工具或导出链兼容", route)
         self.assertNotIn("references/", COMPATIBILITY_TEXT)
 
     def test_cross_root_compound_packages_load_shared_contract_governance(
@@ -118,6 +120,45 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
+
+    def test_official_format_chain_preserves_producers_and_proof_layers(
+        self,
+    ) -> None:
+        format_chain = COMPATIBILITY_TEXT.split(
+            "### 官方格式与作者工具链分别定责",
+            1,
+        )[1].split("## 2. 为每个适配器建立分层证据表", 1)[0]
+        for fragment in (
+            "可编辑作者模型",
+            "公开清单与侧车",
+            "专有编译产物",
+            "权威生产者",
+            "不能用占位文件、文件头、手写二进制或反向猜测冒充官方产物",
+            "机器可读 API 或能力发现建立操作矩阵",
+            "inspect、read、create、update、merge、compile、preview 和 verify",
+            "版本、权限、编辑模式和对象类型",
+            "默认严格停止",
+            "任何事务写入前返回机器可读 blocking",
+            "明确接受，才允许部分同步",
+            "partial、blocking、warnings、已应用与未应用操作",
+            "同一事务取消或回滚",
+            "准确官方运行时或 Viewer",
+            "官方样例只能证明项目能够消费该样例所覆盖的格式版本",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, format_chain)
+
+        ordered_claims = (
+            "结构有效",
+            "官方产物成立",
+            "编辑语义完整",
+            "视觉或行为等价",
+        )
+        positions = [format_chain.index(claim) for claim in ordered_claims]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("上一层通过不能替下一层背书", format_chain)
+        self.assertNotIn(".moc3", format_chain)
+        self.assertNotIn("PuppetLoom", format_chain)
 
     def test_adapter_contract_owns_protocol_credentials_and_results(self) -> None:
         for fragment in (
