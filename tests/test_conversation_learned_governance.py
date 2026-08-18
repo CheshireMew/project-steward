@@ -134,6 +134,28 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         self.assertLess(abstraction, value)
         self.assertLess(value, attribution)
 
+    def test_baseline_correction_is_not_reported_as_scope_expansion(self) -> None:
+        section = LEARNING_TEXT.split(
+            "用户在原结果尚未完成时补充",
+            1,
+        )[1].split("警告、等待和超时必须恢复", 1)[0]
+        ordered = (
+            "基线纠正",
+            "同一结果增项",
+            "独立新结果",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "已经存在但先前误读的产品身份、环境事实、限制或目标",
+            "不是新增范围",
+            "相关返工归入假设或基线调查不足",
+            "不得把基线纠正造成的返工归因于用户扩项",
+            "不得把独立结果藏进原结果的实现时间",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_learning_compares_applicability_and_consumer_scope(self) -> None:
         for fragment in (
             "修改前适用请求、入口和消费者",

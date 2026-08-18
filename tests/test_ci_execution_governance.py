@@ -136,6 +136,30 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_surprising_external_resources_are_explained_before_launch(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "候选检查会启动外部 CLI",
+            1,
+        )[1].split("修改测试执行器、共享配置", 1)[0]
+        ordered = (
+            "在启动前向用户说明",
+            "本轮变化事实",
+            "取得运行资格的具体测试身份",
+            "资源类型和预计耗时",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "只说明风险控制",
+            "不能代替为什么该检查直接覆盖本轮改动",
+            "已经启动后再解释警告也不能追认运行资格",
+            "无法在启动前完成这份映射就不运行",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_test_control_plane_change_uses_representative_nodes_first(
         self,
     ) -> None:
