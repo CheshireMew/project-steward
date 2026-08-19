@@ -341,6 +341,27 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_fault_injection_substitutes_reach_the_intended_failure_stage(
+        self,
+    ) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 可选能力按独立支持面拆分公共合同",
+            1,
+        )[1].split("验收至少包含一个完整能力实现", 1)[0]
+        for fragment in (
+            "故障注入替身必须先按最终合同完成参数、协作者和对象身份绑定",
+            "已经到达原定故障注入阶段",
+            "旧签名、缺失参数、错误构造或替身初始化",
+            "只能判为验证器迁移失败",
+            "不能作为事务、回滚、恢复或失败语义的证据",
+            "拒绝真实无效输入，仍是产品合同失败",
+            "让目标边界按预定故障类别失败",
+            "由正式恢复消费者核对原状态、稳定身份和后置条件",
+            "不能把“测试重新变绿”替代这条失败链",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_new_architecture_contracts_have_one_reference_owner(self) -> None:
         reference_texts = {
             path.name: path.read_text(encoding="utf-8")
