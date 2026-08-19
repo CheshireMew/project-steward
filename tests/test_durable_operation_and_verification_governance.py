@@ -418,6 +418,27 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_TEXT)
 
+    def test_execution_topology_changes_reprove_shared_state_ownership(
+        self,
+    ) -> None:
+        ordered = (
+            "旧的“天然串行”结论立即失效",
+            "重新建立执行拓扑与共享状态矩阵",
+            "覆盖整个在途使用区间",
+            "用受控屏障让它们在共享边界前形成重叠",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "不能证明仲裁器自身的可变状态",
+            "操作身份、generation 和终态隔离继续负责关联结果，不能冒充执行互斥",
+            "共享服务或原生资源的最大在途进入数符合合同",
+            "把测试改成串行，不能证明执行拓扑已经安全",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
 
     def test_archive_preservation_is_byte_exact_and_inactive(self) -> None:
         for fragment in (

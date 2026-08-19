@@ -99,6 +99,21 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         self.assertIn("目录职责", SKILL_TEXT)
         self.assertIn("治理项目变更", OPENAI_TEXT)
 
+    def test_comprehensive_audit_fixes_enter_full_prevention_and_directory_routes(
+        self,
+    ) -> None:
+        audit_fix_route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        self.assertIn(
+            "写入前固定从 `references/change-prevention.md` 进入“改动前预防”完整主链",
+            audit_fix_route,
+        )
+        self.assertIn(
+            "涉及移动或归档时同时进入“项目目录治理”",
+            audit_fix_route,
+        )
+
     def test_method_preserves_evidence_and_permission_boundaries(self) -> None:
         required_contracts = (
             "被 Git 跟踪，所以当前一定使用",

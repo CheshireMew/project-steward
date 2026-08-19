@@ -33,6 +33,34 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         self.assertIn(route, remediation)
         self.assertIn("普通单个 CI 报错仍按当前开发任务处理", CI_TEXT)
 
+    def test_umbrella_commands_are_reconciled_with_validation_obligations(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "### 完整入口必须与验收义务对账",
+            1,
+        )[1].split("### 本地测试前只消费已经完成的远端失败", 1)[0]
+        ordered = (
+            "形成不依赖命令名称的验收义务集合",
+            "展开名为 `full`、`all`、“完整”或类似总入口的机器可读阶段与实际子命令",
+            "由总入口覆盖 / 必须单独运行 / 范围外",
+            "计算合并后的关键路径预算、阶段顺序及完整套件次数",
+            "不能在用户确认预算或完整运行结束后静默追加",
+            "从同一验收义务集合重新展开和对账",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "用户、项目规则、发布合同或公开验证器清单",
+            "真实用户链、性能、视觉、交接、目标平台或其它独立验证族",
+            "覆盖关系标为未知并停在计划阶段",
+            "总入口实际覆盖的义务和仍需单独运行的义务",
+            "旧的覆盖映射与预算确认随之失效",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_local_validation_consumes_one_completed_remote_failure_without_polling(
         self,
     ) -> None:

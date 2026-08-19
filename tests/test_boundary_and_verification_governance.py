@@ -694,6 +694,33 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
+    def test_boundary_spies_assert_canonical_semantic_identity(self) -> None:
+        for fragment in (
+            "测试替身位于本次核心边界之外",
+            "稳定语义身份和规范载荷",
+            "规范路径、对象 ID、合同版本、generation 或结构化字段",
+            "调用次数、参数数量、返回形状或“已经调用”不能证明生产者选择了正确对象",
+            "不能在测试里建立第二个实现",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+    def test_framework_public_names_cross_a_semantic_namespace_contract(
+        self,
+    ) -> None:
+        ordered = (
+            "公共名称会暴露给反射、元对象、数据绑定、序列化映射或代码生成框架",
+            "建立语义命名空间合同",
+            "继承和 final 成员",
+            "让正式应用或顶层消费者从新鲜进程装载这些公开名称",
+        )
+        positions = [PREVENTION_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn(
+            "普通局部变量和不会离开语言作用域的内部名称不触发这份合同",
+            PREVENTION_TEXT,
+        )
+
 
     def test_public_verifiers_must_execute_their_representative_path(
         self,
