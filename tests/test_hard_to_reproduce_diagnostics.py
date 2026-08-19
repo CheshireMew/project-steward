@@ -356,6 +356,30 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
         self.assertIn("一个进程已经消失不能替其它进程退出", DIAGNOSTIC_TEXT)
         self.assertIn("不启动争用同一资源的重复任务", DIAGNOSTIC_TEXT)
 
+    def test_external_process_recovery_is_classified_bounded_and_atomic(
+        self,
+    ) -> None:
+        external_process = DIAGNOSTIC_TEXT.split("### 环境与外部进程", 1)[
+            1
+        ].split("### 数据、缓存与版本沿袭", 1)[0]
+        for fragment in (
+            "实际可执行文件与版本、平台、失败阶段",
+            "结构化退出状态或操作系统崩溃证据",
+            "进程树是否终止",
+            "stdout 与 stderr 是否完整",
+            "全部副作用都能控制",
+            "占用资源已经释放",
+            "新鲜临时命名空间",
+            "固定最大次数内自动重试",
+            "取消、校验或 schema 错误、确定性坏输入、内容错误和未知失败不得自动重试",
+            "重试与标准回退属于同一张恢复图",
+            "一次失败只能沿一条已经声明的边继续",
+            "隔离而不是合并部分输出",
+            "正式消费者重新校验",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, external_process)
+
     def test_validator_drains_child_output_without_hiding_results(self) -> None:
         validator = DIAGNOSTIC_TEXT.split("### 验证器与测试驱动干扰", 1)[1]
         ordered = (

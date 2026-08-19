@@ -99,7 +99,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
 - 返工来自多份产物关系不明、理由在重新生成时丢失、全量重算、错误缓存失效、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
-- 项目级 CI 反复慢测、环境准备浪费、分片失衡、跨平台预检过晚或失败后无差别重跑：`references/ci-execution-governance.md`
+- 审计修复或项目级改动会使用完整套件，或触及验证控制面、CI 分类、资源、分片、成本与重试：`references/ci-execution-governance.md`
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
 - 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`

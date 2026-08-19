@@ -12,6 +12,9 @@ CI_TEXT = (
 SELF_EVOLUTION_TEXT = (
     SKILL_ROOT / "references" / "skill-self-evolution-governance.md"
 ).read_text(encoding="utf-8")
+AUDIT_RELEASE_TEXT = (
+    SKILL_ROOT / "references" / "project-audit-release-and-evidence.md"
+).read_text(encoding="utf-8")
 
 
 class CiExecutionGovernanceTests(unittest.TestCase):
@@ -114,6 +117,48 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             "不能反向让原本不适用的全量验证取得运行资格",
             section,
         )
+
+    def test_audit_remediation_hands_validation_control_to_ci_governance(
+        self,
+    ) -> None:
+        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性",
+            1,
+        )[0]
+        self.assertIn("审计修复或项目级改动会使用完整套件", remediation)
+
+        for fragment in (
+            "交给 `ci-execution-governance.md`",
+            "准确候选内容身份",
+            "必需验证族",
+            "冻结资格的权威来源",
+            "预计累计墙钟时间",
+            "已经消耗的完整套件次数",
+            "不授予运行资格",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, AUDIT_RELEASE_TEXT)
+
+    def test_candidate_changes_invalidate_active_runs_without_bypassing_gates(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "### 阶段资格、累计预算与全量验证上限",
+            1,
+        )[1].split("计划的机器可读输出", 1)[0]
+        for fragment in (
+            "绑定启动时的准确候选内容身份",
+            "从变化发生时起，该运行只能作为诊断证据",
+            "尚未开始的阶段立即停止",
+            "不得关闭当前候选",
+            "不能把变化前后的输出拼成同一次通过",
+            "只收口能够证明由旧运行拥有的进程与资源",
+            "建立新的运行身份",
+            "只证明该验证族适用于最终候选",
+            "不会绕过阶段资格、累计预算、候选冻结",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
 
     def test_test_command_scope_is_expanded_before_execution(self) -> None:
         section = CI_TEXT.split(
