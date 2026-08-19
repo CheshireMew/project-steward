@@ -12,12 +12,20 @@ DESKTOP_TEXT = (
 REMEDIATION_TEXT = (
     SKILL_ROOT / "references" / "root-cause-remediation.md"
 ).read_text(encoding="utf-8")
+CI_TEXT = (
+    SKILL_ROOT / "references" / "ci-execution-governance.md"
+).read_text(encoding="utf-8")
+USER_ENVIRONMENT_TEXT = (
+    SKILL_ROOT / "references" / "user-environment-governance.md"
+).read_text(encoding="utf-8")
 
 
 class ExecutionBoundaryGovernanceTests(unittest.TestCase):
     def test_rules_stay_in_reachable_unique_owners(self) -> None:
         self.assertIn("references/desktop-app-governance.md", SKILL_TEXT)
         self.assertIn("references/root-cause-remediation.md", SKILL_TEXT)
+        self.assertIn("references/ci-execution-governance.md", SKILL_TEXT)
+        self.assertIn("references/user-environment-governance.md", SKILL_TEXT)
 
         reference_texts = [
             path.read_text(encoding="utf-8")
@@ -26,6 +34,8 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         for fragment in (
             "线程池、executor 和框架全局工作池只是调度机制",
             "补丁和写入载荷必须来自完整真源",
+            "测试的正式启动身份还要包含实际 runner",
+            "终止前先区分进程存活与可枚举残留",
         ):
             with self.subTest(fragment=fragment):
                 self.assertEqual(
@@ -76,6 +86,35 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
         self.assertIn("不能因工具报告“应用成功”", section)
         self.assertIn("后续测试的偶然成功", section)
+
+    def test_formal_test_identity_prevents_gui_loader_dialogs(self) -> None:
+        section = CI_TEXT.split("### 测试命令先展开再取得运行资格", 1)[1]
+        for fragment in (
+            "实际 runner 或包装入口",
+            "动态库、插件与运行时模块搜索根",
+            "直接双击或从终端运行 runner 生成的桌面测试可执行文件不能替代正式入口",
+            "在进入 `main()` 和测试框架日志之前",
+            "由系统加载器弹出模态错误框",
+            "不打包”只排除安装包和可分发目录",
+            "不规定把全部运行库一律复制到输出目录",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_process_liveness_is_classified_before_escalation(self) -> None:
+        section = USER_ENVIRONMENT_TEXT.split(
+            "### 终止前先区分进程存活与可枚举残留", 1
+        )[1]
+        for fragment in (
+            "正在运行”“已经退出但仍可枚举的残留”或“状态未知",
+            "仍返回一行记录，只证明系统还能枚举该对象",
+            "访问被拒绝”只证明当前调用缺少终止权限",
+            "不重复提权",
+            "不为清掉一行记录而终止父进程、宿主或整个会话",
+            "不能对用户声称已经关闭",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
 
 
 if __name__ == "__main__":
