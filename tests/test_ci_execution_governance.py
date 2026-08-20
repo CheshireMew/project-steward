@@ -188,6 +188,44 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_equivalent_remote_events_share_one_expensive_run_identity(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "远端运行身份由候选 SHA",
+            1,
+        )[1].split("用户或项目规则明确要求最终完整套件", 1)[0]
+        for fragment in (
+            "验证计划、基准或 merge-ref、权限与信任边界、正式消费者",
+            "`push` 与同仓 PR 的身份等价时",
+            "昂贵验证只保留一个规范运行",
+            "fork 权限、secrets、merge-ref 或消费者不同则分别运行",
+            "不能取消不同信任或基准合同",
+            "required check 名称指向规范结果",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_remote_failures_use_machine_readable_identity(self) -> None:
+        section = CI_TEXT.split("## 7. 失败后只重跑有证据的范围", 1)[1]
+        for fragment in (
+            "状态页与 watcher 只是可能截断名称的展示投影",
+            "机器可读接口还原准确 SHA、run、attempt、job、check",
+            "日志和产物",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_default_branch_result_waits_only_for_its_required_gate(self) -> None:
+        section = CI_TEXT.split("## 9. 完成与停止", 1)[1]
+        self.assertIn("停止位置只是普通提交或候选分支推送时", section)
+        self.assertIn(
+            "普通的提交和推送动作仍在触发远端运行后释放当前任务",
+            section,
+        )
+        self.assertIn("停止位置明确是候选进入默认分支时", section)
+        self.assertIn("required checks 是该已授权结果的前置门", section)
+
     def test_test_command_scope_is_expanded_before_execution(self) -> None:
         section = CI_TEXT.split(
             "### 测试命令先展开再取得运行资格",

@@ -211,6 +211,28 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_effective_merge_policy_and_server_rewrite_are_reconciled(
+        self,
+    ) -> None:
+        section = PUBLICATION_TEXT.split(
+            "### 冻结公开发布候选、标签与资产",
+            1,
+        )[1].split("项目将标签、Release", 1)[0]
+        ordered = (
+            "冻结候选 SHA、基准分支、实际保护规则或 ruleset",
+            "分支规则与实际合并响应才是权威",
+            "merge commit 被拒绝时",
+            "优先保留提交粒度",
+            "服务端 rebase 或 squash 会生成新的提交身份",
+            "重新取得 PR 状态、远端默认分支 HEAD",
+            "本地默认分支已同步",
+            "证明原本地独有提交仍可由来源分支、备份引用或 reflog 找回",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("无法证明时保留分叉并报告", section)
+        self.assertIn("不授权修改代码、测试、工作流或远端设置", section)
+
     def test_self_evolution_stops_at_the_successful_push(self) -> None:
         section = PUBLICATION_TEXT.split(
             "### Project Steward 自我进化使用整仓发布合同",

@@ -12,6 +12,9 @@ STAR_TEXT = (ROOT / "references" / "github-star-history.md").read_text(
 PUBLICATION_TEXT = (ROOT / "references" / "repository-publication.md").read_text(
     encoding="utf-8"
 )
+PUBLICATION_EXECUTION_TEXT = (
+    ROOT / "references" / "repository-publication-execution.md"
+).read_text(encoding="utf-8")
 
 
 class AutomaticPublicationCompletionTests(unittest.TestCase):
@@ -66,6 +69,26 @@ class AutomaticPublicationCompletionTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
+
+    def test_explicit_default_branch_result_owns_its_required_merge_gate(
+        self,
+    ) -> None:
+        for fragment in (
+            "用户明确要求准确改动进入默认分支",
+            "候选分支、PR、准确候选 required checks",
+            "但不授权修复失败或改变远端设置",
+            "只有准确候选的必需检查通过、合并成功",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_TEXT)
+
+        for fragment in (
+            "停止位置明确是默认分支包含候选时",
+            "required checks 是该结果的前置门",
+            "与当前结果无关的可选检查单独报告",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PUBLICATION_EXECUTION_TEXT)
 
     def test_project_steward_invocation_does_not_publish_the_target_project(
         self,
