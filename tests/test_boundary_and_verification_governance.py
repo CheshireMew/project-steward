@@ -4,6 +4,11 @@ from governance_text_fixtures import *
 
 
 class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
+    def assertContains(self, text: str, fragments: tuple[str, ...]) -> None:
+        for fragment in fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
     def test_reference_features_require_target_object_and_entry_evidence(
         self,
     ) -> None:
@@ -572,29 +577,26 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
 
 
     def test_verifier_success_requires_expected_input_coverage(self) -> None:
-        for fragment in (
+        self.assertContains(PREVENTION_TEXT + REMEDIATION_TEXT, (
             "预期覆盖对象及内容身份",
             "工具实际选择的输入、版本、过滤和排除项",
             "输入为空、过期或不完整",
             "未覆盖或未知",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, PREVENTION_TEXT + REMEDIATION_TEXT)
+        ))
 
-        for fragment in (
+        self.assertContains(LEARNING_TEXT, (
             "验证器成功退出也不等于已覆盖预期对象",
             "被过滤与排除规则遗漏",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, LEARNING_TEXT)
+        ))
 
-        for fragment in (
+        self.assertContains(PREVENTION_TEXT, (
             "每项验证还要建立输入覆盖合同",
             "允许的结论：通过 / 零发现 / 未覆盖 / 未知 / 失败",
             "不由验证器碰巧看到的内容反推",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, PREVENTION_TEXT)
+            "首选内部表示",
+            "另一条正式支持路径",
+            "共同能力缺失才阻塞",
+        ))
 
 
     def test_completion_requires_unique_collected_test_identities(self) -> None:
@@ -759,22 +761,23 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
     def test_canvas_sampling_and_playback_have_separate_visual_evidence(
         self,
     ) -> None:
-        for fragment in (
+        self.assertContains(IMPLEMENTATION_TEXT, (
             "不能用任意固定像素证明内容存在",
             "产品合同明确保证该坐标始终由目标内容占据",
             "支撑区域或完整画布",
             "同一条受所有者控制的渲染与捕获边界",
             "透明或背景、内容存在、姿态或状态差异和自主连续播放",
             "不能代替运行时生命周期与连续播放证据",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, IMPLEMENTATION_TEXT)
+            "模态遮罩、非模态提示和带行动通知",
+            "卡片外的透明或布局范围不得遮住底层操作",
+            "普通和窄视口",
+        ))
 
 
     def test_high_cardinality_ui_limits_consumer_fanout_and_stale_writes(
         self,
     ) -> None:
-        for fragment in (
+        self.assertContains(PREVENTION_TEXT, (
             "代表性规模、消费者扩散与编辑状态",
             "首个稳定画面、选择、编辑并持久化",
             "实际实例化的界面对象数",
@@ -790,18 +793,14 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             "无参数的“某处变化”通知不能授权所有消费者重建全部投影",
             "草稿绑定到正式对象身份与基线版本",
             "只提交相对于当前权威状态的脏字段补丁",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, PREVENTION_TEXT)
+        ))
 
-        for fragment in (
+        self.assertContains(IMPLEMENTATION_TEXT, (
             "代表性对象规模、首屏 / 活动对象数与关键操作耗时",
             "打开到首个稳定画面、选择、编辑并持久化",
             "应用启动、第一次访问、离开后再次访问和关闭",
             "后台已经写入的其它字段保持不变",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, IMPLEMENTATION_TEXT)
+        ))
 
 
 if __name__ == "__main__":
