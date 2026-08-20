@@ -737,6 +737,9 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
         self.assertIn("验证与发布脚本、真实用户链工具", PREVENTION_TEXT)
+        for fragment in ("只读命令入口不得激活写入", "未知参数必须明确非零退出", "不用 `--help` 试运行"):
+            self.assertIn(fragment, PREVENTION_TEXT)
+        self.assertIn("同时消费 `change-prevention-delivery-boundaries.md`", PROJECT_AUDIT_TEXT)
 
     def test_public_validator_timeout_covers_required_child_and_cleanup(
         self,
