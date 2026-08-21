@@ -65,6 +65,38 @@ class StagedResultGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, STAGED_TEXT)
 
+    def test_composite_artifact_tracks_acceptance_per_decision_unit(self) -> None:
+        for fragment in (
+            "物理容器，不自动等于一个用户决定",
+            "为每个决策单元分别记录成果身份、正式消费者、检查证据和确认状态",
+            "同一容器可以同时包含已确认、等待确认、已失效和失败的单元",
+            "不能把其中一个单元的确认广播给全部内容",
+            "每个必需决策单元都已经有可判断成果且状态得到解决",
+            "随后才把局部状态聚合为整体确认",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, STAGED_TEXT)
+
+    def test_unreviewed_valid_unit_is_inspected_before_reproduction(self) -> None:
+        inspection = STAGED_TEXT.index("先让正式消费者打开准确的现有单元")
+        production = STAGED_TEXT.index("才启动对应生产者")
+        self.assertLess(inspection, production)
+
+        for fragment in (
+            "等待确认或尚未审查是认识状态",
+            "不等于成果失败、未制作、未完成或必须重新生成",
+            "并运行适用的轻量检查",
+            "输入或目标合同变化",
+            "依赖图已经传播到该单元的真实失效",
+            "正式检查发现具体失败",
+            "用户明确要求重做",
+            "仅仅缺少确认不能创建新版本",
+            "只使该单元及其真实下游失效",
+            "其它身份和证据仍成立的单元继续保留",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, STAGED_TEXT)
+
     def test_full_automation_is_explicit_and_does_not_expand_authority(
         self,
     ) -> None:
