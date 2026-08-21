@@ -427,7 +427,7 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
 
     def test_evidence_acquisition_is_complete_and_failure_isolated(self) -> None:
         for fragment in (
-            "预期范围、取得方式和完整性标记",
+            "预期范围、取得方式与覆盖游标",
             "EOF 或明确末尾",
             "证据编排本身失败",
             "只单独补跑未返回或状态未知的项目",
@@ -443,6 +443,31 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
+
+    def test_each_required_source_must_close_its_own_coverage_ledger(
+        self,
+    ) -> None:
+        section = LEARNING_TEXT.split(
+            "## 1. 先完整覆盖过程证据",
+            1,
+        )[1].split("## 2. 再按用户最终结果分组", 1)[0]
+        for fragment in (
+            "来源—结果账本",
+            "预期范围、取得方式与覆盖游标",
+            "EOF 或完整性",
+            "回答的事实与当前权威角色",
+            "实际采用的证据",
+            "排除的证据与理由",
+            "任何明确必选来源未完成时",
+            "不得声称“全部来源”“完整历史”",
+            "一个来源没有贡献新问题也必须交账",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+        coverage = section.index("来源—结果账本")
+        result_analysis = LEARNING_TEXT.index("## 2. 再按用户最终结果分组")
+        self.assertLess(coverage, result_analysis)
 
 
     def test_sources_are_preflighted_before_unbounded_reads_or_git(self) -> None:

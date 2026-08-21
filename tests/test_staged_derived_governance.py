@@ -148,6 +148,32 @@ class StagedResultGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, STAGED_TEXT)
 
+    def test_stage_quality_separates_blockers_repairs_and_preferences(
+        self,
+    ) -> None:
+        section = STAGED_TEXT.split(
+            "### 推进前区分阻断、可修复缺陷与理想偏好",
+            1,
+        )[1].split("## 4. 确认绑定准确成果", 1)[0]
+        ordered = (
+            "必需不变量或阻断项",
+            "可修复缺陷",
+            "理想偏好",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "不能在验收时悄悄变成硬拒绝条件",
+            "稳定问题身份、证据、影响的下游、修复所有者与计划",
+            "必须在最终交付前关闭的时点",
+            "不能把“留给后期修复”报告成“已经修复”",
+            "下一阶段无法可靠消费",
+            "污染昂贵或不可逆的下游",
+            "不能因为结果未达到示例中的最佳状态就全量重做",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
 
 class DerivedArtifactGovernanceTests(unittest.TestCase):
     def test_multiple_artifacts_choose_one_explicit_evolution_contract(
@@ -174,6 +200,28 @@ class DerivedArtifactGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DERIVED_TEXT + MAIN_TEXT)
+
+    def test_qualitative_review_has_one_editable_authority_and_finalizer(
+        self,
+    ) -> None:
+        section = DERIVED_TEXT.split(
+            "### 定性评审只有一份可编辑权威记录",
+            1,
+        )[1].split("## 3. 先建立语义派生图", 1)[0]
+        for fragment in (
+            "视觉、语义、质量或其它定性判断",
+            "一份带成果身份、证据身份、评审者和决定版本的可编辑评审记录",
+            "不能让多个文件分别拥有同一接受、拒绝、修复或完成事实",
+            "不能靠人工双写保持一致",
+            "一个确定性的收尾边界",
+            "阶段问题和完成状态不冲突",
+            "一次生成或同步全部机器可读镜像",
+            "不得报告完成",
+            "不能反向覆盖权威评审",
+            "双重所有权会被拒绝",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
 
     def test_cache_key_uses_the_consumed_projection(self) -> None:
         for fragment in (

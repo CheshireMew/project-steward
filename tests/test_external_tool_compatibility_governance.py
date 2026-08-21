@@ -54,6 +54,47 @@ class ExternalToolCompatibilityGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, COMPATIBILITY_TEXT)
 
+    def test_execution_route_and_domain_input_are_part_of_the_claim(self) -> None:
+        section = COMPATIBILITY_TEXT.split(
+            "### 执行路线与代表输入属于兼容性声明",
+            1,
+        )[1].split("### 服务可用性测试必须复用正式调用合同", 1)[0]
+        for fragment in (
+            "CLI、API、GUI、官方编辑器",
+            "是验收谓词的一部分",
+            "GUI 自动化成功不能证明 CLI 可调用",
+            "合同事先声明了可替代分支",
+            "匹配外部工具或服务公开承诺、训练或实际服务的目标领域",
+            "几何卡片、纯色块、空白文件",
+            "可以证明传输、格式、解析或错误收口",
+            "不能据此宣称目标领域",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_transformed_external_inputs_preserve_provenance(self) -> None:
+        section = COMPATIBILITY_TEXT.split(
+            "### 执行路线与代表输入属于兼容性声明",
+            1,
+        )[1].split("### 服务可用性测试必须复用正式调用合同", 1)[0]
+        ordered = (
+            "原始输入",
+            "实际发送的精确派生文件",
+            "内容身份或哈希",
+            "转换合同",
+            "外部返回产物",
+            "最终消费者路径",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "服务实际收到哪一份",
+            "不能只保留原图和最终结果而丢失真实传输身份",
+            "准确输入路径、服务入口和返回产物保存位置",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_evidence_matrix_covers_every_compatibility_boundary(self) -> None:
         for fragment in (
             "可执行产物",
