@@ -176,7 +176,7 @@ README 不作为每项内部治理规则的第二份活动真源；自我进化�
 
 ## 项目综合审计
 
-依次读取 `references/project-audit.md` 和 `references/project-audit-release-and-evidence.md`。用户询问实施计划完成度时，先从原计划建立逐项符合性账本；获准修复后必须从原计划和当前已接受合同重新生成一次全新复查，不沿用旧完成标记，也不从现有测试反推计划范围。全面检查则先按项目形态建立全部适用维度的覆盖账本，再加载这些维度要求的专项；不得只根据已经发现的问题回填审查范围。只读审计不自动治理。需要评估用户效果时追加 `references/project-effectiveness-review.md`，需要检查任务体验时追加 `references/task-experience-audit.md`。
+依次读取 `references/project-audit.md` 和 `references/project-audit-release-and-evidence.md`。询问实施计划完成度时，先从原计划建立符合性账本；获准修复后从原计划和当前已接受合同重新生成全新复查，不沿用旧标记，也不从测试反推计划范围。全面检查则先按项目形态建立全部适用维度的覆盖账本，再加载这些维度要求的专项；不得只根据已经发现的问题回填审查范围。性能适用时读取 `references/project-performance-governance.md`。只读审计不自动治理。评估用户效果时追加 `references/project-effectiveness-review.md`，检查任务体验时追加 `references/task-experience-audit.md`。
 
 ## 平台模板资源
 
