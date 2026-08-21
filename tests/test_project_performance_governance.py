@@ -75,6 +75,34 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PERFORMANCE_TEXT)
 
+    def test_each_optimization_remeasures_its_direct_work_before_broad_regression(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        ordered = (
+            "根因假设连接到一个能够直接观察的工作量",
+            "同一正式入口、输入身份和冷、热或命中状态",
+            "再运行宽泛回归",
+            "停止叠加优化",
+            "重新取得 profile 或查询计划并更新根因",
+        )
+        positions = [measurement.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_suite_time_is_not_compared_when_collected_workload_changes(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        for fragment in (
+            "实际收集到的测试身份、参数化展开、夹具、并行方式",
+            "测试新增、删除、改名、改变选择范围或迁移执行路径后",
+            "只作为对应身份的正确性回归证据",
+            "不能据此声称产品或测试套件获得了性能提升",
+            "冻结共同测试身份或建立独立代表性 benchmark",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, measurement)
+
     def test_closure_requires_invariants_user_chain_and_reaudit(self) -> None:
         closure = PERFORMANCE_TEXT.split("## 6. 修复交接与二次性能复审", 1)[1]
         ordered = (
