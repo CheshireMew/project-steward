@@ -122,6 +122,31 @@ class MergedCapabilityTests(unittest.TestCase):
         self.assertNotIn("references/visual-direction.md", section)
         self.assertIn("references/visual-direction.md", readme_section)
 
+    def test_real_acceptance_validates_runtime_and_business_target_before_launch(
+        self,
+    ) -> None:
+        review = read_reference("implementation-review.md")
+        ordered = (
+            "真实验收先锁定运行产物与业务目标身份",
+            "**运行产物**和**业务目标**作为两个分别成立的身份",
+            "只提供历史指针，不得直接成为新一次启动参数",
+            "先使用产品正式读取器、只读预检或等价业务合同证明目标可读且身份一致",
+            "隔离测试夹具、演示对象和用户当前对象分别登记",
+            "在产生应用启动副作用前停止并报告准确缺口",
+            "实际运行产物身份、实际业务目标身份和当前可见结果",
+        )
+        positions = [review.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        all_design_text = "\n".join(
+            (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+            for name in DESIGN_REFERENCES
+        )
+        self.assertEqual(
+            all_design_text.count("真实验收先锁定运行产物与业务目标身份"),
+            1,
+        )
+
     def test_interface_aesthetic_judgment_is_owned_and_not_delegated(
         self,
     ) -> None:
