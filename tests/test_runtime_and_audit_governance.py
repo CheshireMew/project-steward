@@ -15,6 +15,27 @@ class RuntimeAndAuditGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
         self.assertIn("承诺覆盖", REMEDIATION_TEXT)
+
+    def test_performance_audit_routes_causal_measurement_and_large_evidence(
+        self,
+    ) -> None:
+        performance = PROJECT_AUDIT_TEXT.split(
+            "## 8. 审计性能、资源与规模",
+            1,
+        )[1].split("## 9. 审计兼容性、安装与外部边界", 1)[0]
+        for fragment in (
+            "区分预热与稳态资源增长",
+            "检查跨边界数据量或重复工作",
+            "hard-to-reproduce-diagnostics.md",
+            "阶段、竞争解释、工作放大和资源趋势的诊断合同",
+            "首个大文件之前",
+            "production-storage-governance.md",
+            "准确根、预计体积、运行身份、保留方式和清理授权",
+            "运行授权不能补造删除权限",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, performance)
+
     def test_confirmed_plan_is_revalidated_against_current_targets(self) -> None:
         for fragment in (
             "用户确认后、开始写入前",

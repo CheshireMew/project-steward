@@ -149,6 +149,50 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
                 self.assertIn(fragment, DIAGNOSTIC_TEXT)
 
 
+    def test_performance_phases_separate_warmup_from_steady_resource_growth(
+        self,
+    ) -> None:
+        resources = DIAGNOSTIC_TEXT.split("### 吞吐、背压与资源", 1)[
+            1
+        ].split("### 连续实时管线的进度真值与分层验收", 1)[0]
+        ordered = (
+            "冷启动",
+            "首个可用结果",
+            "预热或惰性初始化",
+            "稳态",
+            "持续运行",
+            "过载场景与解除压力后的恢复",
+        )
+        positions = [resources.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "前一阶段的缓存、页面、会话、GPU 保留量或其它初始化状态不能混入后一阶段基线",
+            "预热前后的单次差值不能命名为泄漏",
+            "代表性重复操作和持续时间内仍存在增长趋势",
+            "资源回落、稳定平台、可回收缓存、驱动或运行时保留与持续斜率分别报告",
+            "不用一个开始值和结束值合并结论",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, resources)
+
+    def test_end_to_end_work_amplification_reaches_every_consumer(self) -> None:
+        resources = DIAGNOSTIC_TEXT.split("### 吞吐、背压与资源", 1)[
+            1
+        ].split("### 连续实时管线的进度真值与分层验收", 1)[0]
+        for fragment in (
+            "端到端工作放大账本",
+            "载荷字节数、对象数量、消费者实际需要的投影、是否发生完整物化",
+            "构建、上传、复制、解码、序列化或等价昂贵操作的实际次数",
+            "上游流式、分块或按需生产，不能证明整条链有界",
+            "后续消费者重新读取或物化完整内容",
+            "实际次数 × 代表性单次成本",
+            "不能先完成全部高成本工作再在末端丢弃",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, resources)
+
+
     def test_continuous_realtime_progress_uses_layered_authoritative_evidence(
         self,
     ) -> None:
