@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Steward"
-  short_description: "治理项目变更、根因、README、仓库发布与可迁移经验"
+  short_description: "治理项目变更、根因、README、仓库发布与可迁移经验；也负责界面美观与 UI/UX"
   default_prompt: "使用 $project-steward 研究我提供的代码项目；如果我没有说明更具体目标，先讲清项目价值、最小机制闭环和证据边界后停止。只有我明确要求时，才评估能力吸收、原始上游、许可证和复用关系。"

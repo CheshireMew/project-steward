@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从完整项目过程和真实结果中提炼可迁移治理能力，并在明确要求时让 Project Steward 自我进化；按实施计划审计完成度，研究、讲解和整理仓库，判断开源能力采用、目录职责、许可证与致谢；在改动前预防返工，沿根因修复跨层缺陷，并检查外部工具、持久操作、架构内聚、重复和真实用户链；治理 README、日志、模板、产品体验、用户环境、许可证和仓库发布。Use when the user asks to learn from project history, evolve Project Steward, audit a plan or repository, understand or organize a codebase, study open source and decide what to adopt or attribute, prevent rework, remediate cross-layer defects, inspect external-tool compatibility, durable operations, cohesion, coupling, duplication or god modules, or govern README, logging, templates, UX, licensing, user environments, publication, and project-wide health; not for isolated implementation, a single-function explanation, security-only, dependency-only, CI-only, or monitoring tasks."
+description: "从项目过程与真实结果提炼可迁移治理方法，并在明确要求时自我进化；按实施计划审计完成度，研究和整理仓库，判断开源采用、目录职责、许可证与致谢；预防返工、沿根因修复跨层缺陷，治理外部工具、持久操作、架构质量、真实用户链、产品 UI/UX、界面美观与使用质感、README、日志、模板、用户环境、许可证和仓库发布。Use to learn/evolve from project history; audit a plan or repository; understand or organize a codebase; study open-source adoption/attribution; prevent rework/remediate root causes; inspect external-tool compatibility, durable operations, architecture cohesion/coupling, duplication or god modules, user chains, UI/UX/interface aesthetics, README, logging, templates, user environments, licensing, publication, and project health. Not for a single-function explanation or security-, dependency-, CI-, or monitoring-only tasks."
 ---
 
 # Project Steward
@@ -19,7 +19,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 6. 盘点或整理项目目录，判断真实使用、生成状态、忽略、移动、归档与删除边界：项目目录治理。
 7. 建立、采用、升级或检查项目模板：项目基线与模板。
 8. 把稳定默认写入模板：模板演进。
-9. 定义、审查、重建或实施产品体验与界面：产品体验与界面治理。
+9. 定义、审查、设计、重建、实施或验收产品体验、UI/UX、界面美观度与使用质感：产品体验与界面治理。
 10. 审计、重写 README 或制作 GitHub 主页视觉：README 与主页。
 11. 治理项目日志、LLM 记录、长期记忆、TTS 或日志查看结果：人性化日志。
 12. 初始化 Git、创建仓库、提交、推送、改变可见性或验证远端：仓库建立与发布。
@@ -136,8 +136,10 @@ Project Steward 自我进化时必须执行活动文本约束：
 
 先读取 `references/product-experience-governance.md`，再按以下固定入口和条件专项执行：
 
+该路径直接负责 UI/UX、界面美观、设计实施与真实画面验收；所列 reference 是内部方法，不是外包边界。
+
 - 界面诊断、评价、优化或重建固定读取：`references/ux-design.md`、`references/interface-experience-quality.md`、`references/interface-problem-patterns.md`、`references/implementation-review.md`、`references/implementation-review-visual-evidence.md`。修改前先冻结全部相关窗口、页面、面板、覆盖层、主要状态和用户旅程；不能把截图中最醒目的局部问题当成完整审查范围。
-- 从零设计或改变视觉方向：`references/design-method.md`、`references/visual-direction.md`、`references/surface-registers.md`
+- 从零设计或改变视觉方向：`references/design-method.md`、`references/surface-registers.md`
 - 布局、设计系统、交互和动效：`references/layout-responsive.md`、`references/design-system-alignment.md`、`references/interface-guidelines.md`、`references/interaction-motion.md`
 - 参考界面忠实重建：`references/reference-interface-reconstruction.md`
 - 已确认是桌面、Tauri/Vue 或本地文件工作区时，对应读取 `references/desktop-app-governance.md`、`references/tauri-vue-governance.md`、`references/local-file-workspace-governance.md`；项目形态已经成立时不得因当前反馈只提到颜色、间距或文案而省略平台外壳。

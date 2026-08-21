@@ -7,6 +7,9 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+AGENT_TEXT = (SKILL_ROOT / "agents" / "openai.yaml").read_text(
+    encoding="utf-8"
+)
 REFERENCE_COMPANIONS = {
     "implementation-review.md": ("implementation-review-visual-evidence.md",),
     "interaction-motion.md": ("interaction-navigation-and-media-lifecycle.md",),
@@ -91,9 +94,16 @@ class MergedCapabilityTests(unittest.TestCase):
             "## 产品体验与界面治理", 1
         )[1].split("## 仓库建立与发布", 1)[0]
         core_route = section.split("- 从零设计或改变视觉方向", 1)[0]
+        readme_section = SKILL_TEXT.split(
+            "## README 与主页", 1
+        )[1].split("## 许可证治理", 1)[0]
 
         self.assertIn("固定入口和条件专项", section)
         self.assertNotIn("再按实际任务选择", section)
+        self.assertIn(
+            "直接负责 UI/UX、界面美观、设计实施与真实画面验收",
+            section,
+        )
         for owner in (
             "references/product-experience-governance.md",
             "references/ux-design.md",
@@ -107,6 +117,54 @@ class MergedCapabilityTests(unittest.TestCase):
         self.assertIn("窗口、页面、面板、覆盖层、主要状态和用户旅程", core_route)
         self.assertIn("references/desktop-app-governance.md", section)
         self.assertIn("不得因当前反馈只提到颜色、间距或文案", section)
+        self.assertIn("references/design-method.md", section)
+        self.assertIn("references/surface-registers.md", section)
+        self.assertNotIn("references/visual-direction.md", section)
+        self.assertIn("references/visual-direction.md", readme_section)
+
+    def test_interface_aesthetic_judgment_is_owned_and_not_delegated(
+        self,
+    ) -> None:
+        quality = (
+            SKILL_ROOT / "references" / "interface-experience-quality.md"
+        ).read_text(encoding="utf-8")
+        experience = (
+            SKILL_ROOT / "references" / "product-experience-governance.md"
+        ).read_text(encoding="utf-8")
+
+        for fragment in (
+            "界面美观度属于本方法的直接用户结果",
+            "承担专业 UI/UX 设计者的判断责任",
+            "不得只交付治理报告或组件清单",
+            "紧凑、宽松、靠边、留白、卡片、圆角、深浅和信息密度",
+            "不是软件感、现代感或专业感的固定同义词",
+            "不能从一个感觉词跳到预设风格",
+        ):
+            with self.subTest(owner="quality", fragment=fragment):
+                self.assertIn(fragment, quality)
+
+        for fragment in (
+            "视觉与听觉生产仍由相应专业能力负责",
+            "这里的生产只指独立图片、视频、三维和音频等媒体",
+            "不包含产品界面本身",
+            "界面视觉方向、整体美观度、UI/UX 设计、代码实施与真实画面验收",
+            "不能借媒体分工停在治理报告",
+            "把界面判断推出 Project Steward",
+        ):
+            with self.subTest(owner="experience", fragment=fragment):
+                self.assertIn(fragment, experience)
+
+        self.assertIn("界面美观与 UI/UX", AGENT_TEXT)
+        all_active_references = "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in (SKILL_ROOT / "references").glob("*.md")
+        )
+        self.assertEqual(
+            all_active_references.count(
+                "界面美观度属于本方法的直接用户结果"
+            ),
+            1,
+        )
 
     def test_user_environment_resources_have_one_active_route(self) -> None:
         reference = (
