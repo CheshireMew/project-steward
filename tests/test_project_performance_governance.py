@@ -103,6 +103,23 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, measurement)
 
+    def test_smaller_workload_cannot_close_the_original_performance_contract(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        for fragment in (
+            "性能优化和容量合同变化必须分账",
+            "正式入口继续接受相同的代表性输入",
+            "缩小允许输入规模、降低原有容量上限",
+            "拒绝此前合法输入",
+            "不能被记为性能优化",
+            "由产品合同的权威来源确认",
+            "原性能发现仍然开放",
+            "较小工作负载下的更快数字只证明较小边界",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, measurement)
+
     def test_closure_requires_invariants_user_chain_and_reaudit(self) -> None:
         closure = PERFORMANCE_TEXT.split("## 6. 修复交接与二次性能复审", 1)[1]
         ordered = (
