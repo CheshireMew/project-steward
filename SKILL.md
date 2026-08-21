@@ -26,7 +26,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 13. 选择、应用或批量治理许可证与第三方授权：许可证治理。
 14. 建立或消费用户环境档案，检查工具、缓存、SDK、终端或长任务：用户环境档案与执行环境。
 15. 按实施计划逐项核对完成度，或全面检查、判断项目健康状况和排列项目级风险：项目综合审计。
-16. 生产项目会持续写入大型媒体、缓存、测试证据、下载或中间产物，需要在写入前冻结预算并把防线落进真实生产者：生产存储预防与审查。
+16. 大型运行产物的存储治理：生产存储预防与审查。
 
 只点名本 Skill 时按现有材料选择最匹配路径；材料不足时给出一个贴近上下文的直接请求示例并停下。
 
@@ -122,7 +122,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 
 ## 项目目录治理
 
-读取 `references/repository-directory-governance.md`。先用 `scripts/inspect_project_tree.py` 取得只读物理与 Git 证据，再核对每个候选目录的正式生产者、路径真源、消费者和生命周期；检查、解释与计划停在证据账本，只有明确授权整理、移动或归档时才改变准确路径，删除继续遵守单独授权。移动触及活动源码、模型、数据、素材、构建或运行入口时同时读取 `references/change-prevention.md`；已经存在旧路径、双读、同步副本或半迁移时再读取 `references/root-cause-remediation.md`，一次迁移消费者并退出旧入口。
+读取 `references/repository-directory-governance.md`，先运行 `scripts/inspect_project_tree.py`，再核对候选生产者、路径真源、消费者与生命周期。检查和计划只读；整理、移动、归档、删除分别授权。大型媒体、缓存、测试证据、下载、模型或中间产物涉及占用、可回收量或清理终态时，同时读取 `references/production-storage-governance.md`。移动触及活动源码、模型、数据、素材、构建或运行入口时读取 `references/change-prevention.md`；存在旧路径、双读、同步副本或半迁移时读取 `references/root-cause-remediation.md`，一次迁移消费者并退出旧入口。
 
 ## 项目基线与模板
 

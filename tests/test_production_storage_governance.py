@@ -22,12 +22,17 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
 
         self.assertIn("生产存储预防与审查", skill)
         self.assertGreaterEqual(skill.count("references/production-storage-governance.md"), 2)
+        directory_route = skill.split("## 项目目录治理", 1)[1].split("## 项目基线与模板", 1)[0]
+        self.assertIn("references/production-storage-governance.md", directory_route)
         for phrase in (
             "事先预防必须发生在首个大文件之前",
             "获准实施时必须写进生产项目",
             ".project-steward/storage-contract.json",
             "scripts/production_storage_review.py",
             "不能让 Project Steward 的脚本成为运行时代理",
+            "候选归属体积不等于可回收体积",
+            "实际回收体积",
+            "最后一个写入同一登记根的生产者",
         ):
             self.assertIn(phrase, reference)
 
