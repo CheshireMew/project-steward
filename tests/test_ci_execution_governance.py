@@ -493,6 +493,24 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, CI_TEXT)
 
+    def test_exact_shard_identity_and_timeout_inference_are_bounded(self) -> None:
+        section = CI_TEXT.split("## 5. 按历史耗时分片", 1)[1].split(
+            "## 6. 在昂贵阶段前验证工作流边界",
+            1,
+        )[0]
+        for fragment in (
+            "精确分片身份由候选内容、收集输入、按序节点清单",
+            "分片编号与总数不是身份",
+            "同编号分片已经是新分片",
+            "分别运行旧候选的疑似失败节点和当前候选重新计算的实际分片",
+            "执行器确定串行",
+            "逐节点日志刷新语义已知",
+            "当前节点保持未知",
+            "节点开始标记或心跳",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_parallel_commands_have_short_roots_and_exact_serial_exceptions(
         self,
     ) -> None:
