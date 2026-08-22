@@ -153,7 +153,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 
 ## README 与主页
 
-先读取 `references/readme-delivery.md`，用一份交付账本检查 Git 边界、README、正文、视觉、多语言、许可证、Star History、GitHub Topics、仓库元数据、验证与停止位置；只读请求停在同一账本，明确要求优化、重写或完整处理时才实施。随后读取 `references/content-architecture.md`；完整优化或涉及 Logo、hero 时读取 `references/visual-direction.md`，先完成代码优先的正式身份源调查，再按需读取 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。需要多语言、个人入口或仓库状态区时读取 `assets/readme-profile/profile.json`，由 `scripts/readme_header.py` 消费真实文件、仓库身份、许可证和明确解析的项目导航。已有公开 GitHub 仓库的完整 README 优化把 Star History 与 Topics 都作为默认交付项：Star History 读取 `references/github-star-history.md` 和 `references/repository-publication.md`，Topics 通过 `scripts/github_topics.py` 写入并回读；除非用户明确退出或目标客观不适用，缺少任一真实消费者的成功结果都不能完成整项交付。按需选择：
+读取 `references/readme-delivery.md`，建立覆盖 Git 边界、README 正文、视觉、多语言、许可证、Star History、Topics、About Description/Website、验证与停止位置的交付账本；只读停在账本，优化、重写或完整处理才实施。再读 `references/content-architecture.md`；完整优化或含 Logo、hero 时由 `references/visual-direction.md` 完成代码优先的正式身份源调查，再按需读 `references/project-native-hero.md` 和 `references/github-readme-canvas.md`。多语言、个人入口和仓库状态区由 `scripts/readme_header.py` 按 `assets/readme-profile/profile.json` 消费真实项目事实。公开 GitHub 仓库完整优化默认交付 Star History、Topics 与 About：Star History 读取 `references/github-star-history.md` 和 `references/repository-publication.md`，Topics 由 `scripts/github_topics.py` 写入回读，About 由 `scripts/github_about.py` 写入回读；除非用户退出或不适用，缺少任一真实消费者的成功结果都不能完成整项交付。按需选择：
 
 - SVG 与混合视觉：`references/svg-production.md`、`references/hybrid-svg-production.md`
 - 动效：`references/motion-production.md`

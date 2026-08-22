@@ -56,8 +56,9 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         self.assertIn("scripts/readme_header.py", route)
         self.assertIn("scripts/audit_readme.py", route)
         self.assertIn("scripts/github_topics.py", route)
+        self.assertIn("scripts/github_about.py", route)
         self.assertIn("代码优先的正式身份源调查", route)
-        self.assertIn("Star History 与 Topics 都作为默认交付项", route)
+        self.assertIn("公开 GitHub 仓库完整优化默认交付 Star History、Topics 与 About", route)
         self.assertIn("缺少任一真实消费者的成功结果都不能完成整项交付", route)
         self.assertIn(
             "README 不作为每项内部治理规则的第二份活动真源",
@@ -74,7 +75,8 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "许可证文件、GitHub 识别与权利边界：",
             "Star History 生产者、输出分支、raw 文件与消费端：",
             "GitHub Topics 当前集合、项目事实依据与目标集合：",
-            "GitHub About、Issues、Discussions 与 Release 事实：",
+            "GitHub About 当前 Description、Website，项目事实依据与目标值：",
+            "GitHub Issues、Discussions 与 Release 事实：",
             "本次允许的本地写入、提交、推送和远端元数据动作：",
             "最终停止位置：",
         ):
@@ -94,7 +96,7 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "零星标仓库可以生成真实的零基线",
             "现有公开 GitHub 仓库的完整 README 优化默认包含 Star History",
             "Topics 是公开 GitHub 仓库完整 README 优化的默认交付项",
-            "About 描述只有用户明确要求",
+            "About Description 与 Website 是公开 GitHub 仓库完整 README 优化的默认交付项",
             "远端 HEAD",
             "自动写入全部活动语言 README",
         ):
@@ -130,16 +132,19 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DELIVERY_TEXT)
 
-    def test_topics_are_default_but_identity_labels_remain_conditional(self) -> None:
+    def test_topics_and_about_are_default_but_values_remain_evidence_bound(self) -> None:
         for fragment in (
             "Topics 是公开 GitHub 仓库完整 README 优化的默认交付项",
             "不能因为 Project Steward 被调用就添加",
             "`codex` 只有在 Codex 确实是项目当前公开的主要运行载体",
             "Topics 随同一完整交付自动写入",
-            "About 描述只有用户明确要求",
+            "About 随同一完整交付自动写入",
             "GitHub API 一次替换",
             "scripts/github_topics.py inspect",
             "scripts/github_topics.py apply",
+            "scripts/github_about.py inspect",
+            "scripts/github_about.py apply",
+            "--clear-website",
             "--expected-head FULL_SHA",
             "api_verified",
             "homepage_verified",
@@ -151,6 +156,23 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
         for language, text in README_TEXTS.items():
             with self.subTest(language=language):
                 self.assertIn("Topics", text)
+
+    def test_about_description_and_website_have_complete_default_delivery(self) -> None:
+        for fragment in (
+            "Description 消费 `content-architecture.md` 已核定的默认语言一句公开定义",
+            "保持单行纯文本并与 README 的项目身份一致",
+            "Website 只从项目活动配置、正式项目导航和已经可访问的公开入口中选择",
+            "目标值明确为空并退出旧链接",
+            "不能把仓库首页自身、计划中的站点或临时地址伪装成 Website",
+            "只读审计先运行 `python scripts/github_about.py inspect",
+            "只在交付账本保留目标值，不改变远端",
+            "同一次 GitHub API 请求提交 Description 与 Website",
+            "从 GitHub 仓库主页的 About 数据回读同一结果",
+            "没有 Website 只改变 Website 的明确目标值",
+            "不能用方法文字、一次 PATCH 成功",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DELIVERY_TEXT)
 
     def test_star_history_precedes_license_and_attribution_in_every_language(self) -> None:
         legal_headings = {
@@ -175,6 +197,8 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "仓库状态",
             "许可证",
             "Star History",
+            "GitHub Topics",
+            "About Description/Website",
         ):
             with self.subTest(preserved_output=preserved_output):
                 self.assertIn(preserved_output, DELIVERY_TEXT)
