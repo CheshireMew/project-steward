@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inspect, update, and verify GitHub repository About metadata through ``gh``."""
+"""Update and verify GitHub About metadata without qualifying Website targets."""
 
 from __future__ import annotations
 
@@ -53,10 +53,11 @@ class ApplyResult:
     website: str
     changed: bool
     api_verified: bool
-    homepage_description: str
-    homepage_website: str
-    homepage_verified: bool
-    verified: bool
+    github_page_description: str
+    github_page_website: str
+    github_page_verified: bool
+    website_destination_validation: str
+    metadata_verified: bool
 
 
 class GhClient:
@@ -384,10 +385,13 @@ def apply_about(
         website=after.website,
         changed=changed,
         api_verified=True,
-        homepage_description=homepage_description,
-        homepage_website=homepage_website,
-        homepage_verified=True,
-        verified=True,
+        github_page_description=homepage_description,
+        github_page_website=homepage_website,
+        github_page_verified=True,
+        website_destination_validation=(
+            "caller_qualified_not_checked" if target_website else "not_applicable"
+        ),
+        metadata_verified=True,
     )
 
 
@@ -411,7 +415,10 @@ def build_parser() -> argparse.ArgumentParser:
     inspect_parser.add_argument("--repository", required=True, help="OWNER/REPOSITORY")
     apply_parser = subparsers.add_parser(
         "apply",
-        help="update Description and Website once, then verify API and homepage results",
+        help=(
+            "update Description and Website once, then verify the API and "
+            "GitHub repository page; Website qualification remains caller-owned"
+        ),
     )
     apply_parser.add_argument("--repository", required=True, help="OWNER/REPOSITORY")
     apply_parser.add_argument(
@@ -427,7 +434,10 @@ def build_parser() -> argparse.ArgumentParser:
     website_group = apply_parser.add_mutually_exclusive_group(required=True)
     website_group.add_argument(
         "--website",
-        help="verified official public project URL",
+        help=(
+            "official public project URL already qualified by the caller; "
+            "this tool does not open or validate the destination"
+        ),
     )
     website_group.add_argument(
         "--clear-website",

@@ -96,7 +96,8 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "零星标仓库可以生成真实的零基线",
             "现有公开 GitHub 仓库的完整 README 优化默认包含 Star History",
             "Topics 是公开 GitHub 仓库完整 README 优化的默认交付项",
-            "About Description 与 Website 是公开 GitHub 仓库完整 README 优化的默认交付项",
+            "About Description 是公开 GitHub 仓库完整 README 优化的默认交付项",
+            "Website 是有合格目标时才写入的可选字段",
             "远端 HEAD",
             "自动写入全部活动语言 README",
         ):
@@ -147,7 +148,8 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "--clear-website",
             "--expected-head FULL_SHA",
             "api_verified",
-            "homepage_verified",
+            "github_page_verified",
+            "metadata_verified",
             "不能用规则文字、测试中的预期集合、一次 PUT 成功",
         ):
             with self.subTest(fragment=fragment):
@@ -157,19 +159,40 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             with self.subTest(language=language):
                 self.assertIn("Topics", text)
 
-    def test_about_description_and_website_have_complete_default_delivery(self) -> None:
+    def test_about_description_is_default_but_website_is_optional(self) -> None:
         for fragment in (
             "Description 消费 `content-architecture.md` 已核定的默认语言一句公开定义",
             "保持单行纯文本并与 README 的项目身份一致",
-            "Website 只从项目活动配置、正式项目导航和已经可访问的公开入口中选择",
-            "目标值明确为空并退出旧链接",
-            "不能把仓库首页自身、计划中的站点或临时地址伪装成 Website",
+            "Website 是有合格目标时才写入的可选字段",
+            "没有合格 Website 是一个成功的目标状态",
+            "不为填满字段联网搜索、拼接或猜测网址",
+            "不会阻塞 Description 与 About 交付",
             "只读审计先运行 `python scripts/github_about.py inspect",
             "只在交付账本保留目标值，不改变远端",
             "同一次 GitHub API 请求提交 Description 与 Website",
             "从 GitHub 仓库主页的 About 数据回读同一结果",
-            "没有 Website 只改变 Website 的明确目标值",
+            "website_destination_validation",
+            "caller_qualified_not_checked",
+            "not_applicable",
+            "`github_page_verified` 只证明 GitHub 仓库页面",
             "不能用方法文字、一次 PATCH 成功",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DELIVERY_TEXT)
+
+        self.assertNotIn(
+            "About Description 与 Website 是公开 GitHub 仓库完整 README 优化的默认交付项",
+            DELIVERY_TEXT,
+        )
+
+    def test_website_requires_an_authoritative_real_user_surface(self) -> None:
+        for fragment in (
+            "项目活动配置、正式项目导航、部署配置或用户明确指定",
+            "第三方目录、技能市场、包注册页、搜索结果或仓库地址",
+            "`200`、最终 URL、canonical、页面标题或仓库名相符",
+            "404、soft 404、空页、登录或访问门槛",
+            "文档、安装、下载或其它明确的第一次采用用途",
+            "必须通过真实浏览器核对",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DELIVERY_TEXT)

@@ -126,7 +126,7 @@ class GitHubAboutTests(unittest.TestCase):
             ABOUT.extract_homepage_about(homepage_with("Public definition")),
         )
 
-    def test_apply_updates_both_fields_once_then_verifies_api_head_and_homepage(self) -> None:
+    def test_apply_verifies_metadata_without_claiming_to_check_the_destination(self) -> None:
         client = FixtureClient()
         result = ABOUT.apply_about(
             client,
@@ -153,8 +153,13 @@ class GitHubAboutTests(unittest.TestCase):
         )
         self.assertTrue(result.changed)
         self.assertTrue(result.api_verified)
-        self.assertTrue(result.homepage_verified)
-        self.assertTrue(result.verified)
+        self.assertTrue(result.github_page_verified)
+        self.assertTrue(result.metadata_verified)
+        self.assertEqual(
+            "caller_qualified_not_checked",
+            result.website_destination_validation,
+        )
+        self.assertFalse(hasattr(result, "homepage_verified"))
         self.assertEqual(HEAD, result.head)
 
     def test_noop_still_verifies_the_api_and_homepage(self) -> None:
@@ -178,7 +183,7 @@ class GitHubAboutTests(unittest.TestCase):
 
         self.assertEqual([], client.patch_payloads)
         self.assertFalse(result.changed)
-        self.assertTrue(result.verified)
+        self.assertTrue(result.metadata_verified)
 
     def test_clear_website_is_an_explicit_atomic_target(self) -> None:
         client = FixtureClient(
@@ -198,8 +203,12 @@ class GitHubAboutTests(unittest.TestCase):
 
         self.assertEqual("", client.patch_payloads[0]["homepage"])
         self.assertEqual("", result.website)
-        self.assertEqual("", result.homepage_website)
-        self.assertTrue(result.verified)
+        self.assertEqual("", result.github_page_website)
+        self.assertEqual(
+            "not_applicable",
+            result.website_destination_validation,
+        )
+        self.assertTrue(result.metadata_verified)
 
     def test_head_drift_and_write_permission_fail_before_patch(self) -> None:
         cases = (
