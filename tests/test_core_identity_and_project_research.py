@@ -311,6 +311,23 @@ class CoreIdentityTests(unittest.TestCase):
             with self.subTest(handoff_fragment=fragment):
                 self.assertIn(fragment, absorption)
 
+    def test_hosted_product_research_separates_claims_trials_and_results(self) -> None:
+        hosted = PROJECT_RESEARCH_TEXT.split(
+            "### 没有源码的托管产品", 1
+        )[1].split("## 3. 先判断项目怎样产生价值", 1)[0]
+        for fragment in (
+            "官方文档、条款与产品声明",
+            "机器可读的能力或工具清单",
+            "实际渲染、导出或其它用户可见结果",
+            "额度或费用、可逆性、对现有项目和账号的污染",
+            "不等于已经取得再分发、嵌入目标仓库或长期商用的权利",
+            "素材库显示名、稳定或内部素材身份",
+            "当前项目真正采用了",
+            "普通本地仓库讲解不因此增加联网、登录或在线试用",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, hosted)
+
     def test_adoption_handoff_preserves_non_weakenable_acceptance_items(
         self,
     ) -> None:

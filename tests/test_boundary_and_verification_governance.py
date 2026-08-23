@@ -95,6 +95,10 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             "权威生产者及其来源身份",
             "正式 schema 或规范化内容身份",
             "合同身份碰撞",
+            "算法名称与版本",
+            "叶载荷使用原始字节还是叶摘要",
+            "固定测试向量",
+            "双方都使用 SHA-256",
             "可扩展字段由生产者的机器可读描述拥有",
             "稳定字段身份、默认值、范围、单位、建议控件和是否可动画",
             "消费者只把建议控件映射到自己的界面组件",
@@ -758,6 +762,12 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             "模态遮罩、非模态提示和带行动通知",
             "卡片外的透明或布局范围不得遮住底层操作",
             "普通和窄视口",
+        ))
+        self.assertContains(PREVENTION_TEXT, (
+            "顺序、乱序、重复和新鲜实例",
+            "CSS transition",
+            "不能用固定等待",
+            "随机访问确定性不能替代播放体验",
         ))
 
 
