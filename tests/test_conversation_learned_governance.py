@@ -681,6 +681,22 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
+        section = PREVENTION_TEXT.split(
+            "### 批量改写先按语义角色分类",
+            1,
+        )[1].split("### 多层工具链执行闭包", 1)[0]
+        for fragment in (
+            "唯一实现、注册表、schema 定义或生成源属于规则定义者",
+            "必须与普通消费调用分成独立类别",
+            "面向消费者的机械替换不得覆盖定义者",
+            "单独补丁和唯一命中依据",
+            "自导入、自委托、递归绑定和循环转发",
+            "正式框架加载或运行时 smoke",
+            "静态解析成功",
+        ):
+            with self.subTest(rewrite_fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_reference_capabilities_cross_a_formal_adoption_boundary(self) -> None:
         for fragment in (
             "来源能力台账",

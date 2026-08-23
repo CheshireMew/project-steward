@@ -71,6 +71,36 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
+    def test_state_authority_migrations_close_old_layer_write_ownership(
+        self,
+    ) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 宽公共表面和组合根迁移保留合同身份",
+            1,
+        )[1].split("### 可选能力按独立支持面拆分公共合同", 1)[0]
+        ordered = (
+            "可变事实或业务草稿及其稳定身份",
+            "旧层的全部写入、默认值重算、定时保存、恢复和生命周期回调",
+            "最终权威所有者及其提交、持久化和活动运行时消费者",
+            "旧层获准保留的瞬态展示状态、类型化意图和只读投影",
+            "同一活动实例的装配身份",
+            "旧写入退出、真实入口提交和关闭重开证据",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "新建模型、helper 或 bridge 只证明新边界能够被表达",
+            "事实仍有两个所有者",
+            "展示层只提交类型化意图并读取投影",
+            "瞬态展示状态可以留在界面",
+            "按写入、保存、恢复和生命周期调用形态扫描旧层",
+            "同一个正式模型实例经过提交、活动运行时消费、关闭和重开",
+            "只构造新模型、检查属性存在或让测试直接调用 setter",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_protocol_surfaces_have_liveness_and_one_semantic_contract(
         self,
     ) -> None:
