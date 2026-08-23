@@ -8,12 +8,49 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 LICENSE_TEXT = (
     SKILL_ROOT / "references" / "license-governance.md"
 ).read_text(encoding="utf-8")
+ROLLOUT_TEXT = (
+    SKILL_ROOT / "references" / "license-rollout.md"
+).read_text(encoding="utf-8")
+SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 AUDIT_RELEASE_TEXT = (
     SKILL_ROOT / "references" / "project-audit-release-and-evidence.md"
 ).read_text(encoding="utf-8")
 
 
 class LicenseGovernanceTests(unittest.TestCase):
+    def test_stable_defaults_do_not_require_a_license_choice_prompt(self) -> None:
+        for fragment in (
+            "默认 `AGPL-3.0-or-later`",
+            "默认 `MPL-2.0`",
+            "稳定默认本身就是已经选定的许可证",
+            "不再停下来询问用户选择",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LICENSE_TEXT)
+
+        self.assertIn("命中稳定默认时不再询问许可证", SKILL_TEXT)
+        self.assertIn("无需另问一次许可证偏好", ROLLOUT_TEXT)
+
+    def test_skill_repository_classification_uses_the_primary_product(self) -> None:
+        for fragment in (
+            "主产品是一个 Agent Skill 或正式的 Agent Skill 集合",
+            "根目录 `SKILL.md`",
+            "嵌套适配器、测试夹具、示例、vendored 或第三方 Skill 文件",
+            "不会把宿主仓库改判为 Skill 仓库",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LICENSE_TEXT)
+
+    def test_existing_rights_boundaries_override_automatic_relicensing(self) -> None:
+        for fragment in (
+            "内容、数据、角色、品牌和媒体",
+            "已有许可证、Fork、外部贡献者或第三方冲突仍先保留现状",
+            "不能把稳定默认当成静默重新授权的依据",
+            "权利冲突可以阻塞实施",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, LICENSE_TEXT)
+
     def test_audit_routes_composite_runtime_rights_to_license_governance(
         self,
     ) -> None:

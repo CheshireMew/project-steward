@@ -164,7 +164,7 @@ README 不作为每项内部治理规则的第二份活动真源；自我进化�
 
 ## 许可证治理
 
-先读取 `references/license-governance.md`。用户确认具体方案后再读取 `references/license-rollout.md` 并实施；只读请求停在内容边界、第三方依赖与方案比较。
+先读取 `references/license-governance.md`。命中稳定默认时不再询问许可证。确认实施后读 `references/license-rollout.md`；只读停在内容边界与方案比较。
 
 ## 人性化日志
 
