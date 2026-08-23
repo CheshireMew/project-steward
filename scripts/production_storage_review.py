@@ -12,7 +12,7 @@ from typing import Any
 
 
 PROTOCOL = "project-steward-production-storage-contract"
-VERSION = 1
+VERSION = 2
 DEFAULT_CONTRACT = Path(".project-steward/storage-contract.json")
 ID_PATTERN = re.compile(r"^[a-z0-9]+(?:[._-][a-z0-9]+)*$")
 REQUIRED_POLICY = {
@@ -70,6 +70,23 @@ def _string_list(value: Any, label: str) -> list[str]:
     return result
 
 
+def _implementation_source(root: Path, value: Any, label: str) -> str:
+    selected = _string(value, label)
+    path_value, separator, token = selected.rpartition(":")
+    if not separator or not path_value or not token:
+        raise ReviewError(f"{label} must use project-relative-file:implementation-token")
+    source_path = _relative_path(root, path_value, label)
+    if not source_path.is_file():
+        raise ReviewError(f"{label} references a missing implementation file: {path_value}")
+    try:
+        source_text = source_path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as error:
+        raise ReviewError(f"{label} implementation file must be UTF-8 text") from error
+    if token not in source_text:
+        raise ReviewError(f"{label} implementation token is absent: {token}")
+    return selected
+
+
 def _read_contract(path: Path) -> dict[str, Any]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -106,6 +123,21 @@ def _review_producer(root: Path, value: Any, index: int) -> dict[str, Any]:
     budget = _object(producer.get("budget"), f"producer {producer_id}.budget")
     _string(budget.get("maximum_managed_bytes_source"), f"producer {producer_id}.budget.maximum_managed_bytes_source")
     _string(budget.get("minimum_free_bytes_source"), f"producer {producer_id}.budget.minimum_free_bytes_source")
+    registered_roots_inventory_source = _implementation_source(
+        root,
+        budget.get("registered_roots_inventory_source"),
+        f"producer {producer_id}.budget.registered_roots_inventory_source",
+    )
+    filesystem_allocated_bytes_source = _implementation_source(
+        root,
+        budget.get("filesystem_allocated_bytes_source"),
+        f"producer {producer_id}.budget.filesystem_allocated_bytes_source",
+    )
+    managed_object_identity_source = _implementation_source(
+        root,
+        budget.get("managed_object_identity_source"),
+        f"producer {producer_id}.budget.managed_object_identity_source",
+    )
 
     reuse = _object(producer.get("reuse"), f"producer {producer_id}.reuse")
     if not isinstance(reuse.get("required"), bool):
@@ -150,6 +182,11 @@ def _review_producer(root: Path, value: Any, index: int) -> dict[str, Any]:
         "test_files": test_files,
         "enforcement_file": enforcement_file,
         "enforcement_tokens": tokens,
+        "capacity_evidence": {
+            "registered_roots_inventory_source": registered_roots_inventory_source,
+            "filesystem_allocated_bytes_source": filesystem_allocated_bytes_source,
+            "managed_object_identity_source": managed_object_identity_source,
+        },
     }
 
 

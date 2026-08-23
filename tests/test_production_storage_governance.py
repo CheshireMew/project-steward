@@ -31,7 +31,9 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             "scripts/production_storage_review.py",
             "不能让 Project Steward 的脚本成为运行时代理",
             "候选归属体积不等于可回收体积",
-            "实际回收体积",
+            "文件系统分配体积",
+            "受管唯一对象体积",
+            "实际回收结果",
             "最后一个写入同一登记根的生产者",
         ):
             self.assertIn(phrase, reference)
@@ -49,6 +51,40 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
         template = next(item for item in listed["templates"] if item["id"] == "managed-runtime-artifacts")
         self.assertEqual("explicit-only", template["selection"])
 
+        with tempfile.TemporaryDirectory(prefix="project-steward-storage-template-") as temporary:
+            project = Path(temporary)
+            (project / ".project-steward").mkdir()
+            (project / ".project-steward" / "storage-contract.json").write_text(
+                "{}\n", encoding="utf-8"
+            )
+            adopted = subprocess.run(
+                [
+                    sys.executable,
+                    str(TEMPLATES),
+                    "adopt",
+                    str(project),
+                    "--template",
+                    "managed-runtime-artifacts",
+                    "--compact",
+                ],
+                cwd=SKILL_ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(0, adopted.returncode, adopted.stderr)
+            profile = json.loads(
+                (project / ".project-steward" / "project.json").read_text(encoding="utf-8")
+            )
+            selected = {item["id"]: item["version"] for item in profile["templates"]}
+            self.assertEqual("1.1.0", selected["managed-runtime-artifacts"])
+            self.assertEqual("2.4.0", profile["catalog_version"])
+            self.assertEqual(
+                "required-and-blocking",
+                profile["decisions"]["runtime_artifact_preflight"],
+            )
+
     def test_review_requires_real_enforcement_and_tests(self) -> None:
         with tempfile.TemporaryDirectory(prefix="project-steward-storage-") as temporary:
             project = Path(temporary)
@@ -56,13 +92,17 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             (project / "tests").mkdir()
             (project / ".project-steward").mkdir()
             (project / "src" / "producer.py").write_text(
-                "def require_storage_budget():\n    pass\n\ndef write_storage_inventory():\n    pass\n",
+                "def require_storage_budget():\n    pass\n\n"
+                "def list_storage_roots():\n    pass\n\n"
+                "def allocated_bytes():\n    pass\n\n"
+                "def file_identity():\n    pass\n\n"
+                "def write_storage_inventory():\n    pass\n",
                 encoding="utf-8",
             )
             (project / "tests" / "test_storage.py").write_text("def test_budget():\n    pass\n", encoding="utf-8")
             contract = {
                 "protocol": "project-steward-production-storage-contract",
-                "version": 1,
+                "version": 2,
                 "project_id": "fixture",
                 "policy": {
                     "unknown_peak": "block",
@@ -79,6 +119,9 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
                         "budget": {
                             "maximum_managed_bytes_source": "runtime-config:max_bytes",
                             "minimum_free_bytes_source": "runtime-config:min_free_bytes",
+                            "registered_roots_inventory_source": "src/producer.py:list_storage_roots",
+                            "filesystem_allocated_bytes_source": "src/producer.py:allocated_bytes",
+                            "managed_object_identity_source": "src/producer.py:file_identity",
                         },
                         "reuse": {"required": True, "identity": "content hash and producer version"},
                         "lifecycle": {
@@ -107,8 +150,61 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertEqual(0, passed.returncode, passed.stderr)
-            self.assertEqual("passed", json.loads(passed.stdout)["status"])
+            payload = json.loads(passed.stdout)
+            self.assertEqual("passed", payload["status"])
+            self.assertEqual(
+                "src/producer.py:allocated_bytes",
+                payload["producers"][0]["capacity_evidence"]["filesystem_allocated_bytes_source"],
+            )
 
+            contract["version"] = 1
+            contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
+            legacy = subprocess.run(
+                [sys.executable, str(REVIEW), str(project), "--compact"],
+                cwd=SKILL_ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(2, legacy.returncode)
+            self.assertIn("v2", legacy.stderr)
+
+            contract["version"] = 2
+            del contract["producers"][0]["budget"]["filesystem_allocated_bytes_source"]
+            contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
+            missing_allocation = subprocess.run(
+                [sys.executable, str(REVIEW), str(project), "--compact"],
+                cwd=SKILL_ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(2, missing_allocation.returncode)
+            self.assertIn("filesystem_allocated_bytes_source", missing_allocation.stderr)
+
+            contract["producers"][0]["budget"]["filesystem_allocated_bytes_source"] = (
+                "src/producer.py:allocated_bytes"
+            )
+            contract["producers"][0]["budget"]["managed_object_identity_source"] = (
+                "src/producer.py:missing_identity"
+            )
+            contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
+            missing_identity = subprocess.run(
+                [sys.executable, str(REVIEW), str(project), "--compact"],
+                cwd=SKILL_ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            self.assertEqual(2, missing_identity.returncode)
+            self.assertIn("implementation token is absent", missing_identity.stderr)
+
+            contract["producers"][0]["budget"]["managed_object_identity_source"] = (
+                "src/producer.py:file_identity"
+            )
             contract["producers"][0]["root_source"]["value"] = "D:/unowned"
             contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
             blocked = subprocess.run(

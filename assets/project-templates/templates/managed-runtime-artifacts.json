@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "managed-runtime-artifacts",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "layer": "capability",
   "name": "Managed runtime artifacts",
   "description": "Preflight, ownership, reuse, budget, and finalization contracts for storage-intensive production projects.",
@@ -24,13 +24,14 @@
     {
       "id": "runtime-artifact-preflight-before-write",
       "title": "Budget before the first large write",
-      "statement": "Every storage-intensive producer resolves one owned root, estimates peak bytes, checks managed capacity and free-space headroom, and blocks before creating a large artifact when any input is unknown.",
+      "statement": "Every storage-intensive producer enumerates all owned roots, estimates peak allocation, checks filesystem-allocated bytes and free-space headroom, and blocks before creating a large artifact when any input is unknown.",
       "preflight": [
-        "Name the producer, root source, artifact classes, estimate, capacity source, and interruption outcome.",
+        "Name the producer, registered-roots inventory source, artifact classes, estimate, allocated-bytes source, managed-object identity, capacity source, and interruption outcome.",
         "Run the project storage review before executing the producer."
       ],
       "evidence": [
-        "An over-budget run creates no large file.",
+        "An over-budget run or a run with unknown allocated-byte evidence creates no large file.",
+        "Sparse or compressed fixtures report logical and filesystem-allocated bytes separately across all registered roots.",
         "A configured root never causes a sibling drive-root or repository-neighbor scratch directory."
       ]
     },
