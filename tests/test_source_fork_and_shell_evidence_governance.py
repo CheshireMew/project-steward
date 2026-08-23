@@ -152,10 +152,23 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             1,
         )[1].split("## 项目综合审计", 1)[0]
 
-        self.assertIn("Shell 后句可能遮蔽前序失败", shared)
+        self.assertIn("隐藏项或转义失真时同样进入", shared)
         self.assertIn("先进入“用户环境档案与执行环境”", shared)
         self.assertIn("references/user-environment-governance.md", environment_route)
         self.assertNotIn("$LASTEXITCODE", shared)
+
+    def test_hidden_control_items_require_a_hidden_aware_probe(self) -> None:
+        for fragment in (
+            "Windows 隐藏控制项不能由默认读取判定不存在",
+            "不能证明准确字面量路径不存在",
+            "Test-Path -LiteralPath <root>\\.git",
+            "Get-Item -LiteralPath <root>\\.git -Force",
+            "准确项目根直接存在 `.git`",
+            "验证器假阴性",
+            "不能为了让验证器看见对象而清除 `Hidden`",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
 
     def test_skill_main_file_stays_within_budget(self) -> None:

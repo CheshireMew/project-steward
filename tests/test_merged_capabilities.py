@@ -616,6 +616,25 @@ class MergedCapabilityTests(unittest.TestCase):
         self.assertIn("扩展注入内容", platform)
         self.assertIn("不通过破坏语义标记", platform)
 
+    def test_visual_acceptance_classifies_browser_runtime_diagnostics(self) -> None:
+        visual = (
+            SKILL_ROOT
+            / "references"
+            / "implementation-review-visual-evidence.md"
+        ).read_text(encoding="utf-8")
+        for fragment in (
+            "浏览器运行诊断与画面一起收口",
+            "页面导航和首次交互前订阅",
+            "控制台 `error`",
+            "未捕获的页面异常",
+            "产品拥有的运行错误",
+            "验证器失败",
+            "无关宿主噪声",
+            "不自动判为产品缺陷",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, visual)
+
     def test_collection_preview_and_reorder_contracts_are_active(self) -> None:
         interaction = read_reference("interaction-motion.md")
         layout = (
