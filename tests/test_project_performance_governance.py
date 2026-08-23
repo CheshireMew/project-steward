@@ -64,6 +64,19 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PERFORMANCE_TEXT)
 
+    def test_resource_accounting_uses_the_owned_process_tree_and_lifecycle(self) -> None:
+        for fragment in (
+            "完整进程树核算根进程、子进程和全部后代",
+            "不能用父进程工作集、配置的 worker 数或单进程估算替代",
+            "共享池或常驻服务基线、单任务增量",
+            "任务执行峰值、任务结束后的保留量、空闲回收后的稳定水平",
+            "正式关闭后的释放",
+            "共享进程只在一个所有者下计入一次",
+            "资源总量保持未知",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PERFORMANCE_TEXT)
+
     def test_read_only_measurement_cannot_mutate_user_state(self) -> None:
         for fragment in (
             "只读性能审计不能借“需要测量”改变项目状态",
@@ -116,6 +129,24 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             "由产品合同的权威来源确认",
             "原性能发现仍然开放",
             "较小工作负载下的更快数字只证明较小边界",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, measurement)
+
+    def test_gate_compliance_is_not_overclaimed_as_performance_health(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        for fragment in (
+            "验收门槛与性能评价分开记录",
+            "权威预算被超过时是合同失败",
+            "预算内只证明该项门禁成立",
+            "不能自动推出整体性能健康",
+            "体验风险或优化候选",
+            "门禁仍然通过",
+            "不能把风险改写成合同失败",
+            "没有权威预算时",
+            "待确认的产品判断",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, measurement)
