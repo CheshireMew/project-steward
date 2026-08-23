@@ -6,6 +6,15 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+PREVENTION_TEXT = "".join(
+    (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+    for name in (
+        "change-prevention.md",
+        "change-prevention-state-and-capability.md",
+        "change-prevention-delivery-boundaries.md",
+        "change-prevention-verification.md",
+    )
+)
 DESKTOP_TEXT = (
     SKILL_ROOT / "references" / "desktop-app-governance.md"
 ).read_text(encoding="utf-8")
@@ -21,6 +30,33 @@ USER_ENVIRONMENT_TEXT = (
 
 
 class ExecutionBoundaryGovernanceTests(unittest.TestCase):
+    def test_desktop_audit_remediation_loads_specialization_before_work(self) -> None:
+        route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        for fragment in (
+            "桌面项目涉及外壳、原生进程、界面线程、延迟工作、原生窗口或捕获",
+            "再读 `references/desktop-app-governance.md`",
+            "无关历史审计不扩张单点缺陷范围",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, route)
+        self.assertLess(
+            route.index("references/change-prevention.md"),
+            route.index("references/desktop-app-governance.md"),
+        )
+
+    def test_build_profiles_cannot_remove_required_side_effects(self) -> None:
+        for fragment in (
+            "产生正式结果、改变状态或触发外部副作用的必需动作",
+            "不得放在断言、调试断言、诊断专用宏",
+            "断言只检查已经发生的事实",
+            "会保留和移除该结构的实际配置",
+            "Debug 通过不能替 Release 或其它正式 profile 背书",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
     def test_rules_stay_in_reachable_unique_owners(self) -> None:
         self.assertIn("references/desktop-app-governance.md", SKILL_TEXT)
         self.assertIn("references/root-cause-remediation.md", SKILL_TEXT)
@@ -115,6 +151,22 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_state_change_claims_require_the_same_actual_observation_object(
+        self,
+    ) -> None:
+        for fragment in (
+            "把前后结果解释为同一路径被外部改写前",
+            "每次工具实际收到的字面路径、工作目录和解析后的稳定身份",
+            "身份不同的结果只能分别描述各自对象",
+            "不能先把同步软件、生成器或其它进程当成已经成立的原因",
+            "对象标识的权威发现来源与传递方式",
+            "各次输入解析后的稳定对象身份，以及是否相同",
+            "身份不同只证明分别查询了不同对象",
+            "单次稳定验证没有跨观测比较时",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
 
 
 if __name__ == "__main__":

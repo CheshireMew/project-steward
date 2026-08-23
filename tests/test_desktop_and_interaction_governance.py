@@ -116,6 +116,15 @@ class DesktopAndInteractionGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
         self.assertIn("目标专属代码", PROJECT_AUDIT_TEXT)
+        for fragment in (
+            "多个原生约束",
+            "有序或原子状态转换",
+            "每个会被平台观察到的中间状态都必须合法",
+            "真实 Windows 窗口与目标 DPI",
+            "平台警告视为失败",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DESKTOP_TEXT)
 
     def test_public_audit_uses_live_remote_and_external_capability_evidence(
         self,

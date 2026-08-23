@@ -431,6 +431,9 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             "已解决 / 经新证据重新分类 / 经用户明确同意退出范围 / 受阻",
             "仍然开放或证据未知",
             "不得宣告“全部问题已经解决”",
+            "`稳定发现 ID → 最终状态 → 最后一次有效证据 → 未验证边界`",
+            "分类汇总、测试总数或“均已解决”结论不能替代逐项映射",
+            "显式标为未验证、受阻或开放",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
@@ -443,17 +446,17 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             1,
         )[0]
         ordered = (
-            "修复承接本任务先前的综合审计",
-            "原审计交接账本继续作为结项合同",
+            "修复先前综合审计的全部问题",
+            "原交接账本仍为结项合同",
             "references/change-prevention.md",
-            "最后一次相关修改后",
+            "末次相关修改后",
             "references/project-audit.md",
-            "重新生成覆盖与发现账本",
+            "重建账本",
         )
         positions = [route.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
         self.assertIn(
-            "单点缺陷不会仅因历史中存在无关审计而扩张到这条链",
+            "无关历史审计不扩张单点缺陷范围",
             route,
         )
 
@@ -679,22 +682,6 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
         self.assertEqual(shadowed, [])
         self.assertEqual(len(collected), len(set(collected)))
         self.assertSetEqual(set(collected), expected)
-
-    def test_state_change_claims_require_the_same_actual_observation_object(
-        self,
-    ) -> None:
-        for fragment in (
-            "把前后结果解释为同一路径被外部改写前",
-            "每次工具实际收到的字面路径、工作目录和解析后的稳定身份",
-            "身份不同的结果只能分别描述各自对象",
-            "不能先把同步软件、生成器或其它进程当成已经成立的原因",
-            "对象标识的权威发现来源与传递方式",
-            "各次输入解析后的稳定对象身份，以及是否相同",
-            "身份不同只证明分别查询了不同对象",
-            "单次稳定验证没有跨观测比较时",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, PREVENTION_TEXT)
 
     def test_boundary_spies_assert_canonical_semantic_identity(self) -> None:
         for fragment in (

@@ -106,11 +106,11 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
             "## 外部工具兼容性", 1
         )[0]
         self.assertIn(
-            "写入前固定从 `references/change-prevention.md` 进入“改动前预防”完整主链",
+            "写入前进入 `references/change-prevention.md` 完整预防链",
             audit_fix_route,
         )
         self.assertIn(
-            "涉及移动或归档时同时进入“项目目录治理”",
+            "移动或归档进目录治理",
             audit_fix_route,
         )
 

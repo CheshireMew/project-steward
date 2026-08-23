@@ -140,7 +140,10 @@ class GitHubStarHistoryTests(unittest.TestCase):
         self.assertIn("只读", readme_section)
         self.assertIn("手动派发工作流后立即停止", readme_section)
         self.assertIn("只有用户另行要求远端验收时", readme_section)
-        self.assertIn("Star History 与 Topics 都作为默认交付项", readme_section)
+        self.assertIn(
+            "公开 GitHub 仓库完整优化默认交付 Star History、Topics 与 About",
+            readme_section,
+        )
         self.assertIn("完整 README 优化", REFERENCE_TEXT)
         self.assertIn("默认交付，不等待用户再次点名 Star History", REFERENCE_TEXT)
         self.assertIn("Star History 是目标仓库 README 与主页展示的独立优化结果", REFERENCE_TEXT)

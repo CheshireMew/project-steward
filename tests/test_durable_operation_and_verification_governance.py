@@ -435,6 +435,11 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             "操作身份、generation 和终态隔离继续负责关联结果，不能冒充执行互斥",
             "共享服务或原生资源的最大在途进入数符合合同",
             "把测试改成串行，不能证明执行拓扑已经安全",
+            "内部已经创建的框架资源和子对象",
+            "计时器、读取器、套接字、订阅、回调和句柄",
+            "会随所有者正式迁移",
+            "在原上下文停止并在目标上下文重建",
+            "跨上下文启动、停止或销毁警告属于失败",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_TEXT)
