@@ -142,6 +142,18 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
+    def test_tool_exit_codes_are_mapped_to_defined_result_semantics(self) -> None:
+        for fragment in (
+            "原始退出码与工具定义的结果语义分开记录",
+            "非零不是通用失败标签",
+            "`rg` 的 1 表示无匹配、2 才表示执行错误",
+            "成功有结果、成功无结果、失败或未知",
+            "未映射的非零保持未知",
+            "不能让本来表示零匹配的结果提前终止后续证据链",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
+
     def test_shell_evidence_route_reaches_the_unique_platform_method(self) -> None:
         shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
             "## 对话学习与自我进化",

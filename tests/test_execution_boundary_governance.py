@@ -18,9 +18,13 @@ PREVENTION_TEXT = "".join(
 DESKTOP_TEXT = (
     SKILL_ROOT / "references" / "desktop-app-governance.md"
 ).read_text(encoding="utf-8")
-REMEDIATION_TEXT = (
-    SKILL_ROOT / "references" / "root-cause-remediation.md"
-).read_text(encoding="utf-8")
+REMEDIATION_TEXT = "".join(
+    (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+    for name in (
+        "root-cause-remediation.md",
+        "root-cause-verification-and-closure.md",
+    )
+)
 CI_TEXT = (
     SKILL_ROOT / "references" / "ci-execution-governance.md"
 ).read_text(encoding="utf-8")
@@ -72,12 +76,37 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
             "补丁和写入载荷必须来自完整真源",
             "测试的正式启动身份还要包含实际 runner",
             "终止前先区分进程存活与可枚举残留",
+            "验证命令先固定正式身份",
+            "多轮证据不重复累计",
         ):
             with self.subTest(fragment=fragment):
                 self.assertEqual(
                     sum(text.count(fragment) for text in reference_texts),
                     1,
                 )
+
+    def test_static_verifiers_use_the_formal_project_command_identity(self) -> None:
+        for fragment in (
+            "项目配置、正式包装脚本或默认命令",
+            "准确工作目录、runner、默认输入范围",
+            "临时增加路径参数、从其它目录调用或绕过包装器属于另一命令身份",
+            "验证器或前置条件失败",
+            "不能为迁就错误验证入口修改产品",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
+    def test_validation_totals_deduplicate_actual_test_identities(self) -> None:
+        for fragment in (
+            "每次运行身份、实际选择的唯一测试节点和结果",
+            "总覆盖只能按唯一测试节点去重",
+            "不能相加成新增覆盖",
+            "架构测试、功能测试、静态检查和用户链不能因汇报方便互相改名",
+            "未知重叠",
+            "不给出虚假的累计总数",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
 
     def test_shared_executor_does_not_own_subsystem_lifecycle(self) -> None:
         for fragment in (
