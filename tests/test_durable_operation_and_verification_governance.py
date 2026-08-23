@@ -318,6 +318,51 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
+    def test_reads_declare_consistency_and_mutations_return_closed_projections(
+        self,
+    ) -> None:
+        ordered = (
+            "读取一致性与变更后置投影显式化",
+            "事务快照、可取消时间点扫描或活动投影",
+            "事务快照不得由独立查询拼接",
+            "状态变更在同一提交边界返回可直接消费的版本化后置投影",
+            "完整快照，或覆盖闭合且应用规则明确的补丁",
+            "不能只返回局部状态",
+            "闭合补丁足够时不强制全量快照",
+        )
+        positions = [PREVENTION_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "每个结果都带权威身份或版本",
+            "从正式状态变更直接消费同一提交返回的完整快照或闭合补丁",
+            "必须补查兄弟接口或拼接旧缓存",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+    def test_generation_identity_and_first_use_sync_identity_are_not_reused(
+        self,
+    ) -> None:
+        for fragment in (
+            "generation 的分配身份在旧请求、取消、分片或回调仍可能到达时不得复用",
+            "清理当前记录只结束可发现性，不重置或回绕分配器",
+            "只有旧身份已不可能再到达",
+            "清理记录并启动 B，再投递迟到的 A 请求、取消、分片和回调",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        for fragment in (
+            "同步命名空间必须直接由规范化资源身份和合同版本确定",
+            "在任何参与者创建侧边锁文件、状态目录或业务副作用之前取得",
+            "不能把“侧边锁文件已经存在”作为其它进程加入同一同步边界的前提",
+            "只读参与者也不能为了协调创建业务状态",
+            "不存在任何侧边锁文件的状态启动读写进程",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
     def test_adapters_bind_explicit_inputs_before_defaults(self) -> None:
         ordered = (
             "稳定字段身份及其全部显式输入来源",
