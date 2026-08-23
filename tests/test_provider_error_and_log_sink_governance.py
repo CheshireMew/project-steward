@@ -32,6 +32,23 @@ class ProviderErrorAndLogSinkGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
+    def test_attempt_failure_is_reconciled_before_user_notification(self) -> None:
+        for fragment in (
+            "单次尝试失败不能直接升级为用户可见故障",
+            "尝试失败、协调后的当前健康状态和用户通知必须分层",
+            "界面只消费协调后的已保存、未保存或失败状态",
+            "自动重试资格继续由 `hard-to-reproduce-diagnostics.md` 的精确失败分类拥有",
+            "操作本身幂等或部分写入已经受协调",
+            "未知或不可重试错误不能因为可能是平台抖动就进入宽限期",
+            "失败从未对用户可见时，既不产生失败通知，也不补发恢复通知",
+            "才只产生一次恢复结果",
+            "关闭流程必须消费仍未保存的权威状态",
+            "诊断记录继续消费 `log-audit-standard.md`",
+            "瞬时失败后在有限窗口内恢复、重试耗尽、不可重试错误立即失败",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
     def test_service_upgrade_preserves_product_availability_contract(
         self,
     ) -> None:
