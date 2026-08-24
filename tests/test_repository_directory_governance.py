@@ -108,14 +108,14 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         audit_fix_route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
             "## 外部工具兼容性", 1
         )[0]
-        self.assertIn(
-            "写入前进入 `references/change-prevention.md` 完整预防链",
-            audit_fix_route,
+        ordered = (
+            "写入前读 `references/project-audit.md`",
+            "`references/change-prevention.md`",
+            "桌面、移动或归档叠加",
+            "`references/repository-directory-governance.md`",
         )
-        self.assertIn(
-            "移动或归档再读 `references/repository-directory-governance.md`",
-            audit_fix_route,
-        )
+        positions = [audit_fix_route.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
 
     def test_method_preserves_evidence_and_permission_boundaries(self) -> None:
         required_contracts = (

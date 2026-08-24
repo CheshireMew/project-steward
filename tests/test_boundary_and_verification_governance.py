@@ -452,20 +452,21 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             1,
         )[0]
         ordered = (
-            "修复先前综合审计的全部问题",
-            "写入前先用 `references/project-audit.md`",
-            "账本合格前不得写入",
+            "综合审计全量修复以原交接账本为结项合同",
+            "写入前读 `references/project-audit.md`",
+            "references/project-audit-release-and-evidence.md",
             "references/change-prevention.md",
-            "末次修改后再用 `references/project-audit.md`",
+            "账本合格才写",
+            "末改后重建审计账本",
             "摘要只取逐项终态",
         )
         positions = [route.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
         self.assertIn(
-            "无关历史审计不扩张单点缺陷范围",
+            "无关审计不扩张单点范围",
             route,
         )
-        self.assertEqual(2, route.count("references/project-audit.md"))
+        self.assertEqual(1, route.count("references/project-audit.md"))
 
         self.assertIn("原诊断结论成为本轮结项合同", REMEDIATION_TEXT)
         self.assertIn("修复后再回到本方法全新复查", PROJECT_AUDIT_TEXT)

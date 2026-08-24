@@ -93,12 +93,13 @@ Project Steward 自我进化时必须执行活动文本约束：
 
 先读取 `references/root-cause-remediation.md` 和 `references/root-cause-verification-and-closure.md`。诊断停在证据、影响范围与最终修法；实施才一次迁移全部生产者、边界和消费者，并退出旧架构。按问题叠加：
 
-修复先前综合审计的全部问题时，原交接账本仍是结项合同。写入前先用 `references/project-audit.md` 和 `references/project-audit-release-and-evidence.md` 核对稳定编号、完成条件和证据平面；缺失或过期时按原范围在内存重建，未知保持开放，账本合格前不得写入。写入前进入 `references/change-prevention.md` 完整预防链；桌面项目涉及外壳、原生进程、界面线程、延迟工作、原生窗口或捕获时，再读 `references/desktop-app-governance.md`；移动或归档再读 `references/repository-directory-governance.md`。末次修改后再用 `references/project-audit.md` 重建同一账本，新证据使旧状态失效，摘要只取逐项终态。无关历史审计不扩张单点缺陷范围。
+综合审计全量修复以原交接账本为结项合同。写入前读 `references/project-audit.md`、`references/project-audit-release-and-evidence.md`、`references/change-prevention.md`，核对稳定编号、完成条件与证据面；缺失、过期按原范围重建，未知开放，账本合格才写。桌面、移动或归档叠加 `references/desktop-app-governance.md`、`references/repository-directory-governance.md`。末改后重建审计账本，新证据使旧状态失效，摘要只取逐项终态；无关审计不扩张单点范围。
 
 - 持久操作、队列或调度器的有界批次与积压排空、恢复，或常驻有状态服务的会话准入与释放竞争：`references/durable-operation-governance.md`
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
 - 返工来自多份产物关系不明、理由在重新生成时丢失、全量重算、错误缓存失效、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
+- 性能、资源或规模项：`references/project-performance-governance.md`；写前生成适用矩阵，末改经直接因果检查、二次复审再冻结；无当前平台用户链则证据面未验证。
 - 审计修复或项目级改动会使用完整套件，或触及验证控制面、分类、资源、分片、成本与重试：读 `references/ci-execution-governance.md`，第一条测试前完成运行资格、累计预算和套件次数账本。
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`

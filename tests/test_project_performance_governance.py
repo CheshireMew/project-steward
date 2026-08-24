@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
+MAIN_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 AUDIT_TEXT = (SKILL_ROOT / "references" / "project-audit.md").read_text(
     encoding="utf-8"
 )
@@ -14,6 +15,25 @@ PERFORMANCE_TEXT = (
 
 
 class ProjectPerformanceGovernanceTests(unittest.TestCase):
+    def test_performance_remediation_consumes_owner_before_candidate_freeze(
+        self,
+    ) -> None:
+        section = MAIN_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        ordered = (
+            "性能、资源或规模项",
+            "`references/project-performance-governance.md`",
+            "写前生成适用矩阵",
+            "直接因果检查",
+            "二次复审",
+            "再冻结",
+            "无当前平台用户链",
+            "证据面未验证",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_comprehensive_audit_routes_one_performance_owner(self) -> None:
         section = AUDIT_TEXT.split("## 8. 审计性能、资源与规模", 1)[1].split(
             "## 9. 审计兼容性、安装与外部边界", 1
