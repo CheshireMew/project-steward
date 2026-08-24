@@ -29,6 +29,47 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
+    def test_file_and_aggregate_dependency_graphs_close_independently(self) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 文件图与聚合图分别验收", 1
+        )[1].split("## 3. 判断上帝模块", 1)[0]
+        ordered = (
+            "文件图和聚合图两种投影",
+            "目录层、包、组件或逻辑所有者",
+            "允许的单向依赖",
+            "分别检查非法边、环和强连通分量",
+            "文件图无环不能替目录或包无环",
+            "从正式运行入口核对活动源码可达性",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_hardcode_candidates_require_shared_fact_evidence(self) -> None:
+        section = ARCHITECTURE_TEXT.split("硬编码扫描只生成候选", 1)[1]
+        for fragment in (
+            "共享业务事实",
+            "一个可执行真源",
+            "局部呈现、测量结果、动画曲线或媒体调优",
+            "相同字面量",
+            "不能单独证明应合并",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_architecture_guard_claims_require_violation_and_legal_fixtures(
+        self,
+    ) -> None:
+        output = ARCHITECTURE_TEXT.split("## 8. 输出", 1)[1]
+        for fragment in (
+            "真实违规夹具",
+            "合法近似夹具",
+            "实际目标输入结果",
+            "只报告现状扫描",
+            "不宣称已经防回归",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, output)
+
     def test_architecture_metrics_preserve_audit_baseline_lineage(self) -> None:
         ordered = (
             "审计来源：当前工作树 / 指定提交 / 指定产物",

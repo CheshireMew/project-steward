@@ -61,6 +61,21 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_parent_wrapper_subsumes_duplicate_final_child_runs(self) -> None:
+        section = CI_TEXT.split(
+            "### 完整入口必须与验收义务对账",
+            1,
+        )[1].split("### 本地测试前只消费已经完成的远端失败", 1)[0]
+        ordered = (
+            "父入口在同一候选上完整运行子入口",
+            "保留同等退出状态和证据",
+            "最终只运行父入口",
+            "子入口只用于冻结前聚焦诊断",
+            "不再重复取得最终资格",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_local_validation_consumes_one_completed_remote_failure_without_polling(
         self,
     ) -> None:
@@ -246,6 +261,20 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_test_seam_is_compatible_with_the_formal_runner(self) -> None:
+        section = CI_TEXT.split(
+            "### 测试命令先展开再取得运行资格",
+            1,
+        )[1].split("### 昂贵验证器先证明自己的适用合同", 1)[0]
+        ordered = (
+            "新增测试缝前",
+            "不执行正文的短探针",
+            "runner 的转译方式、模块解析、支持语法和运行时全局",
+            "新模块必须能被正式入口实际加载",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
 
     def test_surprising_external_resources_are_explained_before_launch(
         self,

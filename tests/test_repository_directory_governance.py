@@ -110,7 +110,7 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
             audit_fix_route,
         )
         self.assertIn(
-            "移动或归档进目录治理",
+            "移动或归档再读 `references/repository-directory-governance.md`",
             audit_fix_route,
         )
 
