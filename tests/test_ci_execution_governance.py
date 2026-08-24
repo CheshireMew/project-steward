@@ -9,6 +9,9 @@ SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 CI_TEXT = (
     SKILL_ROOT / "references" / "ci-execution-governance.md"
 ).read_text(encoding="utf-8")
+USER_ENVIRONMENT_TEXT = (
+    SKILL_ROOT / "references" / "user-environment-governance.md"
+).read_text(encoding="utf-8")
 SELF_EVOLUTION_TEXT = (
     SKILL_ROOT / "references" / "skill-self-evolution-governance.md"
 ).read_text(encoding="utf-8")
@@ -46,6 +49,39 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         )
         positions = [remediation.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
+
+    def test_custom_user_chains_and_long_batches_enter_execution_owners(
+        self,
+    ) -> None:
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化", 1
+        )[0]
+        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+
+        for fragment in (
+            "自写浏览器、视觉、用户链验证器首次运行前",
+            "references/ci-execution-governance.md",
+        ):
+            with self.subTest(shared_fragment=fragment):
+                self.assertIn(fragment, shared)
+
+        for fragment in (
+            "后台、跨观察窗口任务、路径或执行环境",
+            "以及并行验证",
+            "启动前读 `references/user-environment-governance.md`",
+            "长命令无可回读身份和独立终态便不成批启动",
+        ):
+            with self.subTest(remediation_fragment=fragment):
+                self.assertIn(fragment, remediation)
+
+        for fragment in (
+            "可回读的进程身份、增量输出和退出状态",
+            "不能通过一个超时后无法恢复生产者身份的前台入口启动",
+        ):
+            with self.subTest(owner_fragment=fragment):
+                self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
     def test_umbrella_commands_are_reconciled_with_validation_obligations(
         self,

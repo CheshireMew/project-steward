@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从项目过程与结果提炼治理方法，并在明确要求时自我进化；按实施计划审计完成度、研究整理仓库，判断开源采用、目录职责、许可证与致谢；预防返工、沿根因修复跨层缺陷，治理外部工具、持久操作、架构质量、用户链、UI/UX、README、日志、模板、用户环境和仓库发布。Use to learn/evolve from project history; audit a plan or repository; understand or organize a codebase; study open-source adoption/attribution; prevent rework/remediate root causes; inspect external-tool compatibility, durable operations, architecture cohesion/coupling, duplication or god modules, UI/UX, README, logging, templates, user environments, licensing/publication. Not for single-function or security/dependency/CI/monitoring-only tasks."
+description: "从项目过程与结果提炼治理方法，并在明确要求时自我进化；按实施计划审计完成度、研究整理仓库，判断开源采用、目录职责、许可证与致谢；预防返工、沿根因修复跨层缺陷，治理外部工具、持久操作、架构质量、用户链、UI/UX、README、日志、模板、用户环境和仓库发布。Use for project-history learning/evolution; audit a plan or repository; understand or organize a codebase; study open-source adoption/attribution; root causes; inspect external-tool compatibility, durable operations, architecture, duplication, UI/UX, docs, logs, templates, user environments, licensing/publication. Excludes isolated function, security, dependency, CI, or monitoring-only work."
 ---
 
 # Project Steward
@@ -48,7 +48,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 - 独立探测不得共享 Shell 退出状态；组合须逐项保留输出、错误和退出状态。Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”，隐藏项或转义失真时同样进入；只把被遮蔽、未执行或状态未知的项目单独补跑。
 - 项目事实写回项目现有唯一真源；环境事实写入独立用户档案；可迁移治理方法才进入本 Skill；模板只接收某类项目每次都应执行的稳定默认。
 - 判断历史或外部材料中的能力是否已经存在时，先完成独立结果拆分和必要的因果排序，再遮住来源检查目标能否认出同一条件、保留同一构成性细节并作出同一具体处理；只有上位治理框架算部分具备。完成逐项比较后才提炼共同机制和特殊维度。
-- 验证按改动风险选择层级：每个验证阶段先按 `references/ci-execution-governance.md` 消费最近一次已完成的公开仓库失败，只运行当前机器上直接覆盖本次改动和验收主张的目标检查；其它平台、完整回归、远端 CI 与真实用户链只有用户明确要求、代码冻结或目标检查证明系统性影响时才进入。
+- 验证按改动风险选择层级：每个验证阶段及自写浏览器、视觉、用户链验证器首次运行前，先按 `references/ci-execution-governance.md` 消费最近一次已完成的公开仓库失败，只运行当前机器上直接覆盖本次改动和验收主张的目标检查；其它平台、完整回归、远端 CI 与真实用户链只有用户明确要求、代码冻结或目标检查证明系统性影响时才进入。
 - 状态改变后直接回读权威目标。完成验证必须沿正式生产者、传输或存储边界、消费者和用户可观察结果；不能让消费端手写假数据或 mock 掉正在验证的核心链路。
 - 测试结果用于关闭承诺或宣告完成前，预期关键测试身份必须与测试框架实际收集的唯一身份一致；缺失或非唯一身份都只能标为未覆盖。
 - 诊断读取设置、运行报告、结构化制品或日志时，按 `references/log-audit-standard.md` 先投影当前判断需要的允许字段；未知结构不得整份递归输出，凭据必须在进入工具输出、对话或诊断导出前脱敏。
@@ -105,7 +105,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
 - 可视层级、变换或动效所有权：`references/interaction-motion.md` 和 `references/interaction-navigation-and-media-lifecycle.md`；需要实际运行画面验收时再读 `references/implementation-review.md` 与 `references/implementation-review-visual-evidence.md`
-- 后台、跨观察窗口任务、路径或执行环境：`references/user-environment-governance.md`
+- 后台、跨观察窗口任务、路径或执行环境，以及并行验证：启动前读 `references/user-environment-governance.md`；长命令无可回读身份和独立终态便不成批启动
 - 大型媒体、缓存、测试证据、下载、模型或中间产物造成容量增长、跨根散落或无主残留：`references/production-storage-governance.md`
 - 事件、版本、历史或缓存把计划影响范围误当成实际变更事实：`references/change-prevention.md` 的“计划范围与实际变更事实分离”合同
 - 局部状态、心跳或遥测更新覆盖、清空了未声明字段，或者消费者无法区分完整快照与局部补丁：`references/change-prevention.md` 的活动投影更新合同

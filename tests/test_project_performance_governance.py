@@ -89,6 +89,33 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PERFORMANCE_TEXT)
 
+    def test_retained_resource_closure_bounds_items_aggregate_and_transient_peak(
+        self,
+    ) -> None:
+        resources = PERFORMANCE_TEXT.split("### 资源趋势和关闭", 1)[1].split(
+            "## 5. 建立可比较的测量证据", 1
+        )[0]
+        ordered = (
+            "从正式内容身份展开完整保留闭包",
+            "活动工作副本",
+            "预览、索引、DOM 或设备投影",
+            "单对象成本和当前最外层正式所有者内的累计成本",
+            "正常路径与最坏生命周期的同时峰值",
+        )
+        positions = [resources.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "单对象大小、活动对象数量",
+            "操作过程中的瞬时峰值",
+            "单文件、单请求或单标签有限，不能证明",
+            "硬上界",
+            "拒绝、回收、卸载或降级语义",
+            "不会因此自动触发无关的全仓容量治理",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, resources)
+
     def test_read_only_measurement_cannot_mutate_user_state(self) -> None:
         for fragment in (
             "只读性能审计不能借“需要测量”改变项目状态",
@@ -216,6 +243,31 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, closure)
+
+    def test_secondary_reaudit_precedes_candidate_freeze_and_expensive_qualification(
+        self,
+    ) -> None:
+        closure = PERFORMANCE_TEXT.split("## 6. 修复交接与二次性能复审", 1)[1]
+        workflow = "先完成直接因果检查" + closure.split(
+            "先完成直接因果检查", 1
+        )[1].split("完整测试、静态检查", 1)[0]
+        ordered = (
+            "直接因果检查",
+            "二次性能复审",
+            "冻结准确候选",
+            "最终完整用户链、规模、视觉、原生或其它昂贵资格检查",
+        )
+        positions = [workflow.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "候选保持未冻结",
+            "不能先用完整套件取得完成资格",
+            "相关资格立即失效并返回二次复审与候选冻结",
+            "为何对最终候选仍然新鲜",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, workflow)
 
 
 if __name__ == "__main__":
