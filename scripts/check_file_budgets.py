@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Measure Project Steward active text against the outer-tool output budget."""
+"""Measure Project Steward active text and root-router budgets."""
 
 from __future__ import annotations
 
@@ -11,6 +11,9 @@ from pathlib import Path
 
 MAX_OUTER_TOOL_TOKENS = 9_000
 BYTES_PER_OUTER_TOOL_TOKEN = 4
+MAX_SKILL_LINES = 220
+MAX_SKILL_CHARACTERS = 14_000
+SKILL_ROUTER_PATH = Path("SKILL.md")
 IGNORED_DIRECTORY_NAMES = {
     ".git",
     ".pytest_cache",
@@ -41,11 +44,13 @@ TEXT_ASSET_SUFFIXES = {
 
 @dataclass(frozen=True)
 class FileBudget:
-    """One active UTF-8 text file and its outer-tool estimate."""
+    """One active UTF-8 text file and every applicable size measure."""
 
     path: Path
     byte_count: int
     estimated_tokens: int
+    line_count: int
+    character_count: int
 
 
 def estimate_outer_tool_tokens(byte_count: int) -> int:
@@ -86,38 +91,59 @@ def collect_file_budgets(root: Path) -> list[FileBudget]:
                 continue
             data = path.read_bytes()
             try:
-                data.decode("utf-8")
+                text = data.decode("utf-8")
             except UnicodeDecodeError:
                 continue
+            normalized_text = text.replace("\r\n", "\n").replace("\r", "\n")
             byte_count = len(data)
             records.append(
                 FileBudget(
                     path=path.relative_to(root),
                     byte_count=byte_count,
                     estimated_tokens=estimate_outer_tool_tokens(byte_count),
+                    line_count=len(normalized_text.splitlines()),
+                    character_count=len(normalized_text),
                 )
             )
     return sorted(records, key=lambda record: record.path.as_posix())
 
 
-def validate_file_budgets(root: Path) -> list[str]:
-    """Report active text files that exceed the outer-tool safety budget.
-
-    @param root: Skill directory to inspect.
-    @returns: Validation errors for files above the hard limit.
-    """
+def validate_budget_records(records: list[FileBudget]) -> list[str]:
+    """Report every active-text or root-router budget violation."""
 
     errors: list[str] = []
-    for record in collect_file_budgets(root):
-        if record.estimated_tokens <= MAX_OUTER_TOOL_TOKENS:
+    for record in records:
+        if record.estimated_tokens > MAX_OUTER_TOOL_TOKENS:
+            errors.append(
+                "active text file exceeds the outer-tool budget: "
+                f"{record.path.as_posix()} "
+                f"({record.estimated_tokens} estimated tokens, "
+                f"{record.byte_count} UTF-8 bytes, limit {MAX_OUTER_TOOL_TOKENS})"
+            )
+        if record.path != SKILL_ROUTER_PATH:
             continue
-        errors.append(
-            "active text file exceeds the outer-tool budget: "
-            f"{record.path.as_posix()} "
-            f"({record.estimated_tokens} estimated tokens, "
-            f"{record.byte_count} UTF-8 bytes, limit {MAX_OUTER_TOOL_TOKENS})"
-        )
+        if record.line_count > MAX_SKILL_LINES:
+            errors.append(
+                "SKILL.md exceeds the root-router line budget: "
+                f"{record.line_count} lines (limit {MAX_SKILL_LINES})"
+            )
+        if record.character_count > MAX_SKILL_CHARACTERS:
+            errors.append(
+                "SKILL.md exceeds the root-router character budget: "
+                f"{record.character_count} characters "
+                f"(limit {MAX_SKILL_CHARACTERS})"
+            )
     return errors
+
+
+def validate_file_budgets(root: Path) -> list[str]:
+    """Collect and validate every budget owned by this public checker.
+
+    @param root: Skill directory to inspect.
+    @returns: Validation errors for every applicable hard limit.
+    """
+
+    return validate_budget_records(collect_file_budgets(root))
 
 
 def main(argv: list[str]) -> int:
@@ -137,12 +163,21 @@ def main(argv: list[str]) -> int:
         records,
         key=lambda item: (-item.estimated_tokens, item.path.as_posix()),
     ):
-        print(
+        line = (
             f"{record.estimated_tokens:>6} tokens  "
+            f"{MAX_OUTER_TOOL_TOKENS - record.estimated_tokens:>5} remaining  "
             f"{record.byte_count:>7} bytes  {record.path.as_posix()}"
         )
+        if record.path == SKILL_ROUTER_PATH:
+            line += (
+                f"  {record.line_count}/{MAX_SKILL_LINES} lines "
+                f"({MAX_SKILL_LINES - record.line_count} remaining)"
+                f"  {record.character_count}/{MAX_SKILL_CHARACTERS} characters "
+                f"({MAX_SKILL_CHARACTERS - record.character_count} remaining)"
+            )
+        print(line)
 
-    errors = validate_file_budgets(root)
+    errors = validate_budget_records(records)
     if errors:
         print("FILE BUDGET FAIL")
         for error in errors:

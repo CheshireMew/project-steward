@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import sys
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -11,8 +13,11 @@ sys.path.insert(0, str(SCRIPTS))
 from check_file_budgets import (
     BYTES_PER_OUTER_TOOL_TOKEN,
     MAX_OUTER_TOOL_TOKENS,
+    MAX_SKILL_CHARACTERS,
+    MAX_SKILL_LINES,
     collect_file_budgets,
     estimate_outer_tool_tokens,
+    main,
     validate_file_budgets,
 )
 
@@ -71,6 +76,69 @@ class FileBudgetTests(unittest.TestCase):
             [record.path.as_posix() for record in records],
             ["SKILL.md", "assets/catalog.json"],
         )
+
+    def test_skill_router_exact_limits_pass_and_overflow_fails(self) -> None:
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            skill = root / "SKILL.md"
+            skill.write_text("a" * MAX_SKILL_CHARACTERS, encoding="utf-8")
+            self.assertEqual(validate_file_budgets(root), [])
+
+            skill.write_text("a" * (MAX_SKILL_CHARACTERS + 1), encoding="utf-8")
+            character_errors = validate_file_budgets(root)
+
+            skill.write_text(
+                "\n".join("a" for _ in range(MAX_SKILL_LINES)),
+                encoding="utf-8",
+            )
+            self.assertEqual(validate_file_budgets(root), [])
+
+            skill.write_text(
+                "\n".join("a" for _ in range(MAX_SKILL_LINES + 1)),
+                encoding="utf-8",
+            )
+            line_errors = validate_file_budgets(root)
+
+        self.assertEqual(len(character_errors), 1)
+        self.assertIn("14001 characters", character_errors[0])
+        self.assertEqual(len(line_errors), 1)
+        self.assertIn("221 lines", line_errors[0])
+
+    def test_skill_router_limits_do_not_apply_to_references(self) -> None:
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            (root / "reference.md").write_text(
+                "a" * (MAX_SKILL_CHARACTERS + 1),
+                encoding="utf-8",
+            )
+
+            errors = validate_file_budgets(root)
+
+        self.assertEqual(errors, [])
+
+    def test_cli_reports_skill_usage_and_remaining_headroom(self) -> None:
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            (root / "SKILL.md").write_text("alpha\nbeta", encoding="utf-8")
+            output = StringIO()
+
+            with redirect_stdout(output):
+                result = main(["check_file_budgets.py", str(root)])
+
+            (root / "SKILL.md").write_text(
+                "a" * (MAX_SKILL_CHARACTERS + 1),
+                encoding="utf-8",
+            )
+            failed_output = StringIO()
+            with redirect_stdout(failed_output):
+                failed_result = main(["check_file_budgets.py", str(root)])
+
+        self.assertEqual(result, 0)
+        self.assertIn("2/220 lines (218 remaining)", output.getvalue())
+        self.assertIn("10/14000 characters (13990 remaining)", output.getvalue())
+        self.assertEqual(failed_result, 1)
+        self.assertIn("FILE BUDGET FAIL", failed_output.getvalue())
+        self.assertIn("14001 characters", failed_output.getvalue())
 
 
 if __name__ == "__main__":
