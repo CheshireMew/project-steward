@@ -235,7 +235,10 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
         ordered = (
             "独立探测不得共享 Shell 退出状态",
             "组合须逐项保留输出、错误和退出状态",
+            "身份并 fail-fast",
+            "顺序连接不得以后句代表整批",
             "Shell 后句可能遮蔽前序失败",
+            "并停批",
             "只把被遮蔽、未执行或状态未知的项目单独补跑",
         )
         positions = [shared.index(fragment) for fragment in ordered]

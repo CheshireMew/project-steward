@@ -426,6 +426,8 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
 
 
     def test_prior_audit_findings_must_close_before_all_fixed_claim(self) -> None:
+        self.assertIn("全称结论须列稳定发现 ID", MAIN_TEXT)
+
         for fragment in (
             "此前诊断或审计的“全部问题”或“上述问题”",
             "原诊断结论成为本轮结项合同",

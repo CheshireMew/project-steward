@@ -165,6 +165,20 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         self.assertIn("不增加临时流程", section)
 
     def test_static_verifiers_use_the_formal_project_command_identity(self) -> None:
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
+            1,
+        )[0]
+        ordered = (
+            "首测前固定正式 runner",
+            "预期关键测试身份",
+            "测试框架实际收集的唯一身份",
+            "缺失或非唯一身份即停批",
+            "标为未覆盖",
+        )
+        positions = [shared.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
         for fragment in (
             "项目配置、正式包装脚本或默认命令",
             "准确工作目录、runner、默认输入范围",
