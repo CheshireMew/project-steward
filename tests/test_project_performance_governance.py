@@ -109,6 +109,30 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PERFORMANCE_TEXT)
 
+    def test_execution_context_memory_budget_separates_stack_from_process_total(
+        self,
+    ) -> None:
+        resources = PERFORMANCE_TEXT.split("### 资源趋势和关闭", 1)[1].split(
+            "## 5. 建立可比较的测量证据", 1
+        )[0]
+        ordered = (
+            "单个执行上下文的分配账本",
+            "线程栈、堆或对象池、共享映射还是设备内存",
+            "单实例大小、最大同时实例数",
+            "当前目标平台的线程栈预算",
+            "最坏调用链 + 框架保留",
+            "有界堆对象、复用池或分块处理",
+        )
+        positions = [resources.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "每线程限制独立生效",
+            "不能用进程总内存、低并发或正常短跑替它背书",
+            "改到堆上只退出栈耗尽风险",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, resources)
+
     def test_retained_resource_closure_bounds_items_aggregate_and_transient_peak(
         self,
     ) -> None:
@@ -260,6 +284,32 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             "缓存是否跨越信任边界",
             "关闭后入口是否重启服务",
             "验证器是否写入用户数据或全局缓存",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, closure)
+
+    def test_worker_crash_keeps_current_attempt_cause_across_host_restart(
+        self,
+    ) -> None:
+        closure = PERFORMANCE_TEXT.split("## 6. 修复交接与二次性能复审", 1)[1]
+        ordered = (
+            "操作接受点",
+            "精确失败分类",
+            "正式入口接受一次真实操作",
+            "原操作身份、尝试 generation、实际可执行文件",
+            "结构化退出状态或操作系统崩溃证据",
+            "原操作先进入准确终态",
+            "只为新的操作建立新 generation",
+            "提交一个合法操作",
+            "正式消费者取得完整结果",
+        )
+        positions = [closure.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "`durable-operation-governance.md`",
+            "`hard-to-reproduce-diagnostics.md`",
+            "不能把当前失败改写成“没有活动任务”",
+            "执行器仍可用",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, closure)
