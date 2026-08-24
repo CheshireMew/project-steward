@@ -77,6 +77,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 - 大型媒体、缓存、测试证据、下载、模型或中间产物会持续写盘，或用户要求把预防能力写进生产项目：`references/production-storage-governance.md`
 - 运行中配置会重建共享服务、provider、存储根或组合图：`references/runtime-generation-governance.md`
 - 难复现、时序、并发、背压或昂贵完整链：`references/hard-to-reproduce-diagnostics.md`
+- IPC、MessagePort、worker 或线程消息的数据表示、传输、首条或终态投递、懒加载监听：`references/runtime-message-transport-governance.md`
 - 外部、持久化、模型、网络或进程 JSON 存在多处解析、容量、原子分片、重放游标或合同歧义：`references/structured-data-boundary.md`
 - 模型参与任务判断、状态表达、运行时事件或结构化回复，需要核对消息来源、角色、路由、线请求与呈现职责：`references/model-mediated-operation-governance.md`
 - 源码一次性分叉、生态吸收，或持续同步上游且可能修改上游所有路径：`references/source-fork-and-ecosystem-adoption.md`；实际复制代码时同时读取 `references/license-governance.md`
