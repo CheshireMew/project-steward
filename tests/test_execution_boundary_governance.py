@@ -56,13 +56,15 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
             "## 外部工具兼容性", 1
         )[0]
-        for fragment in (
-            "桌面项目涉及外壳、原生进程、界面线程、延迟工作、原生窗口或捕获",
-            "再读 `references/desktop-app-governance.md`",
-            "无关历史审计不扩张单点缺陷范围",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, route)
+        ordered = (
+            "写入前读 `references/project-audit.md`",
+            "`references/change-prevention.md`",
+            "账本合格才写",
+            "桌面、移动或归档叠加 `references/desktop-app-governance.md`",
+            "无关审计不扩张单点范围",
+        )
+        positions = [route.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
         self.assertLess(
             route.index("references/change-prevention.md"),
             route.index("references/desktop-app-governance.md"),
