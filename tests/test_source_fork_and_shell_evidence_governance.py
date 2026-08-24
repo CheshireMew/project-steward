@@ -212,6 +212,26 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
+    def test_powershell_native_search_uses_explicit_file_and_regex_boundaries(
+        self,
+    ) -> None:
+        section = USER_ENVIRONMENT_TEXT.split(
+            "### PowerShell 调用原生搜索时显式传递文件范围和正则",
+            1,
+        )[1].split("### Windows 隐藏控制项", 1)[0]
+        for fragment in (
+            "不会可靠地替原生命令展开位置参数中的 `*`、`**` 等通配符",
+            "`rg pattern tests/*.py`",
+            "把目录根作为搜索输入，用 `--glob` 表达文件范围",
+            "先用 `rg --files` 取得并核对身份",
+            "阻止 PowerShell 二次解释 `$`、反引号、括号和引号",
+            "分别验证每一层收到的字面参数",
+            "区分无匹配与命令构造失败",
+            "不把可选搜索与必需探测绑成一个整体退出状态",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_shell_evidence_route_reaches_the_unique_platform_method(self) -> None:
         shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
             "## 对话学习与自我进化",

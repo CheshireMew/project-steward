@@ -635,6 +635,20 @@ class MergedCapabilityTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, visual)
 
+    def test_clean_and_deliberate_hover_visual_evidence_are_distinct(self) -> None:
+        visual = read_reference("implementation-review.md")
+        ordered = (
+            "默认或干净状态画面前",
+            "真实指针移到不触发控件的中性区域",
+            "等待 tooltip、hover card、菜单和其它瞬态表面按合同关闭",
+            "记录指针位置、焦点所有者和仍可见的瞬态表面",
+            "省略号、截断或长文本执行有意悬停",
+            "边界、换行、屏幕边缘避让、遮挡范围、关闭条件和焦点恢复",
+            "中性截图与有意悬停截图证明不同状态",
+        )
+        positions = [visual.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_collection_preview_and_reorder_contracts_are_active(self) -> None:
         interaction = read_reference("interaction-motion.md")
         layout = (

@@ -400,6 +400,28 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
         self.assertIn("不能边修验证器边反复生成大数据", section)
 
+    def test_runner_side_effects_require_authorized_retention_semantics(
+        self,
+    ) -> None:
+        section = CI_TEXT.split(
+            "### 正式 runner 的副作用与证据保留先满足授权",
+            1,
+        )[1].split("### 昂贵验证器先证明自己的适用合同", 1)[0]
+        ordered = (
+            "创建、移动、覆盖、删除和保留规则",
+            "没有删除授权或完成合同要求保留",
+            "不具备正式运行资格",
+            "项目提供正式保留模式",
+            "同一测试身份、正式生产者、结果判定和退出语义",
+            "只改变证据保留",
+            "不得绕过 runner 的正常完成路径后手工改写 manifest、状态或成功标记",
+            "最多是诊断证据",
+            "不能报告为正式 runner 已完成",
+            "停在运行前",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_skill_evolution_validation_is_isolated_from_governed_projects(
         self,
     ) -> None:

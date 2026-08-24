@@ -290,6 +290,42 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
+    def test_new_root_evidence_invalidates_only_dependent_conclusions(
+        self,
+    ) -> None:
+        section = REMEDIATION_TEXT.split(
+            "同一现象链可以同时存在多个独立缺陷或根因",
+            1,
+        )[1].split("错误最后显示在界面", 1)[0]
+        ordered = (
+            "新证据只使依赖被推翻前提的结论失效",
+            "不能自动撤销已经由另一份有效夹具独立复现的故障",
+            "准备回退较早修复前",
+            "未包含该修复的基线实现或等价不变实现",
+            "重新取得原失败证据",
+            "只撤销该次实验的证明力",
+            "独立证据仍成立就保留对应修复与验证",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_completion_consumes_the_final_ci_validation_plan(self) -> None:
+        section = REMEDIATION_TEXT.split(
+            "### 结项前消费最终验证计划",
+            1,
+        )[1].split("完成摘要必须", 1)[0]
+        for fragment in (
+            "最后一次实际差异、候选内容身份、原发现账本和当前用户承诺",
+            "重新生成并消费 `ci-execution-governance.md` 拥有的唯一验证计划",
+            "不复制 CI 的适用性、预算或运行资格规则",
+            "公开架构、源码质量、合同、测试收集、正式用户链",
+            "真实用户链通过只能关闭它实际覆盖的承诺",
+            "不能替代计划遗漏的公开控制项",
+            "全称结论保持未验证",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
 
 if __name__ == "__main__":
     unittest.main()
