@@ -244,15 +244,6 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
         }
         self.assertEqual(routed, expected)
 
-        for fragment in (
-            "只拥有路由、触发条件、读取顺序、权限、输出和停止位置",
-            "每条新增规则指定唯一活动所有者",
-            "不得超过 220 行或 14,000 个字符",
-            "无法完整保留时停止写入、重新规划",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, MAIN_TEXT)
-
         for method_detail in (
             "观察到的现象或结果",
             "每层分别记录证据",

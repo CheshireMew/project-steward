@@ -8,6 +8,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+SKILL_ROOT = SCRIPTS.parent
+SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+SELF_EVOLUTION_TEXT = (
+    SKILL_ROOT / "references" / "skill-self-evolution-governance.md"
+).read_text(encoding="utf-8")
 sys.path.insert(0, str(SCRIPTS))
 
 from check_file_budgets import (
@@ -139,6 +144,29 @@ class FileBudgetTests(unittest.TestCase):
         self.assertEqual(failed_result, 1)
         self.assertIn("FILE BUDGET FAIL", failed_output.getvalue())
         self.assertIn("14001 characters", failed_output.getvalue())
+
+    def test_budget_method_has_one_owner_and_router_only_keeps_its_gate(
+        self,
+    ) -> None:
+        self.assertIn(
+            "自我进化写入前后按 `references/skill-self-evolution-governance.md`",
+            SKILL_TEXT,
+        )
+        self.assertIn(
+            "预算算法、上限、职责迁移与失败收口由该方法唯一拥有",
+            SKILL_TEXT,
+        )
+
+        for method_detail in (
+            "取得全部活动 UTF-8 文本文件的完整账本",
+            "硬上限为 9,000 tokens",
+            "不得超过 220 行和 14,000 个字符",
+            "迁移完整章节、内聚函数族或测试主题",
+            "停止本次写入并重新规划",
+        ):
+            with self.subTest(method_detail=method_detail):
+                self.assertIn(method_detail, SELF_EVOLUTION_TEXT)
+                self.assertNotIn(method_detail, SKILL_TEXT)
 
 
 if __name__ == "__main__":

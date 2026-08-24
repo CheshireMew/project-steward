@@ -68,6 +68,14 @@ class CiExecutionGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, shared)
 
         for fragment in (
+            "验证预计跨观察窗口时",
+            "启动前读 `references/user-environment-governance.md`",
+            "没有可回读运行身份、增量输出和独立终态便不启动",
+        ):
+            with self.subTest(shared_long_run_fragment=fragment):
+                self.assertIn(fragment, shared)
+
+        for fragment in (
             "后台、跨观察窗口任务、路径或执行环境",
             "以及并行验证",
             "启动前读 `references/user-environment-governance.md`",

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from governance_text_fixtures import LEARNING_TEXT, unittest
+from governance_text_fixtures import LEARNING_TEXT, MAIN_TEXT, unittest
 
 
 class ConversationHistoryReadingGovernanceTests(unittest.TestCase):
@@ -36,6 +36,22 @@ class ConversationHistoryReadingGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_main_router_rejects_an_empty_or_summarized_history_projection(
+        self,
+    ) -> None:
+        shared = MAIN_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
+            1,
+        )[0]
+        ordered = (
+            "`hasMore=false` 只关闭当前返回层",
+            "消息为空或被摘要替代",
+            "稳定原始记录",
+            "不得声称完整",
+        )
+        positions = [shared.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
 
     def test_public_dialogue_and_process_evidence_are_separate_ledgers(self) -> None:
         section = self.history_section()
