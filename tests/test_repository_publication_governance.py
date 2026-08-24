@@ -273,6 +273,72 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
         self.assertIn("无法证明时保留分叉并报告", section)
         self.assertIn("不授权修改代码、测试、工作流或远端设置", section)
 
+    def test_branch_language_freezes_delivery_final_refs_and_ongoing_policy(
+        self,
+    ) -> None:
+        section = PUBLICATION_TEXT.split(
+            "## 1. 先冻结目标和停止位置",
+            1,
+        )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
+        ordered = (
+            "本次交付路径：",
+            "交付后允许存在的本地分支：",
+            "交付后允许存在的远端分支：",
+            "长期贡献路径：",
+            "分支保护或 ruleset 目标状态：",
+            "分支删除与例外授权：",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "只描述本次交付路径",
+            "还声明了交付后的最终分支集合",
+            "无法唯一确定时只约束本次交付",
+            "不据此删除已有分支或改变保护规则",
+            "自动生成的展示分支或发布分支等正式消费者",
+            "长期贡献路径与分支保护目标是另外两项决定",
+            "在任何删除或远端设置变更前停止",
+            "不替代准确分支的删除授权",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_protection_policy_is_compatible_and_applied_after_content_freeze(
+        self,
+    ) -> None:
+        section = PUBLICATION_TEXT.split(
+            "### 分支目标状态与保护策略必须相容",
+            1,
+        )[1].split("### 冻结公开发布候选、标签与资产", 1)[0]
+        ordered = (
+            "读取当前本地分支、其它 worktree、实时远端分支",
+            "先建立兼容性账本",
+            "必需检查能否在候选身份上真实产生",
+            "交付冲突并等待用户决定",
+            "最终候选已经冻结",
+            "用远端接口要求的完整 schema 提交",
+            "写入后必须重新读取准确分支的有效规则或 ruleset",
+            "候选内容又变化",
+            "临时放松保护是新的远端设置变更",
+            "按已授权恢复并回读有效状态",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "本次不创建其它分支",
+            "不能推导出“交付后只保留 main”",
+            "不替用户选择一项，也不静默放松保护",
+            "不授权删除现有分支或修改远端设置",
+            "代码、文档、README、许可证与致谢、版本化素材",
+            "接口返回验证错误不能证明远端完全没有变化",
+            "临时放松不能作为正常收尾步骤",
+            "不授予分支删除、保护修改、bypass 或其它远端写入权限",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_self_evolution_stops_at_the_successful_push(self) -> None:
         section = PUBLICATION_TEXT.split(
             "### Project Steward 自我进化使用整仓发布合同",
