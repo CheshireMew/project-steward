@@ -204,6 +204,40 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_remote_advance_rebuilds_the_semantic_publication_candidate(
+        self,
+    ) -> None:
+        section = PUBLICATION_TEXT.split(
+            "### 远端前进后先重建发布基线",
+            1,
+        )[1].split("创建提交、创建远程、选择或改变可见性", 1)[0]
+        ordered = (
+            "取得当前跟踪目标的实时远端 HEAD",
+            "旧远端到新远端的变化",
+            "重叠路径",
+            "权威合同",
+            "唯一方法所有者",
+            "全部正式消费者",
+            "只有仍属于本次获准结果的消费者才进入迁移",
+            "重新冻结最终候选",
+            "读取完整最终差异",
+            "每项检查分别保留退出状态",
+            "推送前再次取得目标远端",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "Git 能自动合并或文本没有冲突",
+            "不能按提交时间、`ours`、`theirs`、文件多数或自动合并结果猜权威",
+            "不复制许可证、schema 或公开身份方法",
+            "不因需要整合远端而扩大普通工作树的发布范围",
+            "不能把整合前的暂存检查或后续成功命令当作最终候选通过",
+            "目标已经变化就重新建立上述账本",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_remote_checks_are_verified_without_granting_fix_authority(
         self,
     ) -> None:
