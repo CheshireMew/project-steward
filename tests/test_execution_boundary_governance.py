@@ -78,12 +78,41 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
             "终止前先区分进程存活与可枚举残留",
             "验证命令先固定正式身份",
             "多轮证据不重复累计",
+            "临时根由正式消费者决定",
         ):
             with self.subTest(fragment=fragment):
                 self.assertEqual(
                     sum(text.count(fragment) for text in reference_texts),
                     1,
                 )
+
+    def test_root_cause_route_loads_environment_governance_for_background_work(
+        self,
+    ) -> None:
+        route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性",
+            1,
+        )[0]
+        self.assertIn("后台、跨观察窗口任务、路径或执行环境", route)
+        self.assertIn("references/user-environment-governance.md", route)
+
+    def test_temporary_roots_follow_their_formal_consumer(self) -> None:
+        section = PREVENTION_TEXT.split(
+            "### 受限执行路径与临时产物",
+            1,
+        )[1].split("### 大型内容默认根先消费用户环境策略", 1)[0]
+        ordered = (
+            "临时根由正式消费者决定",
+            "项目测试、构建或正式项目工具会继续读取的对象",
+            "只被浏览器、调试器、执行器或机器环境消费",
+            "不进入活动仓库或项目归档",
+            "没有删除权限只改变清理终态",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("不能把环境残留改称项目历史", section)
+        self.assertIn("普通工具能够直接完成动作且不会建立这些产物", section)
+        self.assertIn("不增加临时流程", section)
 
     def test_static_verifiers_use_the_formal_project_command_identity(self) -> None:
         for fragment in (

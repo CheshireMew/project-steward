@@ -105,7 +105,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
 - 可视层级、变换或动效所有权：`references/interaction-motion.md` 和 `references/interaction-navigation-and-media-lifecycle.md`；需要实际运行画面验收时再读 `references/implementation-review.md` 与 `references/implementation-review-visual-evidence.md`
-- 工具、路径别名、执行环境或长任务：`references/user-environment-governance.md`
+- 后台、跨观察窗口任务、路径或执行环境：`references/user-environment-governance.md`
 - 大型媒体、缓存、测试证据、下载、模型或中间产物造成容量增长、跨根散落或无主残留：`references/production-storage-governance.md`
 - 事件、版本、历史或缓存把计划影响范围误当成实际变更事实：`references/change-prevention.md` 的“计划范围与实际变更事实分离”合同
 - 局部状态、心跳或遥测更新覆盖、清空了未声明字段，或者消费者无法区分完整快照与局部补丁：`references/change-prevention.md` 的活动投影更新合同
