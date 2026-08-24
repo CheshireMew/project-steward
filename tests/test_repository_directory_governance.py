@@ -11,6 +11,9 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 REFERENCE = SKILL_ROOT / "references" / "repository-directory-governance.md"
 REFERENCE_TEXT = REFERENCE.read_text(encoding="utf-8")
+REMEDIATION_TEXT = (
+    SKILL_ROOT / "references" / "root-cause-remediation.md"
+).read_text(encoding="utf-8")
 OPENAI_TEXT = (SKILL_ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8")
 SCRIPT = SKILL_ROOT / "scripts" / "inspect_project_tree.py"
 
@@ -127,6 +130,24 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         for contract in required_contracts:
             with self.subTest(contract=contract):
                 self.assertIn(contract, REFERENCE_TEXT)
+
+    def test_no_delete_authority_does_not_create_an_archive_by_default(self) -> None:
+        for fragment in (
+            "没有删除授权不等于获得归档授权",
+            "Git 历史已经提供可恢复证据",
+            "保留在原位并列为准确删除候选",
+            "正式消费者、保留责任人和到期或复查条件",
+            "‘以后可能有用’不能成为入库理由",
+            "不得为了让旧实现退出活动入口而制造新的仓库归档",
+            "披露全部仍被保留或已经归档的退役路径",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REFERENCE_TEXT)
+
+        self.assertIn(
+            "未获删除授权时先按项目目录治理保留准确候选",
+            REMEDIATION_TEXT,
+        )
 
     def test_main_skill_stays_within_its_budget(self) -> None:
         self.assertLessEqual(len(SKILL_TEXT.splitlines()), 220)

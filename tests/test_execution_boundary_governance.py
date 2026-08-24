@@ -96,6 +96,36 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         self.assertIn("后台、跨观察窗口任务、路径或执行环境", route)
         self.assertIn("references/user-environment-governance.md", route)
 
+    def test_project_commands_freeze_the_effective_child_runtime(self) -> None:
+        section = USER_ENVIRONMENT_TEXT.split(
+            "### 正式项目命令先固定任务级执行环境", 1
+        )[1].split("## 5. 包、缓存与安装位置", 1)[0]
+        for fragment in (
+            "解释器、包装器、PATH 变化、工作目录",
+            "包存储与缓存根",
+            "包装器的绝对路径不能证明子进程使用了同一解释器",
+            "通过同一个正式包装入口",
+            "子进程实际可执行文件与版本",
+            "整项任务复用同一组执行环境",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_package_manager_side_effects_need_install_authority(self) -> None:
+        section = USER_ENVIRONMENT_TEXT.split(
+            "### 正式项目命令先固定任务级执行环境", 1
+        )[1].split("## 5. 包、缓存与安装位置", 1)[0]
+        for fragment in (
+            "`exec`、临时下载、依赖安装、工作区重连或链接重建",
+            "没有安装授权时不得调用",
+            "锁文件、工作树、包链接和缓存或存储根",
+            "只能作为诊断或聚焦检查",
+            "不能冒充正式项目命令已经通过",
+            "直接调用内部脚本绕过版本门",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_temporary_roots_follow_their_formal_consumer(self) -> None:
         section = PREVENTION_TEXT.split(
             "### 受限执行路径与临时产物",

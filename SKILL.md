@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从项目过程与真实结果提炼可迁移治理方法，并在明确要求时自我进化；按实施计划审计完成度，研究和整理仓库，判断开源采用、目录职责、许可证与致谢；预防返工、沿根因修复跨层缺陷，治理外部工具、持久操作、架构质量、真实用户链、产品 UI/UX、界面美观与使用质感、README、日志、模板、用户环境、许可证和仓库发布。Use to learn/evolve from project history; audit a plan or repository; understand or organize a codebase; study open-source adoption/attribution; prevent rework/remediate root causes; inspect external-tool compatibility, durable operations, architecture cohesion/coupling, duplication or god modules, user chains, UI/UX/interface aesthetics, README, logging, templates, user environments, licensing, publication, and project health. Not for a single-function explanation or security-, dependency-, CI-, or monitoring-only tasks."
+description: "从项目过程与真实结果提炼治理方法，并在明确要求时自我进化；按计划审计、研究和整理仓库，判断开源采用、目录职责、许可证与致谢；预防返工、沿根因修复跨层缺陷，治理外部工具、持久操作、架构质量、真实用户链、UI/UX、README、日志、模板、用户环境、许可证和仓库发布。Use to learn/evolve from project history; audit or organize a repository; study open-source adoption/attribution; prevent rework/remediate root causes; inspect external-tool compatibility, durable operations, architecture cohesion/coupling, duplication or god modules, UI/UX, README, logging, templates, user environments, licensing, and publication. Not for single-function explanations or security-, dependency-, CI-, or monitoring-only tasks."
 ---
 
 # Project Steward
@@ -34,7 +34,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 
 ## 共同边界
 
-- 普通业务功能仍由当前开发任务负责；用户只要求解释单条报错、单个函数或局部行为时，在回答该结果后停止，不升级为项目级改造。只有请求本身要求预防、治理、迁移、自我进化或项目级结果时才进入相应路径。
+- 普通业务功能由当前开发任务负责；只解释单条报错、单个函数或局部行为时，回答后停止。只有请求本身要求预防、治理、迁移、自我进化或项目级结果才进入相应路径。
 - 选择路径后立即冻结范围、写入权限和停止位置。检查、审计、诊断、评估、分析、复盘或报告默认只读；同一请求明确要求修复、治理、实施、修改、更新或自我进化时才获得相应写入权限。
 - 用户提供源码归档并要求看懂、审计或研究项目，或只点名本 Skill 并附上源码归档时，解压是进入只读研究所需的材料准备，不是项目正式写入。直接按“项目研究与讲解”确定目标根，运行既有脚本解压到独立避重名目录，读取脚本返回的项目根并继续只读研究，无需额外取得解压确认。该动作只授权创建研究副本和读取其内容；运行项目、安装依赖或解压工具、修改项目、移动或删除原文件、提交和发布仍分别授权。
 - 联网、下载、安装、运行、生成、写入、移动、归档、删除、提交、推送和发布分别授权；只有对应主路径明确列出的独立完成合同可以合并同一结果内的状态改变。运行或生成不等于获得项目写入权限；提交或推送不自动授权等待 GitHub Actions、部署或远端验证。
@@ -84,7 +84,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 难复现、时序、并发、背压或昂贵完整链：`references/hard-to-reproduce-diagnostics.md`
 - 外部、持久化、模型、网络或进程 JSON 存在多处解析、容量、原子分片、重放游标或合同歧义：`references/structured-data-boundary.md`
 - 模型参与任务判断、状态表达、运行时事件或结构化回复，需要核对消息来源、角色、路由、线请求与呈现职责：`references/model-mediated-operation-governance.md`
-- 以外部源码为一次性起点建立独立产品，或选择性吸收其扩展生态：`references/source-fork-and-ecosystem-adoption.md`；实际复制代码时同时读取 `references/license-governance.md`
+- 源码一次性分叉、生态吸收，或持续同步上游且可能修改上游所有路径：`references/source-fork-and-ecosystem-adoption.md`；实际复制代码时同时读取 `references/license-governance.md`
 - 产品体验或界面：`references/product-experience-governance.md`；需要设计或交互方法时再读 `references/ux-design.md`
 
 只有用户明确授权实施时修改项目；只要求计划则停在影响图、目标边界、迁移顺序和验收合同。
@@ -111,6 +111,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 局部状态、心跳或遥测更新覆盖、清空了未声明字段，或者消费者无法区分完整快照与局部补丁：`references/change-prevention.md` 的活动投影更新合同
 - 源码、README、脚本、测试或配置硬编码本机与部署事实：`references/change-prevention.md` 的项目运行配置边界；用户机器事实同时读取 `references/user-environment-governance.md`
 - 内聚、耦合、语义重复或上帝模块：`references/architecture-cohesion-governance.md`
+- 持续同步上游且可能修改上游所有路径：写入前读 `references/source-fork-and-ecosystem-adoption.md`
 
 ## 外部工具兼容性
 

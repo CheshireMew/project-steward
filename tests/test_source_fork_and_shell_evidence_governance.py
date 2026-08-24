@@ -31,9 +31,67 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
         for fragment in (
             "运行时依赖",
             "一次性源码分叉",
+            "持续同步的下游产品",
             "兼容适配器",
             "机制借鉴",
             "不能用一个仓库级标签掩盖不同依赖方向",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_maintained_downstream_is_routed_before_writes(self) -> None:
+        prevention_route = SKILL_TEXT.split("## 改动前预防", 1)[1].split(
+            "## 根因治理", 1
+        )[0]
+        remediation_route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+
+        for route in (prevention_route, remediation_route):
+            with self.subTest(route=route[:60]):
+                self.assertIn("持续同步上游", route)
+                self.assertIn(
+                    "references/source-fork-and-ecosystem-adoption.md",
+                    route,
+                )
+
+        self.assertIn("普通独立仓库的局部重构不因此进入本方法", FORK_TEXT)
+
+    def test_downstream_path_ownership_precedes_broad_refactoring(self) -> None:
+        for fragment in (
+            "经过核验的上游文件树",
+            "下游自有 / 上游所有 / 独立 vendor / 未知",
+            "宽泛的修复、重构或‘彻底解决’请求",
+            "不能授权修改上游所有路径",
+            "优先寻找下游插件、适配器、配置或补丁层",
+            "不能根据目录名猜所有权",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_authorized_upstream_edits_have_a_managed_patch_lifecycle(self) -> None:
+        for fragment in (
+            "原因、精确路径、验证方式、退出条件",
+            "核对过的上游身份",
+            "保留、重放、迁移到下游扩展点或退役",
+            "冻结差异只能保全未知历史",
+            "不构成继续修改的授权",
+            "语义冲突",
+            "不能只看 Git 是否产生文本冲突",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, FORK_TEXT)
+
+    def test_downstream_recovery_and_handoff_keep_maintenance_debt_visible(
+        self,
+    ) -> None:
+        for fragment in (
+            "不能对整个工作树执行宽泛恢复",
+            "迁到下游扩展点 / 登记为受控补丁 / 经授权退出",
+            "官方上游远端是否被修改",
+            "本地下游仓库中的上游所有源码是否被修改",
+            "下一次同步如何处理",
+            "仍有多少未分类或冻结债务",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, FORK_TEXT)
@@ -181,7 +239,6 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
-
 
     def test_skill_main_file_stays_within_budget(self) -> None:
         self.assertLessEqual(len(SKILL_TEXT.splitlines()), 220)
