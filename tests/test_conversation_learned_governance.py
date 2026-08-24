@@ -693,6 +693,10 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "自导入、自委托、递归绑定和循环转发",
             "正式框架加载或运行时 smoke",
             "静态解析成功",
+            "语法节点的源码区间不自动等于完整声明",
+            "声明附着的装饰器、属性、注解、修饰符与声明元数据",
+            "导入、常量、类型别名和协作者",
+            "正式模块路径真实导入",
         ):
             with self.subTest(rewrite_fragment=fragment):
                 self.assertIn(fragment, section)

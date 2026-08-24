@@ -438,6 +438,8 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             "`稳定发现 ID → 最终状态 → 最后一次有效证据 → 未验证边界`",
             "分类汇总、测试总数或“均已解决”结论不能替代逐项映射",
             "显式标为未验证、受阻或开放",
+            "完成摘要必须从逐项最终状态和最后一次有效证据生成",
+            "全局零发现必须同时写明扫描器实际覆盖的输入",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
