@@ -4,6 +4,25 @@ from governance_text_fixtures import *
 
 
 class ConversationLearnedGovernanceTests(unittest.TestCase):
+    def test_later_independent_result_reroutes_and_reloads_fixed_method(
+        self,
+    ) -> None:
+        routing = MAIN_TEXT.split("## 角色与路由", 1)[1].split(
+            "## 共同边界",
+            1,
+        )[0]
+        ordered = (
+            "每个独立结果",
+            "建立路由账本",
+            "本轮较早读过",
+            "同一结果增项更新原账本",
+            "后续独立结果重新选路",
+            "重读固定方法",
+            "新建账本",
+        )
+        positions = [routing.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_continuation_cannot_promote_a_completed_read_only_result(self) -> None:
         shared = MAIN_TEXT.split("## 共同边界", 1)[1].split(
             "## 对话学习与自我进化",
