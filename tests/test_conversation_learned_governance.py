@@ -51,6 +51,15 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             "## 对话学习与自我进化",
             1,
         )[0]
+        dynamic_route = (
+            "下一实际动作新增账本外类别或条件",
+            "首次改变状态前",
+            "更新原账本",
+            "读对应方法",
+            "复核授权、Git 影响、生命周期与停止位置",
+        )
+        positions = [shared.index(fragment) for fragment in dynamic_route]
+        self.assertEqual(positions, sorted(positions))
         for fragment in (
             "普通业务功能仍由当前开发任务负责",
             "联网、下载、安装、运行、生成、写入、移动、归档、删除、提交、推送和发布分别授权",
