@@ -11,6 +11,7 @@ AGENT_TEXT = (SKILL_ROOT / "agents" / "openai.yaml").read_text(
     encoding="utf-8"
 )
 REFERENCE_COMPANIONS = {
+    "desktop-app-governance.md": ("desktop-window-lifecycle-and-verification.md",),
     "implementation-review.md": ("implementation-review-visual-evidence.md",),
     "interaction-motion.md": ("interaction-navigation-and-media-lifecycle.md",),
     "root-cause-remediation.md": ("root-cause-verification-and-closure.md",),
@@ -224,9 +225,7 @@ class MergedCapabilityTests(unittest.TestCase):
         )
 
     def test_desktop_presentation_and_capture_contracts_are_active(self) -> None:
-        desktop = (
-            SKILL_ROOT / "references" / "desktop-app-governance.md"
-        ).read_text(encoding="utf-8")
+        desktop = read_reference("desktop-app-governance.md")
         for fragment in (
             "窗口呈现状态矩阵",
             "外框尺寸是整个窗口占据的屏幕矩形",
@@ -550,9 +549,7 @@ class MergedCapabilityTests(unittest.TestCase):
             SKILL_ROOT / "references" / "interface-problem-patterns.md"
         ).read_text(encoding="utf-8")
         review = read_reference("implementation-review.md")
-        desktop = (
-            SKILL_ROOT / "references" / "desktop-app-governance.md"
-        ).read_text(encoding="utf-8")
+        desktop = read_reference("desktop-app-governance.md")
 
         self.assertIn(
             "references/root-cause-remediation.md",
@@ -757,9 +754,7 @@ class MergedCapabilityTests(unittest.TestCase):
     def test_desktop_launch_prewarm_and_audio_modes_have_real_acceptance(
         self,
     ) -> None:
-        desktop = (
-            SKILL_ROOT / "references" / "desktop-app-governance.md"
-        ).read_text(encoding="utf-8")
+        desktop = read_reference("desktop-app-governance.md")
         review = read_reference("implementation-review.md")
 
         for fragment in (

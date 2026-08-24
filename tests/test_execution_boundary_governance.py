@@ -18,6 +18,11 @@ PREVENTION_TEXT = "".join(
 DESKTOP_TEXT = (
     SKILL_ROOT / "references" / "desktop-app-governance.md"
 ).read_text(encoding="utf-8")
+DESKTOP_TEXT += (
+    SKILL_ROOT
+    / "references"
+    / "desktop-window-lifecycle-and-verification.md"
+).read_text(encoding="utf-8")
 REMEDIATION_TEXT = "".join(
     (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
     for name in (
@@ -212,7 +217,7 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
-        acceptance = DESKTOP_TEXT.split("## 11. 实机验收", 1)[1]
+        acceptance = DESKTOP_TEXT.split("## 3. 实机验收", 1)[1]
         self.assertIn("受控的无关长任务", acceptance)
         self.assertIn("只等待并收口自己的登记项和结果投递", acceptance)
 

@@ -101,6 +101,20 @@ class LicenseGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_rollout_closes_every_formal_project_license_declaration(self) -> None:
+        for fragment in (
+            "正式声明消费者必须同时闭合",
+            "生态项目清单和工作区包清单中的许可证字段",
+            "根包元数据",
+            "锁文件中的根项目记录",
+            "包管理器或注册表工具从这些文件解析出的许可证输出",
+            "依赖、vendor 和第三方组件各自的许可证记录保持独立",
+            "`apply_license.py` 继续只写获准的许可证治理文件",
+            "从实际解析输出核对",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, ROLLOUT_TEXT)
+
 
 if __name__ == "__main__":
     unittest.main()

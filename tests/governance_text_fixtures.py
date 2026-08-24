@@ -80,6 +80,7 @@ LOCAL_WORKSPACE_TEXT = (
 
 LEARNING_TEXT += (SKILL_ROOT / "references" / "skill-self-evolution-governance.md").read_text(encoding="utf-8")
 PUBLICATION_TEXT += (SKILL_ROOT / "references" / "repository-publication-execution.md").read_text(encoding="utf-8")
+DESKTOP_TEXT += (SKILL_ROOT / "references" / "desktop-window-lifecycle-and-verification.md").read_text(encoding="utf-8")
 PREVENTION_TEXT += "".join(
     (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
     for name in (

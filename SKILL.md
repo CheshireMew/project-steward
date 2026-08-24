@@ -179,7 +179,7 @@ README 不作为每项内部治理规则的第二份活动真源；自我进化�
 
 处理对应项目类型时按需读取：
 
-- 桌面应用：`references/desktop-app-governance.md`
+- 桌面应用：`references/desktop-app-governance.md`、`references/desktop-window-lifecycle-and-verification.md`
 - Tauri v2 + Vue：`references/tauri-vue-governance.md`
 - 本地文件工作区：`references/local-file-workspace-governance.md`
 

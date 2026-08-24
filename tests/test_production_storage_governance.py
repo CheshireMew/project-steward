@@ -35,6 +35,11 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             "受管唯一对象体积",
             "实际回收结果",
             "最后一个写入同一登记根的生产者",
+            "枚举结果不是事务快照",
+            "精确返回 not-found",
+            "权限、损坏、身份漂移和其它 I/O 错误继续失败",
+            "不能统一忽略成临时文件消失",
+            "只有新鲜稳定重扫与生产者终态清单一致时才能宣告成功",
         ):
             self.assertIn(phrase, reference)
 

@@ -232,6 +232,21 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_powershell_source_encoding_is_verified_by_the_production_host(
+        self,
+    ) -> None:
+        for fragment in (
+            "`.ps1` 源码编码是正式入口的输入协议",
+            "生产入口实际使用 `powershell.exe` 5.1、`pwsh` 还是其它宿主",
+            "带 BOM 的 UTF-8",
+            "从实际生产入口调用同一宿主",
+            "解析、一次成功路径和一次受控失败路径",
+            "非 ASCII 字面量、参数与错误输出没有损坏",
+            "不能证明 Windows PowerShell 5.1 会正确读取同一源文件",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
+
     def test_shell_evidence_route_reaches_the_unique_platform_method(self) -> None:
         shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
             "## 对话学习与自我进化",

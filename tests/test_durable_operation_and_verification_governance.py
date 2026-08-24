@@ -17,6 +17,7 @@ PREVENTION_TEXT = read("references/change-prevention.md")
 REMEDIATION_TEXT = read("references/root-cause-remediation.md")
 STRUCTURED_TEXT = read("references/structured-data-boundary.md")
 DESKTOP_TEXT = read("references/desktop-app-governance.md")
+DESKTOP_TEXT += read("references/desktop-window-lifecycle-and-verification.md")
 IMPLEMENTATION_TEXT = read("references/implementation-review.md")
 AGENT_TEXT = read("agents/openai.yaml")
 
@@ -280,6 +281,9 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             "实际变更集",
             "前三类是执行输入，不能直接成为已经发生的事实",
             "操作合法但没有改变权威事实时，实际变更集为空",
+            "首次建立缺失的权威结构、历史或迁移标记",
+            "只有初始化事实已存在且相同时才是空操作",
+            "验收分别覆盖未初始化与已初始化状态",
             "观察集合必须对合同内副作用闭合",
             "不能共用一个笼统的 `affected` 列表",
             "只消费实际变更集及其提交版本",

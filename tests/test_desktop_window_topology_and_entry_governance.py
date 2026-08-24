@@ -35,6 +35,27 @@ class DesktopWindowTopologyAndEntryGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DESKTOP_TEXT)
 
+    def test_restored_window_bounds_are_verified_after_native_constraints_settle(
+        self,
+    ) -> None:
+        desktop_route = (
+            SKILL_ROOT / "references" / "desktop-app-governance.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "desktop-window-lifecycle-and-verification.md",
+            desktop_route,
+        )
+        for fragment in (
+            "窗口几何恢复不能停在构造参数或首次 `setBounds` 成功",
+            "持久化边界、创建时请求边界",
+            "无用户输入时的稳定边界",
+            "由唯一窗口所有者在约束就绪后重新应用",
+            "抑制这次内部恢复触发的错误回写",
+            "关闭重开后最终边界仍应稳定",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DESKTOP_TEXT)
+
     def test_preview_evidence_rejects_wrong_or_information_free_frames(
         self,
     ) -> None:
