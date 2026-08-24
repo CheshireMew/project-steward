@@ -545,6 +545,19 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_TEXT)
 
+    def test_completion_summary_preserves_every_non_passing_check(self) -> None:
+        for fragment in (
+            "全称结论",
+            "明确列出且最后一次有效状态均为通过的检查集合",
+            "每项实际执行过的非通过结果",
+            "检查身份、状态、覆盖范围和与当前用户结果的相关性",
+            "任务前既有脏状态、无关格式差异、环境失败或验证器错误",
+            "不能从完成摘要中消失",
+            "一个证据平面通过不能替另一个平面改名或补位",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REMEDIATION_TEXT)
+
     def test_public_identity_exposes_the_new_capability(self) -> None:
 
         self.assertIn(

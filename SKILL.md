@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从项目过程与真实结果提炼治理方法，并在明确要求时自我进化；按计划审计、研究和整理仓库，判断开源采用、目录职责、许可证与致谢；预防返工、沿根因修复跨层缺陷，治理外部工具、持久操作、架构质量、真实用户链、UI/UX、README、日志、模板、用户环境、许可证和仓库发布。Use to learn/evolve from project history; audit or organize a repository; study open-source adoption/attribution; prevent rework/remediate root causes; inspect external-tool compatibility, durable operations, architecture cohesion/coupling, duplication or god modules, UI/UX, README, logging, templates, user environments, licensing, and publication. Not for single-function explanations or security-, dependency-, CI-, or monitoring-only tasks."
+description: "从项目过程与结果提炼治理方法，并在明确要求时自我进化；按实施计划审计完成度、研究整理仓库，判断开源采用、目录职责、许可证与致谢；预防返工、沿根因修复跨层缺陷，治理外部工具、持久操作、架构质量、用户链、UI/UX、README、日志、模板、用户环境和仓库发布。Use to learn/evolve from project history; audit a plan or repository; understand or organize a codebase; study open-source adoption/attribution; prevent rework/remediate root causes; inspect external-tool compatibility, durable operations, architecture cohesion/coupling, duplication or god modules, UI/UX, README, logging, templates, user environments, licensing/publication. Not for single-function or security/dependency/CI/monitoring-only tasks."
 ---
 
 # Project Steward
@@ -34,7 +34,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 
 ## 共同边界
 
-- 普通业务功能由当前开发任务负责；只解释单条报错、单个函数或局部行为时，回答后停止。只有请求本身要求预防、治理、迁移、自我进化或项目级结果才进入相应路径。
+- 普通业务功能仍由当前开发任务负责；只解释单条报错、单个函数或局部行为时，回答后停止。只有请求本身要求预防、治理、迁移、自我进化或项目级结果才进入相应路径。
 - 选择路径后立即冻结范围、写入权限和停止位置。检查、审计、诊断、评估、分析、复盘或报告默认只读；同一请求明确要求修复、治理、实施、修改、更新或自我进化时才获得相应写入权限。
 - 用户提供源码归档并要求看懂、审计或研究项目，或只点名本 Skill 并附上源码归档时，解压是进入只读研究所需的材料准备，不是项目正式写入。直接按“项目研究与讲解”确定目标根，运行既有脚本解压到独立避重名目录，读取脚本返回的项目根并继续只读研究，无需额外取得解压确认。该动作只授权创建研究副本和读取其内容；运行项目、安装依赖或解压工具、修改项目、移动或删除原文件、提交和发布仍分别授权。
 - 联网、下载、安装、运行、生成、写入、移动、归档、删除、提交、推送和发布分别授权；只有对应主路径明确列出的独立完成合同可以合并同一结果内的状态改变。运行或生成不等于获得项目写入权限；提交或推送不自动授权等待 GitHub Actions、部署或远端验证。
@@ -44,8 +44,8 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 - 工作从短动作扩展为多阶段、进入等待或证据状态发生变化时，主动说明扩展原因、已完成检查点、当前状态、下一项可观察结果和所需输入；状态不变时不重复刷屏，也不能用流程说明掩盖范围扩张。
 - 新的独立请求替换尚未完成的结果时，先交接已经写入或改变的对象、已有证据、尚未验证的用户承诺、运行进程、残留、原权限和停止位置；新请求不授权继续、回退或清理旧结果。
 - 先冻结准确项目根、材料范围、活动文件和真实消费者。Git 只在准确项目根直接存在 .git 且当前路径确需历史、工作树或发布证据时使用。
-- 来源必须读到明确末尾；长文件先取得行数、字节数或分页能力，再按稳定区间完整读取。并发变化触及行为合同、影响文件、消费者、验证或用户结果时，旧确认失效，重新规划并确认。
-- 探测须逐项保留输出、错误和退出状态；Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”，隐藏项或转义失真时同样进入；失败保留新鲜证据，只把被遮蔽、未执行或状态未知的项目单独补跑。
+- 来源读到末尾；长文件按稳定区间读取。记录 Skill 与方法的内容身份；自动续跑、压缩恢复、结项前复核只重读变化文件。变化触及合同、消费者、验证或用户结果时，旧确认失效，重新规划并确认。
+- 独立探测不得共享 Shell 退出状态；组合须逐项保留输出、错误和退出状态。Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”，隐藏项或转义失真时同样进入；只把被遮蔽、未执行或状态未知的项目单独补跑。
 - 项目事实写回项目现有唯一真源；环境事实写入独立用户档案；可迁移治理方法才进入本 Skill；模板只接收某类项目每次都应执行的稳定默认。
 - 判断历史或外部材料中的能力是否已经存在时，先完成独立结果拆分和必要的因果排序，再遮住来源检查目标能否认出同一条件、保留同一构成性细节并作出同一具体处理；只有上位治理框架算部分具备。完成逐项比较后才提炼共同机制和特殊维度。
 - 验证按改动风险选择层级：每个验证阶段先按 `references/ci-execution-governance.md` 消费最近一次已完成的公开仓库失败，只运行当前机器上直接覆盖本次改动和验收主张的目标检查；其它平台、完整回归、远端 CI 与真实用户链只有用户明确要求、代码冻结或目标检查证明系统性影响时才进入。
@@ -99,7 +99,7 @@ Project Steward 自我进化时必须执行活动文本约束：
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
 - 返工来自多份产物关系不明、理由在重新生成时丢失、全量重算、错误缓存失效、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
-- 审计修复或项目级改动会使用完整套件，或触及验证控制面、CI 分类、资源、分片、成本与重试：`references/ci-execution-governance.md`
+- 审计修复或项目级改动会使用完整套件，或触及验证控制面、分类、资源、分片、成本与重试：读 `references/ci-execution-governance.md`，第一条测试前完成运行资格、累计预算和套件次数账本。
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
 - 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`

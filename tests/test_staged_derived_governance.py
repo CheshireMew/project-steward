@@ -269,6 +269,26 @@ class DerivedArtifactGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DERIVED_TEXT)
 
+    def test_optional_segmentation_must_earn_its_first_run_cost(self) -> None:
+        ordered = (
+            "强制切分",
+            "可选切分",
+            "每单元固定启动成本",
+            "短输入首次冷运行",
+            "代表性长输入首次冷运行",
+            "同计划暖缓存重跑",
+        )
+        positions = [DERIVED_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "短输入没有并行或复用收益时可以保持一个单元",
+            "暖缓存胜出不能单独证明首次运行的分段策略正确",
+            "记录单单元或多单元的原因、阈值来源和本轮实际固定开销",
+            "短输入首次单单元与多单元",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DERIVED_TEXT)
+
     def test_local_change_preserves_unaffected_units_and_shared_resources(
         self,
     ) -> None:

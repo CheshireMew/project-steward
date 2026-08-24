@@ -35,6 +35,18 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PERFORMANCE_TEXT)
 
+    def test_one_cheap_operation_cannot_represent_distinct_cost_topologies(self) -> None:
+        for fragment in (
+            "按会改变成本拓扑的操作形状拆分",
+            "属性原地修改、集合成员增加或删除、拆分或合并",
+            "重排或涟漪更新、关系变化和二级投影更新",
+            "各选择至少一个代表性操作",
+            "一个廉价操作通过不能代表这些结构操作",
+            "同一闭合变更集并产生同一种工作放大",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PERFORMANCE_TEXT)
+
     def test_amplification_and_all_queue_layers_are_audited(self) -> None:
         for fragment in (
             "代表性单次成本 × 实际次数",
@@ -150,6 +162,38 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, measurement)
+
+    def test_automatic_parallelism_preserves_absolute_and_relative_guards(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        for fragment in (
+            "自动并发策略以已经声明的用户结果为选择目标",
+            "总耗时、尾部延迟、启动与收尾固定成本",
+            "相同输入、后端和缓存条件",
+            "独立的绝对安全上限与同机相对不退化",
+            "相对改善不能关闭已经超过的用户预算",
+            "候选运行前分别冻结并记录权威来源",
+            "不能让已经看见的候选数字反向成为它自己的通过标准",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, measurement)
+
+    def test_audit_owned_observers_are_terminal_before_timing(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        ordered = (
+            "第一条计时前",
+            "取得终态",
+            "不启动无边界目录遍历",
+            "重叠期间取得的全部性能数字失效",
+            "重新核对资源",
+        )
+        positions = [measurement.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("不能擅自终止", measurement)
+        self.assertIn("不能与审计自扰合并成产品结论", measurement)
 
     def test_closure_requires_invariants_user_chain_and_reaudit(self) -> None:
         closure = PERFORMANCE_TEXT.split("## 6. 修复交接与二次性能复审", 1)[1]

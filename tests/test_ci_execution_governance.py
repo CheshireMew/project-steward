@@ -33,6 +33,20 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         self.assertIn(route, remediation)
         self.assertIn("普通单个 CI 报错仍按当前开发任务处理", CI_TEXT)
 
+    def test_root_cause_route_requires_the_ci_ledger_before_tests(self) -> None:
+        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        ordered = (
+            "references/ci-execution-governance.md",
+            "第一条测试前",
+            "运行资格",
+            "累计预算",
+            "套件次数账本",
+        )
+        positions = [remediation.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_umbrella_commands_are_reconciled_with_validation_obligations(
         self,
     ) -> None:

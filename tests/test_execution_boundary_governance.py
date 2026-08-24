@@ -34,6 +34,24 @@ USER_ENVIRONMENT_TEXT = (
 
 
 class ExecutionBoundaryGovernanceTests(unittest.TestCase):
+    def test_loaded_method_identity_is_revalidated_at_resume_and_completion(
+        self,
+    ) -> None:
+        boundaries = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化", 1
+        )[0]
+        identity_rule = boundaries.split("记录 Skill 与方法的内容身份", 1)[1]
+        ordered = (
+            "自动续跑",
+            "压缩恢复",
+            "结项前复核",
+            "只重读变化文件",
+            "旧确认失效",
+            "重新规划并确认",
+        )
+        positions = [identity_rule.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_desktop_audit_remediation_loads_specialization_before_work(self) -> None:
         route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
             "## 外部工具兼容性", 1

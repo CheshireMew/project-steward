@@ -227,6 +227,20 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
         self.assertIn("references/user-environment-governance.md", environment_route)
         self.assertNotIn("$LASTEXITCODE", shared)
 
+    def test_independent_shell_probes_cannot_share_one_exit_status(self) -> None:
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
+            1,
+        )[0]
+        ordered = (
+            "独立探测不得共享 Shell 退出状态",
+            "组合须逐项保留输出、错误和退出状态",
+            "Shell 后句可能遮蔽前序失败",
+            "只把被遮蔽、未执行或状态未知的项目单独补跑",
+        )
+        positions = [shared.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_hidden_control_items_require_a_hidden_aware_probe(self) -> None:
         for fragment in (
             "Windows 隐藏控制项不能由默认读取判定不存在",
