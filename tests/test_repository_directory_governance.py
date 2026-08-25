@@ -15,6 +15,9 @@ REMEDIATION_TEXT = (
     SKILL_ROOT / "references" / "root-cause-remediation.md"
 ).read_text(encoding="utf-8")
 OPENAI_TEXT = (SKILL_ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8")
+STORAGE_TEXT = (
+    SKILL_ROOT / "references" / "production-storage-governance.md"
+).read_text(encoding="utf-8")
 SCRIPT = SKILL_ROOT / "scripts" / "inspect_project_tree.py"
 
 
@@ -130,6 +133,29 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         for contract in required_contracts:
             with self.subTest(contract=contract):
                 self.assertIn(contract, REFERENCE_TEXT)
+
+    def test_every_task_artifact_is_contained_by_the_current_project_root(self) -> None:
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化", 1
+        )[0]
+        self.assertIn("任何写盘先读", shared)
+        self.assertIn("references/repository-directory-governance.md", shared)
+        for fragment in (
+            "任何任务产物都必须收在当前项目根",
+            "测试夹具、快照、覆盖率、测试报告",
+            "staging、working copy 和中间文件",
+            "临时目录、日志、截图、录像、审查与验收证据",
+            "不能在项目旁边创建 `*-staging`、`*-output`",
+            "项目外存续的任务产物为零",
+            "活动消费者不再引用旧外部路径",
+            "已安装运行时、共享依赖缓存",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, REFERENCE_TEXT)
+        self.assertIn(
+            "产物归位门槛唯一决定",
+            STORAGE_TEXT,
+        )
 
     def test_no_delete_authority_does_not_create_an_archive_by_default(self) -> None:
         for fragment in (

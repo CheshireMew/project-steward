@@ -25,6 +25,10 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
         directory_route = skill.split("## 项目目录治理", 1)[1].split("## 项目基线与模板", 1)[0]
         self.assertIn("references/production-storage-governance.md", directory_route)
         for phrase in (
+            "产物归位门槛唯一决定",
+            "同时位于当前项目根和登记根内",
+            "普通根和配置根都保持在当前项目根内",
+            "项目外存续的任务产物为零",
             "事先预防必须发生在首个大文件之前",
             "获准实施时必须写进生产项目",
             ".project-steward/storage-contract.json",
