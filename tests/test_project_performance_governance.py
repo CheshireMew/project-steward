@@ -81,6 +81,38 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PERFORMANCE_TEXT)
 
+    def test_stream_shape_and_observability_sinks_are_first_class_work(self) -> None:
+        amplification = PERFORMANCE_TEXT.split("## 3. 沿完整用户链计算工作放大", 1)[
+            1
+        ].split("## 4. 按真实表面检查性能所有权", 1)[0]
+        ordered = (
+            "总字节量",
+            "分片数量与分布",
+            "未消费尾部",
+            "累计复制和扫描字节",
+            "代表性重复分片",
+            "一个会跨越协议或 token 边界的对抗切分",
+        )
+        positions = [amplification.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "一个短前缀加一个剩余大块",
+            "日志、追踪、审计、持久重放、缓存和调试导出",
+            "正式下游消费者",
+            "权威无损记录和有界诊断投影分别核算",
+            "二级消费者仍无必要地完整物化并持久化同一大对象",
+            "不能为了更快静默降低可诊断性",
+            "一次性处理已有权威小上限的内存值",
+            "不触发流式工作形状与观测副本闭包",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, amplification)
+
+        closure = PERFORMANCE_TEXT.split("## 6. 修复交接与二次性能复审", 1)[1]
+        self.assertIn("真实重复分片下产生累计复制或扫描放大", closure)
+        self.assertIn("无必要地完整物化同一大对象", closure)
+
     def test_runtime_surfaces_have_specific_performance_contracts(self) -> None:
         for fragment in (
             "不可见不等于未实例化",
