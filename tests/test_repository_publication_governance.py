@@ -422,6 +422,51 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_push_preflight_accounts_for_automatic_remote_side_effects(
+        self,
+    ) -> None:
+        owner = PUBLICATION_TEXT.split(
+            "### 推送前先冻结自动远端后果",
+            1,
+        )[1].split(
+            "如果普通项目的推送请求承接同一对话",
+            1,
+        )[0]
+        ordered = (
+            "最终候选内容、准确推送事件和目标引用",
+            "展开候选提交中的 workflow 触发器",
+            "以实际触发条件、步骤和写入目标判断后果",
+            "逐项把后果分类",
+            "与本次允许动作、明确禁止项和停止位置逐项对账",
+            "停在推送前",
+        )
+        positions = [owner.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "普通测试、文档检查或质量门",
+            "打包与签名、创建或更新 Release 与标签、部署、发布包或镜像",
+            "不能因为它由 push 自动触发，就把它降为普通推送的内部步骤",
+            "不要打包",
+            "不能擅自修改工作流、改推其它引用、临时禁用远端规则",
+            "候选中的自动化、目标引用或远端生产者发生变化",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, owner)
+
+        consumer = PUBLICATION_TEXT.split(
+            "### 推送执行必须消费自动远端后果账本",
+            1,
+        )[1].split("### 远端前进后先重建发布基线", 1)[0]
+        for fragment in (
+            "最终候选冻结后、执行任何 push 之前",
+            "消费 `repository-publication.md` 的“推送前先冻结自动远端后果”",
+            "相关状态未知或存在冲突时不推送",
+            "回到该方法重新取得授权兼容性",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, consumer)
+
     def test_project_steward_self_evolution_publishes_the_whole_worktree(self) -> None:
         section = PUBLICATION_TEXT.split(
             "### Project Steward 自我进化使用整仓发布合同",
