@@ -67,23 +67,23 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 
 ## 改动前预防
 
-先依次读取 `references/change-prevention.md`、`references/change-prevention-state-and-capability.md`、`references/change-prevention-delivery-boundaries.md` 和 `references/change-prevention-verification.md`，由它们共同负责目标行为、唯一真源、影响图、最终接口、旧路径退出和真实用户链验收。按问题叠加：
+读取 `references/change-prevention.md`、`references/change-prevention-state-and-capability.md`、`references/change-prevention-delivery-boundaries.md` 和 `references/change-prevention-verification.md`，负责目标、真源、影响图、接口、旧路退出与验收；按问题叠加：
 
 - 持久操作、队列或调度器的有界批次与积压排空、恢复、重启、成组产物，或常驻有状态服务中可发现会话与共享资源的并发准入、释放和关闭：`references/durable-operation-governance.md`
 - 任务状态、进度或自动续跑：`references/task-progress-governance.md`
 - 高成本结果需要分阶段展示、确认、连续自动执行或按上游变化失效：`references/staged-result-governance.md`
-- 同一结果由多份规格、计划、任务或研究产物表达且需决定演化关系，或涉及派生产物、语义缓存、工作单元切分、候选资格、配额、补位、资源池利用或重复 Agent 编排：`references/derived-artifact-governance.md`
+- 同一结果由多份规格、计划、任务或研究产物表达，或涉及派生产物、语义缓存、工作单元、候选资格、配额、补位、资源池及重复 Agent 编排：`references/derived-artifact-governance.md`
 - 项目级 CI 的验证计划、执行环境缓存、测试资源分层、耗时分片、早失败和精准重跑：`references/ci-execution-governance.md`
 - 大型媒体、缓存、测试证据、下载、模型或中间产物会持续写盘，或用户要求把预防能力写进生产项目：`references/production-storage-governance.md`
 - 运行中配置会重建共享服务、provider、存储根或组合图：`references/runtime-generation-governance.md`
 - 难复现、时序、并发、背压或昂贵完整链：`references/hard-to-reproduce-diagnostics.md`
 - IPC、MessagePort、worker 或线程消息的数据表示、传输、首条或终态投递、懒加载监听：`references/runtime-message-transport-governance.md`
-- 外部、持久化、模型、网络或进程 JSON 存在多处解析、容量、原子分片、重放游标或合同歧义：`references/structured-data-boundary.md`
+- 面向外部 Agent 新建项目 CLI：`references/agent-facing-cli-governance.md`；JSON 合同及解析、容量、原子分片、重放游标或歧义：`references/structured-data-boundary.md`
 - 模型参与任务判断、状态表达、运行时事件或结构化回复，需要核对消息来源、角色、路由、线请求与呈现职责：`references/model-mediated-operation-governance.md`
 - 源码一次性分叉、生态吸收，或持续同步上游且可能修改上游所有路径：`references/source-fork-and-ecosystem-adoption.md`；实际复制代码时同时读取 `references/license-governance.md`
-- 产品体验或界面：`references/product-experience-governance.md`；需要设计或交互方法时再读 `references/ux-design.md`
+- 产品体验或界面：`references/product-experience-governance.md`；设计或交互再读 `references/ux-design.md`
 
-只有用户明确授权实施时修改项目；只要求计划则停在影响图、目标边界、迁移顺序和验收合同。
+实施授权才修改；计划停在影响图、目标边界、迁移顺序和验收合同。
 
 ## 根因治理
 
