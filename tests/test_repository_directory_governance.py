@@ -18,6 +18,9 @@ OPENAI_TEXT = (SKILL_ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8"
 STORAGE_TEXT = (
     SKILL_ROOT / "references" / "production-storage-governance.md"
 ).read_text(encoding="utf-8")
+PREVENTION_TEXT = (
+    SKILL_ROOT / "references" / "change-prevention.md"
+).read_text(encoding="utf-8")
 SCRIPT = SKILL_ROOT / "scripts" / "inspect_project_tree.py"
 
 
@@ -134,24 +137,50 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
             with self.subTest(contract=contract):
                 self.assertIn(contract, REFERENCE_TEXT)
 
-    def test_every_task_artifact_is_contained_by_the_current_project_root(self) -> None:
+    def test_task_artifacts_follow_their_formal_owner_and_consumer(self) -> None:
         shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
             "## 对话学习与自我进化", 1
         )[0]
         self.assertIn("任何写盘先读", shared)
         self.assertIn("references/repository-directory-governance.md", shared)
+
+        ownership = REFERENCE_TEXT.split(
+            "### 任务产物按正式所有者和消费者归位", 1
+        )[1].split("## 2. 建立目录证据账本", 1)[0]
+        ordered = (
+            "消费 `change-prevention.md` 的受限执行路径合同",
+            "以正式消费者确定位置",
+            "项目登记的受控源码、测试或运行根",
+            "只被浏览器、调试器、执行器或机器环境消费",
+            "用户确认的环境工具或临时根",
+            "无关项目不能因为可写而充当中转站",
+            "项目外无所有者的任务产物为零",
+            "准确路径、生产者、所有者、清理状态和责任",
+        )
+        positions = [ownership.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
         for fragment in (
-            "任何任务产物都必须收在当前项目根",
-            "测试夹具、快照、覆盖率、测试报告",
-            "staging、working copy 和中间文件",
-            "临时目录、日志、截图、录像、审查与验收证据",
-            "不能在项目旁边创建 `*-staging`、`*-output`",
-            "项目外存续的任务产物为零",
-            "活动消费者不再引用旧外部路径",
+            "项目旁边的 `*-staging`、`*-output`",
             "已安装运行时、共享依赖缓存",
+            "某次任务专用的对象必须记录本轮所有者和生命周期",
+            "因缺少删除权限或宿主策略而保留的环境对象",
+            "活动消费者不再引用错误旧路径",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, REFERENCE_TEXT)
+                self.assertIn(fragment, ownership)
+
+        prevention = PREVENTION_TEXT.split("### 受限执行路径与临时产物", 1)[
+            1
+        ].split("### 大型内容默认根先消费用户环境策略", 1)[0]
+        self.assertIn("临时根由正式消费者决定", prevention)
+        self.assertIn("`change-prevention.md`", ownership)
+        self.assertNotIn("临时根由正式消费者决定", ownership)
+        self.assertIn(
+            "只被浏览器、调试器、执行器或机器环境消费", prevention
+        )
+        self.assertNotIn("任何任务产物都必须收在当前项目根", REFERENCE_TEXT)
+        self.assertNotIn("项目外存续的任务产物为零", REFERENCE_TEXT)
         self.assertIn(
             "产物归位门槛唯一决定",
             STORAGE_TEXT,
