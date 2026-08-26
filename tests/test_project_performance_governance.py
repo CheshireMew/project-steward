@@ -248,6 +248,55 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, measurement)
 
+    def test_approximation_cannot_masquerade_as_exact_optimization(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        for fragment in (
+            "近似捷径不能伪装成等价优化",
+            "候选数量上限、采样、代表项或锚点比较、近似搜索",
+            "质量、完整性或产品合同变化",
+            "未优化的参考实现或其它结果预言",
+            "代表性与对抗性输入",
+            "输出集合、排序、召回、精度、终态",
+            "只证明比较次数、延迟或资源下降不构成等价证据",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, measurement)
+
+    def test_logical_retention_requires_product_authority_and_preview(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        ordered = (
+            "物理存储维护与业务记录的逻辑淘汰必须分账",
+            "性能目标不能凭空发明 30 天、365 天等保留期",
+            "权威数据生命周期决定",
+            "时间字段、终态与进行中关系、豁免项",
+            "报告或快照依赖和恢复语义",
+            "现有数据生成可核对的影响预演",
+            "迁移、回滚、观测与异常停止条件",
+        )
+        positions = [measurement.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("不能把删除数据记为性能修复", measurement)
+
+    def test_performance_regression_guard_is_bounded_on_bad_candidate(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        for fragment in (
+            "在故障或退化实现上也必须有界",
+            "计数预算或断路器，一旦超过预算立即失败",
+            "规模更小但仍能区分正确与退化实现的固定夹具",
+            "能够按准确进程树安全回收的外部超时",
+            "不能先让病态工作完整跑完再断言",
+            "不能要求维护者猜测进程身份后手工终止",
+            "已知坏候选在规定边界内失败",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, measurement)
+
     def test_gate_compliance_is_not_overclaimed_as_performance_health(self) -> None:
         measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
             "## 6. 修复交接与二次性能复审", 1
