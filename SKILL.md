@@ -88,7 +88,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 
 ## 根因治理
 
-先读取 `references/root-cause-remediation.md` 和 `references/root-cause-verification-and-closure.md`。诊断停在证据、影响范围与最终修法；实施才一次迁移全部生产者、边界和消费者，并退出旧架构。按问题叠加：
+先读取 `references/root-cause-remediation.md` 和 `references/root-cause-verification-and-closure.md`。登记、安装或选择被误报为可用时再读 `references/change-prevention-state-and-capability.md`。诊断停在证据、影响范围与最终修法；实施才一次迁移全部生产者、边界和消费者，并退出旧架构。按问题叠加：
 
 综合审计全量修复以原交接账本为结项合同。写入前读 `references/project-audit.md`、`references/project-audit-release-and-evidence.md`、`references/change-prevention.md`，核对稳定编号、完成条件与证据面；缺失、过期按原范围重建，未知开放，账本合格才写。桌面、移动或归档叠加 `references/desktop-app-governance.md`、`references/repository-directory-governance.md`。末改后重建审计账本，新证据使旧状态失效，摘要只取逐项终态；无关审计不扩张单点范围。
 

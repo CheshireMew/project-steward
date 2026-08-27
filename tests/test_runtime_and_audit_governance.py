@@ -286,6 +286,23 @@ class RuntimeAndAuditGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
+    def test_resource_readiness_has_one_projection_and_root_cause_route(self) -> None:
+        for fragment in (
+            "必需资源闭包",
+            "不能越级为就绪",
+            "唯一状态投影",
+            "能力已满足才成功无操作",
+            "未满足则明确不可用或不完整",
+            "不显示空名称、零大小入口",
+            "只有共同能力缺失才阻塞",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        self.assertIn("登记、安装或选择被误报为可用", MAIN_TEXT)
+        self.assertIn("第一处把弱事实提升为就绪的边界", REMEDIATION_TEXT)
+        self.assertIn("空动作集合本身不能证明就绪", REMEDIATION_TEXT)
+
 
     def test_settings_have_scoped_targets_and_one_atomic_commit(self) -> None:
         for fragment in (
