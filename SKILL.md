@@ -1,6 +1,6 @@
 ---
 name: project-steward
-description: "从项目过程与结果提炼治理方法并在明确要求时自我进化；按实施计划审计完成度，研究整理仓库，预防返工，沿根因修复跨层缺陷，治理架构、用户链、UI/UX、文档、日志、环境与发布。Use for project-history learning/evolution; audit a plan or repository; understand or organize a codebase; inspect external-tool compatibility and project governance. Excludes isolated function, security, dependency, CI, or monitoring-only work."
+description: "从项目过程与结果提炼治理方法并在明确要求时自我进化；按实施计划审计完成度，研究整理仓库，预防返工，沿根因修复跨层缺陷，治理架构、目录职责、用户链、UI/UX、文档、日志、环境与发布。Use for project-history learning/evolution; audit a plan or repository; understand or organize a codebase; inspect external-tool compatibility, durable operations, and project governance. Excludes isolated function, security, dependency, CI, or monitoring-only work."
 ---
 
 # Project Steward
@@ -46,7 +46,7 @@ Project Steward 保存跨项目可复用的治理方法。项目自己的产品�
 - 新的独立请求替换尚未完成的结果时，交接已改对象、证据、未验证承诺、运行进程、残留、原权限与停止位置；新请求不授权继续、回退或清理旧结果。
 - 先冻结准确项目根；任何写盘先读 `references/repository-directory-governance.md` 的产物归位门槛。Git 仅在该根有 .git 且需证据时用。
 - Codex 完整历史先运行本 Skill 的 `scripts/read_codex_session.py`，只读其稳定快照，不先以普通文件命令或语义入口探测活动源；其它宿主选择能关闭范围的最强稳定来源，缺口不得声称完整。记录 Skill 与方法的内容身份；自动续跑、压缩恢复、结项前复核只重读变化文件；合同、消费者、验证或用户结果变化时，旧确认失效，重新规划并确认。
-- 独立探测不得共享 Shell 退出状态；组合须逐项保留输出、错误和退出状态、身份并 fail-fast；顺序连接不得以后句代表整批。Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”并停批；隐藏项或转义失真时同样进入；只把被遮蔽、未执行或状态未知的项目单独补跑。
+- 独立探测不得共享 Shell 退出状态；组合须逐项保留输出、错误和退出状态、身份并 fail-fast；顺序连接不得以后句代表整批。Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”并停批；命令构造、解析、隐藏项或转义失真时同样进入；只把被遮蔽、未执行或状态未知的项目单独补跑。
 - 项目事实写回项目现有唯一真源；环境事实写入独立用户档案；可迁移治理方法才进入本 Skill；模板只接收某类项目每次都应执行的稳定默认。
 - 判断历史或外部材料中的能力是否已经存在时，先完成独立结果拆分和必要的因果排序，再遮住来源检查目标能否认出同一条件、保留同一构成性细节并作出同一具体处理；只有上位治理框架算部分具备。完成逐项比较后才提炼共同机制和特殊维度。
 - 验证按改动风险选择层级：每个验证阶段及自写浏览器、视觉、用户链验证器首次运行前，先按 `references/ci-execution-governance.md` 消费最近一次已完成的公开仓库失败，只运行当前机器上直接覆盖本次改动和验收主张的目标检查；其它平台、完整回归、远端 CI 与真实用户链只有用户明确要求、代码冻结或目标检查证明系统性影响时才进入。验证预计跨观察窗口时，启动前读 `references/user-environment-governance.md`；没有可回读运行身份、增量输出和独立终态便不启动。

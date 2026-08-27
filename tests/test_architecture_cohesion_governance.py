@@ -251,19 +251,46 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
-    def test_migration_test_failures_stay_bound_to_findings_and_target_behavior(
+    def test_private_test_dependencies_move_to_valid_consumption_boundaries(
         self,
     ) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 测试依赖和失败作用域随成员迁移",
+            1,
+        )[1].split("同时冻结代码移动前的失败作用域", 1)[0]
+        ordered = (
+            "私有方法、模块常量、monkeypatch、fixture 和内部状态",
+            "公共行为、最终所有者的领域规则、结构不变量，还是过期耦合",
+            "公共行为改从正式入口到达",
+            "最终所有者的窄接口",
+            "结构测试点名准确不变量",
+            "不能为旧测试恢复私有兼容层",
+            "不能只改 monkeypatch 路径使其变绿",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_decomposition_preserves_failure_isolation_and_target_behavior(
+        self,
+    ) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "同时冻结代码移动前的失败作用域",
+            1,
+        )[1].split("不得按行数平均切文件", 1)[0]
         for fragment in (
-            "逐项映射到稳定发现身份和已冻结的目标行为基线",
-            "同一测试文件、套件或目录不能证明多个失败属于同一迁移边界",
-            "生产者、合同、边界或消费者的迁移确实改变了该断言或夹具",
+            "在哪里捕获异常、记录错误、重试、继续或中止",
+            "事务与清理覆盖什么",
+            "逐项失败没有升级成整批失败",
+            "必须中止的错误没有被吞掉",
+            "后续合法项仍按原合同处理",
+            "生产者、合同、边界或消费者的断言和夹具",
+            "稳定发现身份和已冻结的目标行为基线",
             "无关断言、并发改动或目标仍未知的失败",
-            "不能用脏工作树当前显示的文字",
+            "不能用脏工作树当前文字",
             "反向改写目标行为",
         ):
             with self.subTest(fragment=fragment):
-                self.assertIn(fragment, ARCHITECTURE_TEXT)
+                self.assertIn(fragment, section)
 
     def test_async_workflows_close_by_stage_without_central_redispatch(
         self,

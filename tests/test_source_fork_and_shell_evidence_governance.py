@@ -212,6 +212,31 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, USER_ENVIRONMENT_TEXT)
 
+    def test_parse_failures_reduce_interpreter_layers_and_gate_dependents(
+        self,
+    ) -> None:
+        section = USER_ENVIRONMENT_TEXT.split(
+            "### 命令构造或解析失败后切换执行边界",
+            1,
+        )[1].split(
+            "### PowerShell 调用原生搜索时显式传递文件范围和正则",
+            1,
+        )[0]
+        ordered = (
+            "失败的准确命令形态已经无效",
+            "不能通过增加引号、反斜杠或转义层继续试错",
+            "先减少一层解释器",
+            "只覆盖失败语法的最小探测",
+            "任务自有脚本或受控证据文件",
+            "能力发现与依赖动作分成独立调用",
+            "停止并报告不支持",
+            "上游身份、对象或能力结果为空、未知或失败时",
+            "哈希、计数、格式化或实际操作不得开始",
+            "$rows = foreach (...) { ... }; $rows | Format-Table",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_powershell_native_search_uses_explicit_file_and_regex_boundaries(
         self,
     ) -> None:
@@ -257,7 +282,7 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             1,
         )[1].split("## 项目综合审计", 1)[0]
 
-        self.assertIn("隐藏项或转义失真时同样进入", shared)
+        self.assertIn("命令构造、解析、隐藏项或转义失真时同样进入", shared)
         self.assertIn("先进入“用户环境档案与执行环境”", shared)
         self.assertIn("references/user-environment-governance.md", environment_route)
         self.assertNotIn("$LASTEXITCODE", shared)
