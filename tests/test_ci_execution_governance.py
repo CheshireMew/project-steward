@@ -41,6 +41,7 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             "## 外部工具兼容性", 1
         )[0]
         ordered = (
+            "多发现审计修复直接读",
             "references/ci-execution-governance.md",
             "第一条测试前",
             "运行资格",
@@ -198,6 +199,24 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_mid_run_budget_reduction_preserves_completion_contract(self) -> None:
+        section = CI_TEXT.split(
+            "### 阶段资格、累计预算与全量验证上限",
+            1,
+        )[1].split("计划的机器可读输出", 1)[0]
+        ordered = (
+            "用户在执行中要求简单收口、缩短耗时或降低成本",
+            "冻结原完成条件和已消耗预算",
+            "必需、辅助和范围外",
+            "只裁减辅助项",
+            "剩余必需检查超出新边界",
+            "标为未验证、开放或受阻",
+            "不能删除原义务",
+            "追认“全部完成”",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
 
     def test_full_suite_has_an_authoritative_two_run_ceiling(self) -> None:
         section = CI_TEXT.split(

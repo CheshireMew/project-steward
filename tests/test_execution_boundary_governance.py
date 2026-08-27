@@ -57,6 +57,43 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         positions = [identity_rule.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
 
+    def test_authorization_is_attributable_and_bound_to_exact_request(self) -> None:
+        boundaries = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化", 1
+        )[0]
+        ordered = (
+            "对应请求之后",
+            "可归因于用户",
+            "准确对象、范围与代次",
+            "更早确认",
+            "宿主注入",
+            "不能补造授权",
+            "对象待确认",
+            "只继续不依赖它的已授权工作",
+        )
+        positions = [boundaries.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_compaction_or_goal_reset_rehydrates_audit_identity_before_status(
+        self,
+    ) -> None:
+        section = REMEDIATION_TEXT.split(
+            "### 结项状态先重建原账本",
+            1,
+        )[1].split("### 结项前消费最终验证计划", 1)[0]
+        ordered = (
+            "上下文压缩、恢复、目标状态丢失或重建",
+            "最强稳定真源",
+            "稳定发现 ID、语义标题、原完成条件和最后一次有效证据",
+            "摘要、计划和近期修改文件只是投影",
+            "同一 ID 对应不同语义标题",
+            "目标或任务的权威状态缺失",
+            "保持未知或开放",
+            "不得输出数字比例、`还剩 N 项`或全称完成",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_desktop_audit_remediation_loads_specialization_before_work(self) -> None:
         route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
             "## 外部工具兼容性", 1
