@@ -186,6 +186,51 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
 
+    def test_unified_contracts_reject_ignored_applicable_qualifiers(self) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 统一合同按语义单元闭合采用关系",
+            1,
+        )[1].split("## 5. 设计最终边界", 1)[0]
+        ordered = (
+            "语义单元、字段、限定条件或状态身份",
+            "唯一所有者与正式生产者",
+            "适用消费者",
+            "实际消费方式：查询、判断、校验、传递或投影",
+            "明确不适用及理由",
+            "旧解释、默认值和回退退出",
+            "代表性验证",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "只导入、构造合同或读取部分字段不能证明迁移完成",
+            "每个适用字段都必须真正参与对应消费者",
+            "忽略适用限定条件仍是半迁移",
+            "明确记为 N/A",
+            "不为了形式完整制造虚假消费",
+            "真实违规夹具证明忽略适用限定条件会失败",
+            "合法近似夹具证明明确 N/A 不会误报",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
+    def test_equal_wire_literals_do_not_merge_domain_identities(self) -> None:
+        section = ARCHITECTURE_TEXT.split(
+            "### 统一合同按语义单元闭合采用关系",
+            1,
+        )[1].split("## 5. 设计最终边界", 1)[0]
+        for fragment in (
+            "相同序列化值不等于同一领域身份",
+            "仍保留独立类型、枚举或命名常量",
+            "不能交叉使用",
+            "不同身份只共享底层序列化机制",
+            "真实违规夹具证明跨领域常量会失败",
+            "合法近似夹具证明相同字面量的独立身份不会误报",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_architecture_residue_scans_close_semantic_invariants(self) -> None:
         for fragment in (
             "同一问题类型、关键词、目录位置或代码形态",
@@ -469,6 +514,7 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             "### 适配器族先拆开共同政策与合法变体",
             "### 测试专用影子实现不算生产覆盖",
             "### Repository 边界按聚合所有权验收",
+            "### 统一合同按语义单元闭合采用关系",
             "### 可选能力按独立支持面拆分公共合同",
             "### 多入口操作共享一份绑定与请求收口",
         ):
