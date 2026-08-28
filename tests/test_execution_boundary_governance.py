@@ -287,6 +287,21 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         self.assertIn("不能因工具报告“应用成功”", section)
         self.assertIn("后续测试的偶然成功", section)
 
+    def test_non_git_manifests_and_actual_tool_actions_bound_writes(self) -> None:
+        for fragment in (
+            "非 Git 项目级写入先冻结变更身份",
+            "相对路径、类型、字节数、内容哈希",
+            "已修改、新增、缺失或未知",
+            "它不是备份",
+            "清单不会授予删除权限",
+            "删除后同路径新建仍包含删除与创建",
+            "移动后移回仍包含移动",
+            "覆盖后恢复仍包含覆盖",
+            "只能原位更新",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
     def test_formal_test_identity_prevents_gui_loader_dialogs(self) -> None:
         section = CI_TEXT.split("### 测试命令先展开再取得运行资格", 1)[1]
         for fragment in (

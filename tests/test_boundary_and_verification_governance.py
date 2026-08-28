@@ -99,6 +99,8 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             "叶载荷使用原始字节还是叶摘要",
             "固定测试向量",
             "双方都使用 SHA-256",
+            "`/daily/news`、`/daily/article`、`/daily/{kind}` 是三项不同操作",
+            "不能把多个静态路由折叠成一个不存在的参数化模板",
             "可扩展字段由生产者的机器可读描述拥有",
             "稳定字段身份、默认值、范围、单位、建议控件和是否可动画",
             "消费者只把建议控件映射到自己的界面组件",
@@ -113,6 +115,7 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
             "唯一同步入口单向更新快照",
             "不能原地改写同一版本的多份副本",
             "实际操作集合与参数 schema",
+            "操作注册表漂移",
             "不能让运行时代码迎合过期说明",
         ):
             with self.subTest(fragment=fragment):
