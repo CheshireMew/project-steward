@@ -94,6 +94,28 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         positions = [section.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
 
+    def test_administrative_metrics_cannot_be_created_retroactively_for_completion(
+        self,
+    ) -> None:
+        section = REMEDIATION_TEXT.split(
+            "### 结项状态先重建原账本",
+            1,
+        )[1].split("### 结项前消费最终验证计划", 1)[0]
+        ordered = (
+            "Goal、计划、任务计时器和用量记录",
+            "实际创建或绑定到当前结果之后持续覆盖的区间",
+            "不存在与当前用户结果、范围和代次匹配的活动记录",
+            "直接依据原账本与正式证据结项",
+            "不得在实现或验证结束后补建、重置或重新绑定记录",
+            "制造完成状态、总耗时或总用量",
+            "只处理确实覆盖当前结果的记录",
+            "标明为该记录的实际覆盖区间",
+            "从用户结果被接受到最终交付连续覆盖全程",
+            "才可称为本结果总量",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_desktop_audit_remediation_loads_specialization_before_work(self) -> None:
         route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
             "## 外部工具兼容性", 1
