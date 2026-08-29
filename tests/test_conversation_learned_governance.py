@@ -673,19 +673,20 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
-    def test_partition_sensitive_differences_preserve_identity_before_merge(
+    def test_partition_and_derived_aggregate_semantics_precede_merge(
         self,
     ) -> None:
         for fragment in (
             "分区语义先于全局聚合",
             "语义分区键及其正式来源",
-            "每个分区的变更前与变更后状态",
             "先在每个语义分区内计算",
-            "不能先把各分区状态做全局并集",
             "提前聚合会丢失归属",
-            "一个分区仍存在的同值事实掩盖另一个分区已经发生的变化",
-            "同一值、区间或资源在一个分区仍然存在",
-            "正式结果必须保留后一个分区的差异及身份",
+            "分段明细与派生汇总先冻结度量语义",
+            "权威明细、派生汇总及各自所有者",
+            "逐段占用量 / 时间轴跨度 / 区间并集 / 计数 / 其它",
+            "空档、重叠、非零起点、变速或单位转换",
+            "消费者不得凭字段名称猜求和、最大末端或并集",
+            "容差内外边界",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PREVENTION_TEXT)
