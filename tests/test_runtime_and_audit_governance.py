@@ -16,6 +16,22 @@ class RuntimeAndAuditGovernanceTests(unittest.TestCase):
 
         self.assertIn("承诺覆盖", REMEDIATION_TEXT)
 
+    def test_realtime_remote_audit_requires_network_authority(self) -> None:
+        section = PROJECT_AUDIT_TEXT.split(
+            "### 分开本地与实时远端事实", 1
+        )[1].split("写清：", 1)[0]
+        ordered = (
+            "当前请求已经单独授权联网",
+            "网络可访问",
+            "只读接口或正式客户端",
+            "缺少当前请求对应的联网授权",
+            "不调用托管方接口或客户端",
+            "完整本地审计继续",
+            "实时远端证据平面标为待确认",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_performance_audit_routes_causal_measurement_and_large_evidence(
         self,
     ) -> None:

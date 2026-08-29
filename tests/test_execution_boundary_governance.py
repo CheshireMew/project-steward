@@ -74,6 +74,26 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         positions = [boundaries.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
 
+    def test_failure_evidence_precedes_the_first_production_write(self) -> None:
+        section = REMEDIATION_TEXT.split(
+            "### 首次生产写入前固定失败证据", 1
+        )[1].split("按层验证：", 1)[0]
+        ordered = (
+            "稳定发现 ID",
+            "当前候选内容身份",
+            "正式复现或关键测试身份",
+            "实际失败结果",
+            "最早错误边界",
+            "正式消费者",
+            "正式发现或收集入口核对为唯一",
+            "停在诊断",
+            "不开始生产写入",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("不能把准备新增测试写成已经取得失败证据", section)
+        self.assertIn("使用同一发现 ID 和复现身份取得新结果", section)
+
     def test_compaction_or_goal_reset_rehydrates_audit_identity_before_status(
         self,
     ) -> None:
