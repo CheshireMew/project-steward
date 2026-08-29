@@ -68,8 +68,24 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
             "更早确认",
             "宿主注入",
             "不能补造授权",
+            "变更前",
+            "commentary",
+            "明列证据、允许动作与停止位置",
             "对象待确认",
             "只继续不依赖它的已授权工作",
+        )
+        positions = [boundaries.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_final_is_terminal_and_known_work_stays_out_of_final(self) -> None:
+        boundaries = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化", 1
+        )[0]
+        ordered = (
+            "同一结果仍未交付",
+            "final 只在真实交付时发送",
+            "自动续跑不得重开",
+            "不能补造新结果或写入权限",
         )
         positions = [boundaries.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
@@ -424,6 +440,31 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_closure_preflight_precedes_candidate_and_final_suite(self) -> None:
+        section = REMEDIATION_TEXT.split(
+            "### 候选冻结前完成结项预检",
+            1,
+        )[1].split("### 结项前消费最终验证计划", 1)[0]
+        ordered = (
+            "原发现账本",
+            "`root-cause-remediation.md` 的“同源变体收口”",
+            "冻结候选或启动最终完整套件前",
+            "原完成条件和已取得证据",
+            "正式生产者 → 传输或存储边界 → 全部正式消费者",
+            "替代入口、构建或测试目标及实际运行产物",
+            "生命周期终结",
+            "直接诊断、落盘或持久化消费者",
+            "唯一测试或检查身份及实际收集结果",
+            "开放或未知",
+            "不得冻结候选、启动最终完整套件或准备全称结论",
+            "其它平台、远端、实机或外部条件继续单列证据平面",
+            "交给下一节的唯一验证计划",
+            "候选与既有完整套件证据失效",
+            "重新生成预检",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
 
 
 if __name__ == "__main__":
