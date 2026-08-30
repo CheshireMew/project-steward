@@ -238,6 +238,49 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_remote_result_resolves_its_target_before_local_history_changes(
+        self,
+    ) -> None:
+        owner = PUBLICATION_TEXT.split(
+            "### 远端结果先通过目标前置门",
+            1,
+        )[1].split("### Project Steward 自我进化使用整仓发布合同", 1)[0]
+        ordered = (
+            "停止位置包含推送、远端分支更新、PR 或默认分支结果时",
+            "在任何暂存、创建提交或其它本地历史变化前",
+            "准确远端、目标引用与可用上游",
+            "用户是否单独要求本地提交",
+            "保持工作区、索引和本地提交图不变",
+        )
+        positions = [owner.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "仍可完成用户明确要求且不会改变状态的检查",
+            "推送请求不能把“本地先提交也有用”作为默认降级",
+            "不执行已知必然失败的 push",
+            "未发生的暂存、提交与推送",
+            "用户明确只要本地提交",
+            "把远端保持为未改变",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, owner)
+
+        consumer = PUBLICATION_TEXT.split(
+            "## 6. 创建提交、远程仓库与推送",
+            1,
+        )[1].split("开始发布事务时", 1)[0]
+        consumer_order = (
+            "消费 `repository-publication.md` 的“远端结果先通过目标前置门”",
+            "早于任何 `git add`、commit 和 push",
+            "可以完成用户明确要求的只读检查",
+            "不创建索引或提交",
+            "只在用户另行明确授权本地提交结果时",
+        )
+        positions = [consumer.index(fragment) for fragment in consumer_order]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("不能从推送请求自动降级", consumer)
+
     def test_remote_checks_are_verified_without_granting_fix_authority(
         self,
     ) -> None:
