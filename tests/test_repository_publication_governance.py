@@ -664,6 +664,46 @@ class RepositoryPublicationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, PUBLICATION_TEXT)
 
+    def test_history_filtering_closes_one_semantic_scope_across_all_consumers(
+        self,
+    ) -> None:
+        planning = PUBLICATION_TEXT.split(
+            "准确清理范围来自语义所有权账本",
+            1,
+        )[1].split("删除当前文件、改写本地历史", 1)[0]
+        for fragment in (
+            "生产者、正式消费者、生命周期、所属根目录和历史别名",
+            "正则扫描只能提供候选",
+            "当前物理文件、忽略规则、源码验证器、当前树和获准历史必须消费同一范围身份",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, planning)
+
+        execution = PUBLICATION_TEXT.split(
+            "### 历史过滤使用同一份语义清理集",
+            1,
+        )[1].split("### 有意重建为单一根提交", 1)[0]
+        ordered = (
+            "遍历当前树和每个获准提交树补齐",
+            "在隔离的完整镜像中记录旧目标 SHA",
+            "每个获准提交树的目标路径计数为零",
+            "范围外路径与 blob 身份未变",
+            "显式把该远端的 mirror 配置设为 false",
+            "重新读取目标远端",
+            "验证器必须声明对象可用性",
+            "设置 `GIT_NO_LAZY_FETCH=1`",
+        )
+        positions = [execution.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "不能把单引用 refspec 与仍然生效的 mirror 推送混用",
+            "需要证明历史 blob 等价或目标对象不可达时，使用完整隔离镜像",
+            "不用会为取得缺失 blob 而隐式访问网络的 `git fsck`",
+            "fork、PR 缓存、其它克隆和托管方对象仍按已授权结果层分别报告",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, execution)
+
 
 if __name__ == "__main__":
     unittest.main()
