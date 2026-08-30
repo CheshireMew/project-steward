@@ -5,6 +5,7 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 REFERENCES_ROOT = SKILL_ROOT / "references"
+SKILL_TEXT = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
 ARCHITECTURE_TEXT = (REFERENCES_ROOT / "architecture-cohesion-governance.md").read_text(
     encoding="utf-8"
 )
@@ -92,6 +93,41 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, ARCHITECTURE_TEXT)
+
+    def test_migration_route_requires_evidence_before_writes(self) -> None:
+        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        gate = next(
+            line
+            for line in remediation.splitlines()
+            if "references/architecture-cohesion-governance.md" in line
+        )
+        ordered = (
+            "references/architecture-cohesion-governance.md",
+            "公共接口、组合根或控制器拆分前完成",
+            "成员与协作者迁移账本",
+            "全部消费者清单",
+            "异步初始化、重置或调度变化先落实",
+            "references/change-prevention-delivery-boundaries.md",
+            "时间过程合同",
+            "门槛未满足不得写入",
+        )
+        positions = [gate.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        migration = ARCHITECTURE_TEXT.split(
+            "### 宽公共表面和组合根迁移保留合同身份", 1
+        )[1].split("### 可选能力按独立支持面拆分公共合同", 1)[0]
+        self.assertIn("生产代码、跨语言绑定、测试、脚本和验证器中的正式消费者", migration)
+        delivery = (
+            REFERENCES_ROOT / "change-prevention-delivery-boundaries.md"
+        ).read_text(encoding="utf-8")
+        temporal = delivery.split("再建立时间过程合同，而不是只写最终状态", 1)[1].split(
+            "### 代表性规模、消费者扩散与编辑状态", 1
+        )[0]
+        self.assertIn("必须依次出现的可观察里程碑", temporal)
+        self.assertIn("证明每个时刻而非只证明终点的验收证据", temporal)
 
     def test_facade_and_composition_root_migrations_preserve_contract_identity(
         self,
@@ -515,6 +551,7 @@ class ArchitectureCohesionGovernanceTests(unittest.TestCase):
             "### 测试专用影子实现不算生产覆盖",
             "### Repository 边界按聚合所有权验收",
             "### 统一合同按语义单元闭合采用关系",
+            "### 宽公共表面和组合根迁移保留合同身份",
             "### 可选能力按独立支持面拆分公共合同",
             "### 多入口操作共享一份绑定与请求收口",
         ):

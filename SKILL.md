@@ -46,12 +46,13 @@ description: "从项目过程与结果提炼治理方法并在明确要求时自
 - 新的独立请求替换尚未完成的结果时，交接已改对象、证据、未验证承诺、运行进程、残留、原权限与停止位置；新请求不授权继续、回退或清理旧结果。
 - 先冻结准确项目根；任何写盘先读 `references/repository-directory-governance.md` 的产物归位门槛。Git 仅在该根有 .git 且需证据时用。
 - Codex 完整历史先运行本 Skill 的 `scripts/read_codex_session.py`，只读其稳定快照，不先以普通文件命令或语义入口探测活动源；其它宿主选择能关闭范围的最强稳定来源，缺口不得声称完整。记录 Skill 与方法的内容身份；自动续跑、压缩恢复、结项前复核只重读变化文件；合同、消费者、验证或用户结果变化时，旧确认失效，重新规划并确认。
-- 独立探测不得共享 Shell 退出状态；组合须逐项保留输出、错误和退出状态、身份并 fail-fast；顺序连接不得以后句代表整批。Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”并停批；命令构造、解析、隐藏项或转义失真时同样进入；只把被遮蔽、未执行或状态未知的项目单独补跑。
+- 独立探测不得共享 Shell 退出状态；逐项保留输出、错误和退出状态、身份并 fail-fast；后句不得代表整批。Shell 后句可能遮蔽前序失败时先进入“用户环境档案与执行环境”并停批；构造、解析、隐藏项或转义失真同样处理；只把被遮蔽、未执行或状态未知的项目单独补跑。
+- Windows 复合命令、原生搜索、结构化投影、后台或跨观察窗口任务、路径、执行环境及并行验证：首次执行前进入“用户环境档案与执行环境”，门槛未满足不启动；普通单文件读取或简单命令不追加机器审计。
 - 项目事实写回项目现有唯一真源；环境事实写入独立用户档案；可迁移治理方法才进入本 Skill；模板只接收某类项目每次都应执行的稳定默认。
 - 判断历史或外部材料中的能力是否已经存在时，先完成独立结果拆分和必要的因果排序，再遮住来源检查目标能否认出同一条件、保留同一构成性细节并作出同一具体处理；只有上位治理框架算部分具备。完成逐项比较后才提炼共同机制和特殊维度。
-- 验证按改动风险选择层级：每个验证阶段及自写浏览器、视觉、用户链验证器首次运行前，先按 `references/ci-execution-governance.md` 消费最近一次已完成的公开仓库失败，只运行当前机器上直接覆盖本次改动和验收主张的目标检查；其它平台、完整回归、远端 CI 与真实用户链只有用户明确要求、代码冻结或目标检查证明系统性影响时才进入。验证预计跨观察窗口时，启动前读 `references/user-environment-governance.md`；没有可回读运行身份、增量输出和独立终态便不启动。
+- 验证按改动风险选择层级：每个验证阶段及自写浏览器、视觉、用户链验证器首次运行前，按 `references/ci-execution-governance.md` 消费最近一次已完成的公开仓库失败，只运行当前机器直接覆盖本次改动和验收主张的目标检查；其它平台、完整回归、远端 CI 与真实用户链只有用户明确要求、代码冻结或目标检查证明系统性影响时才进入。每次完整运行或重跑前按该方法重新核对候选、实际范围、已耗次数与确认有效性，旧计划不能代替确认。
 - 状态改变后直接回读权威目标。完成验证必须沿正式生产者、传输或存储边界、消费者和用户可观察结果；不能让消费端手写假数据或 mock 掉正在验证的核心链路。
-- 首测前固定正式 runner；预期关键测试身份须等于测试框架实际收集的唯一身份，缺失或非唯一身份即停批并标为未覆盖。
+- 首测前固定正式 runner，完成运行资格、累计预算和套件次数账本；预期关键测试身份须等于测试框架实际收集的唯一身份，缺失或非唯一身份即停批并标为未覆盖。
 - 诊断读取设置、运行报告、结构化制品或日志时，按 `references/log-audit-standard.md` 先投影当前判断需要的允许字段；未知结构不得整份递归输出，凭据必须在进入工具输出、对话或诊断导出前脱敏。
 
 ## 对话学习与自我进化
@@ -98,18 +99,17 @@ description: "从项目过程与结果提炼治理方法并在明确要求时自
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
 - 产物关系不明、再生成时丢失理由、全量重算、缓存失效、旧产物回流或自引用、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
 - 性能、资源或规模项：`references/project-performance-governance.md`。
-- 多发现审计修复直接读 `references/ci-execution-governance.md`；审计修复或项目级改动会使用完整套件，或触及验证控制面、分类、资源、分片、成本与重试时同样读取，第一条测试前完成运行资格、累计预算和套件次数账本。
+- 审计修复或验证控制面变化：遵循共同验证门槛。
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
 - 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
 - 可视层级、变换、动效所有权或输入能力：`references/interaction-motion.md` 和 `references/interaction-navigation-and-media-lifecycle.md`；运行画面或浏览器验收读 `references/implementation-review.md` 与 `references/implementation-review-visual-evidence.md`
-- 后台、跨观察窗口任务、路径或执行环境，以及并行验证：启动前读 `references/user-environment-governance.md`；长命令无可回读身份和独立终态便不成批启动
 - 大型媒体、缓存、测试证据、下载、模型或中间产物造成容量增长、跨根散落或无主残留：`references/production-storage-governance.md`
 - 事件、版本、历史或缓存把计划影响范围误当成实际变更事实：`references/change-prevention.md` 的“计划范围与实际变更事实分离”合同
 - 局部状态、心跳或遥测更新覆盖、清空了未声明字段，或者消费者无法区分完整快照与局部补丁：`references/change-prevention.md` 的活动投影更新合同
 - 源码、README、脚本、测试或配置硬编码本机与部署事实：`references/change-prevention.md` 的项目运行配置边界；用户机器事实同时读取 `references/user-environment-governance.md`
-- 内聚、耦合、语义重复或上帝模块：`references/architecture-cohesion-governance.md`
+- 内聚、耦合、语义重复或上帝模块：读 `references/architecture-cohesion-governance.md`；公共接口、组合根或控制器拆分前完成成员与协作者迁移账本及全部消费者清单；异步初始化、重置或调度变化先落实 `references/change-prevention-delivery-boundaries.md` 的时间过程合同；门槛未满足不得写入。
 - 持续同步上游且可能修改上游所有路径：写入前读 `references/source-fork-and-ecosystem-adoption.md`
 
 ## 外部工具兼容性

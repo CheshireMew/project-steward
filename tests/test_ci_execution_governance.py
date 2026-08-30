@@ -28,27 +28,33 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         prevention = SKILL_TEXT.split("## 改动前预防", 1)[1].split(
             "## 根因治理", 1
         )[0]
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化", 1
+        )[0]
         remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
             "## 外部工具兼容性", 1
         )[0]
 
         self.assertIn(route, prevention)
-        self.assertIn(route, remediation)
+        self.assertIn("遵循共同验证门槛", remediation)
+        self.assertIn(route, shared)
         self.assertIn("普通单个 CI 报错仍按当前开发任务处理", CI_TEXT)
 
-    def test_root_cause_route_requires_the_ci_ledger_before_tests(self) -> None:
-        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
-            "## 外部工具兼容性", 1
+    def test_shared_validation_gate_is_renewed_before_full_runs_and_reruns(self) -> None:
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化", 1
         )[0]
         ordered = (
-            "多发现审计修复直接读",
             "references/ci-execution-governance.md",
-            "第一条测试前",
+            "每次完整运行或重跑前按该方法重新核对",
+            "候选、实际范围、已耗次数与确认有效性",
+            "旧计划不能代替确认",
+            "首测前固定正式 runner",
             "运行资格",
             "累计预算",
             "套件次数账本",
         )
-        positions = [remediation.index(fragment) for fragment in ordered]
+        positions = [shared.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
 
     def test_custom_user_chains_and_long_batches_enter_execution_owners(
@@ -57,8 +63,8 @@ class CiExecutionGovernanceTests(unittest.TestCase):
         shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
             "## 对话学习与自我进化", 1
         )[0]
-        remediation = SKILL_TEXT.split("## 根因治理", 1)[1].split(
-            "## 外部工具兼容性", 1
+        environment_route = SKILL_TEXT.split("## 用户环境档案与执行环境", 1)[1].split(
+            "## 项目综合审计", 1
         )[0]
 
         for fragment in (
@@ -68,22 +74,15 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(shared_fragment=fragment):
                 self.assertIn(fragment, shared)
 
+        gate = next(line for line in shared.splitlines() if line.startswith("- Windows "))
         for fragment in (
-            "验证预计跨观察窗口时",
-            "启动前读 `references/user-environment-governance.md`",
-            "没有可回读运行身份、增量输出和独立终态便不启动",
+            "后台或跨观察窗口任务、路径、执行环境及并行验证",
+            "首次执行前进入“用户环境档案与执行环境”",
+            "门槛未满足不启动",
         ):
-            with self.subTest(shared_long_run_fragment=fragment):
-                self.assertIn(fragment, shared)
-
-        for fragment in (
-            "后台、跨观察窗口任务、路径或执行环境",
-            "以及并行验证",
-            "启动前读 `references/user-environment-governance.md`",
-            "长命令无可回读身份和独立终态便不成批启动",
-        ):
-            with self.subTest(remediation_fragment=fragment):
-                self.assertIn(fragment, remediation)
+            with self.subTest(gate_fragment=fragment):
+                self.assertIn(fragment, gate)
+        self.assertIn("references/user-environment-governance.md", environment_route)
 
         for fragment in (
             "可回读的进程身份、增量输出和退出状态",
@@ -245,7 +244,7 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             "## 外部工具兼容性",
             1,
         )[0]
-        self.assertIn("审计修复或项目级改动会使用完整套件", remediation)
+        self.assertIn("审计修复或验证控制面变化：遵循共同验证门槛", remediation)
 
         for fragment in (
             "交给 `ci-execution-governance.md`",

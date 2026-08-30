@@ -282,10 +282,19 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
             1,
         )[1].split("## 项目综合审计", 1)[0]
 
-        self.assertIn("命令构造、解析、隐藏项或转义失真时同样进入", shared)
-        self.assertIn("先进入“用户环境档案与执行环境”", shared)
+        gate = next(line for line in shared.splitlines() if line.startswith("- Windows "))
+        ordered = (
+            "Windows 复合命令、原生搜索、结构化投影",
+            "首次执行前进入“用户环境档案与执行环境”",
+            "门槛未满足不启动",
+            "普通单文件读取或简单命令不追加机器审计",
+        )
+        positions = [gate.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("构造、解析、隐藏项或转义失真同样处理", shared)
         self.assertIn("references/user-environment-governance.md", environment_route)
         self.assertNotIn("$LASTEXITCODE", shared)
+        self.assertNotIn("$rows = foreach", shared)
 
     def test_independent_shell_probes_cannot_share_one_exit_status(self) -> None:
         shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
@@ -294,9 +303,9 @@ class SourceForkAndShellEvidenceGovernanceTests(unittest.TestCase):
         )[0]
         ordered = (
             "独立探测不得共享 Shell 退出状态",
-            "组合须逐项保留输出、错误和退出状态",
+            "逐项保留输出、错误和退出状态",
             "身份并 fail-fast",
-            "顺序连接不得以后句代表整批",
+            "后句不得代表整批",
             "Shell 后句可能遮蔽前序失败",
             "并停批",
             "只把被遮蔽、未执行或状态未知的项目单独补跑",
