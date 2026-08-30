@@ -176,6 +176,100 @@ class StagedResultGovernanceTests(unittest.TestCase):
 
 
 class DerivedArtifactGovernanceTests(unittest.TestCase):
+    def test_unit_completion_has_one_owner_on_existing_routes(self) -> None:
+        heading = "### 单元完成必须核对产物来源"
+        owners = [
+            path.name for path in (SKILL_ROOT / "references").glob("*.md")
+            if heading in path.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(owners, ["derived-artifact-governance.md"])
+        graph = DERIVED_TEXT.split("## 3. 先建立语义派生图", 1)[1].split(
+            "## 4. 缓存键只表达会改变产物的事实", 1
+        )[0]
+        self.assertEqual(graph.count(heading), 1)
+        self.assertNotIn(heading, MAIN_TEXT)
+
+        for start, end, trigger in (
+            ("## 改动前预防", "## 根因治理", "涉及派生产物"),
+            ("## 根因治理", "## 外部工具兼容性", "产物关系不明"),
+        ):
+            route = MAIN_TEXT.split(start, 1)[1].split(end, 1)[0]
+            lines = [line for line in route.splitlines() if trigger in line]
+            with self.subTest(route=start):
+                self.assertEqual(len(lines), 1)
+                self.assertIn("references/derived-artifact-governance.md", lines[0])
+
+        entry = DERIVED_TEXT.split("## 1. 进入条件与主要失败", 1)[1].split(
+            "## 2. 多份产物先选择演化合同", 1
+        )[0]
+        self.assertIn("多个步骤或语义单元输出同类型产物", entry)
+        self.assertIn("恢复记录缺少可核对的产物归属", entry)
+        self.assertIn("普通一次性、小型且没有复用或分段的派生结果不增加完整治理", entry)
+
+    def test_unit_completion_binds_results_to_semantic_producers(self) -> None:
+        contract = DERIVED_TEXT.split("### 单元完成必须核对产物来源", 1)[1].split(
+            "## 4. 缓存键只表达会改变产物的事实", 1
+        )[0]
+        for detail in (
+            "稳定单元身份、实际消费的规范输入、生产者及其语义版本、输出规格和结果内容身份",
+            "正式完成边界逐项核对",
+            "同一处理器的不同语义单元不能互相顶替",
+            "同后缀、同类型、同路径或别的步骤已有文件",
+            "来源由正式生产者在产出时记录",
+            "持久化、去重、检查点和重开中保留",
+            "共享产物通过显式依赖关系满足消费者输入",
+            "不冒充消费者自己应生产的输出",
+        ):
+            with self.subTest(detail=detail):
+                self.assertIn(detail, contract)
+
+    def test_unit_completion_preserves_valid_reuse_and_unknown_provenance(self) -> None:
+        contract = DERIVED_TEXT.split("### 单元完成必须核对产物来源", 1)[1].split(
+            "## 4. 缓存键只表达会改变产物的事实", 1
+        )[0]
+        for detail in (
+            "复用记录引用原产物及本次被接受的依赖关系",
+            "不把旧产物重标为本轮新产物",
+            "合法缓存可以计入完成，不因未重新调用生产者而拒绝",
+            "来源缺失、所属单元不匹配或结果不完整",
+            "保留可恢复文件并标明缺失的完成证据",
+            "不猜造来源，不把单元置为完成",
+            "旧记录只可依据可核对的原始生产证据补齐",
+            "`durable-operation-governance.md` 核对权限和副作用",
+            "不能从来源未知推导出自动重跑",
+            "不另建任务、缓存、恢复或归档系统",
+        ):
+            with self.subTest(detail=detail):
+                self.assertIn(detail, contract)
+
+    def test_unit_completion_contract_reaches_publication_validation_and_output(
+        self,
+    ) -> None:
+        publication = DERIVED_TEXT.split("## 9. 失效、装配与发布", 1)[1].split(
+            "## 10. 真实验证矩阵", 1
+        )[0]
+        qualification = publication.index("每个完成入口先消费第 3 节的单元完成资格")
+        release = publication.index("单元、接缝、共享资源和最终装配分别在完成校验后原子发布")
+        self.assertLess(qualification, release)
+        self.assertIn("正常完成、缓存命中与检查点恢复不能各用一套条件", publication)
+
+        matrix = DERIVED_TEXT.split("## 10. 真实验证矩阵", 1)[1].split(
+            "## 11. 输出合同", 1
+        )[0]
+        self.assertIn("只处理产物来源时核对单元完成资格", matrix)
+        scenario = matrix.split("**单元完成资格**：", 1)[1].split("\n\n", 1)[0]
+        for detail in (
+            "第二单元未产生应有结果时仍不得完成",
+            "同一处理器的两个语义单元不互相顶替",
+            "来源完整的合法缓存", "旧记录缺少来源", "输入或生产版本已变化",
+            "正式完成入口和最终消费者读到一致结果",
+            "不能手写来源或直接把单元设为完成",
+        ):
+            with self.subTest(detail=detail):
+                self.assertIn(detail, scenario)
+        output = DERIVED_TEXT.split("## 11. 输出合同", 1)[1]
+        self.assertIn("逐单元完成证据、产物来源、合法复用关系与未满足原因：", output)
+
     def test_multiple_artifacts_choose_one_explicit_evolution_contract(
         self,
     ) -> None:
