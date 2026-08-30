@@ -4,24 +4,19 @@ from governance_text_fixtures import *
 
 
 class ConversationLearnedGovernanceTests(unittest.TestCase):
-    def test_later_independent_result_reroutes_and_reloads_fixed_method(
-        self,
-    ) -> None:
-        routing = MAIN_TEXT.split("## 角色与路由", 1)[1].split(
-            "## 共同边界",
-            1,
-        )[0]
+    def test_later_independent_result_reroutes_and_reloads_fixed_method(self) -> None:
+        routing = MAIN_TEXT.split("## 角色与路由", 1)[1].split("## 共同边界", 1)[0]
         ordered = (
-            "每个独立结果",
-            "建立路由账本",
+            "每个独立结果行动前建立路由账本",
+            "方法逐项绑定适用门槛与证据",
+            "证据未满足不得执行对应后续动作或宣布完成",
             "本轮较早读过",
             "同一结果增项更新原账本",
-            "后续独立结果重新选路",
-            "重读固定方法",
-            "新建账本",
+            "后续独立结果重新选路、重读固定方法、新建账本",
         )
         positions = [routing.index(fragment) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
+        self.assertEqual(MAIN_TEXT.count(ordered[1]), 1)
 
     def test_continuation_cannot_promote_a_completed_read_only_result(self) -> None:
         shared = MAIN_TEXT.split("## 共同边界", 1)[1].split(
@@ -74,26 +69,22 @@ class ConversationLearnedGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, shared)
 
     def test_failed_execution_of_an_existing_rule_changes_consumers(self) -> None:
-        for fragment in (
-            "已有能力没有被执行",
-            "最早没有消费该规则的路由或动作门槛",
-            "表层不同的代表性请求",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, LEARNING_TEXT)
-
-        learning_route = MAIN_TEXT.split(
-            "## 对话学习与自我进化", 1
-        )[1].split("## 改动前预防", 1)[0]
-        for fragment in (
-            "方法缺失",
-            "已有方法没有被路由、执行或验收",
-            "只修最早失效的主路由、动作门槛、正式消费者或验证",
-            "不在其它文件增加同义规则",
-            "方案按所有者和消费链组织",
-        ):
-            with self.subTest(route_fragment=fragment):
-                self.assertIn(fragment, learning_route)
+        route = MAIN_TEXT.split("## 对话学习与自我进化", 1)[1].split(
+            "## 改动前预防", 1
+        )[0]
+        owner = "references/conversation-learning-and-self-evolution.md"
+        self.assertEqual(route.count(f"`{owner}`"), 1)
+        self.assertIn(
+            "只修最早失效的主路由、动作门槛、正式消费者或验证，不在其它文件增加同义规则",
+            route,
+        )
+        attribution = LEARNING_TEXT.split("### 最后判断历史责任归属", 1)[1].split(
+            "### 被否定内容", 1
+        )[0]
+        self.assertRegex(
+            attribution,
+            r"\| 已启用，正确规则存在.*\| 已有能力没有被执行 \| 修复最早没有消费该规则的路由或动作门槛",
+        )
 
     def test_self_evolution_maps_consumption_before_adding_capability(self) -> None:
         consumption = LEARNING_TEXT.split(
