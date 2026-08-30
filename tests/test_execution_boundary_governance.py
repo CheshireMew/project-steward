@@ -216,6 +216,28 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         self.assertIn("后台、跨观察窗口任务、路径或执行环境", route)
         self.assertIn("references/user-environment-governance.md", route)
 
+    def test_protection_rejection_cannot_be_bypassed_by_changing_tools(
+        self,
+    ) -> None:
+        section = USER_ENVIRONMENT_TEXT.split(
+            "### 命令构造或解析失败后切换执行边界",
+            1,
+        )[1].split("### PowerShell 调用原生搜索时显式传递文件范围和正则", 1)[0]
+        ordered = (
+            "与 Shell 构造或解析失败分开记录",
+            "结果没有说明、可能部分执行或状态查询失败时保持未知",
+            "不能把拒绝称为“误判”",
+            "也不能只为让同一状态改变通过而更换 Shell、语言、API、工具或执行宿主",
+            "已确认的命令形态歧义、明确策略禁止，还是原因未知",
+            "原动作仍处于同一份准确授权内",
+            "改写不得扩大对象、权限或副作用",
+            "明确策略禁止或原因未知时停止并报告",
+            "不从另一执行表面完成相同状态改变",
+            "披露原拒绝、改写依据、替代入口与后验验证",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_project_commands_freeze_the_effective_child_runtime(self) -> None:
         section = USER_ENVIRONMENT_TEXT.split(
             "### 正式项目命令先固定任务级执行环境", 1

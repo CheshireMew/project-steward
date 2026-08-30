@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Review a production project's owned storage contract without writing it."""
+"""Statically check storage declarations; never execute or certify project behavior."""
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
 from pathlib import Path
 from typing import Any
 
-
 PROTOCOL = "project-steward-production-storage-contract"
 VERSION = 2
+REVIEW_SCHEMA = "project-steward-production-storage-review/v2"
+RUNTIME_CHECKS = (
+    "first-production", "same-input-reuse", "budget-rejection", "interruption-recovery"
+)
 DEFAULT_CONTRACT = Path(".project-steward/storage-contract.json")
 ID_PATTERN = re.compile(r"^[a-z0-9]+(?:[._-][a-z0-9]+)*$")
 REQUIRED_POLICY = {
@@ -26,7 +30,27 @@ ALLOWED_ARTIFACT_CLASSES = {"truth", "deliverable", "cache", "temporary", "evide
 
 
 class ReviewError(ValueError):
-    pass
+    def __init__(
+        self, message: str, *, code: str = "invalid_contract", actual_contract: dict | None = None
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.actual_contract = actual_contract
+
+
+def error_result(error: OSError | ReviewError) -> dict[str, Any]:
+    """Use the same static failure result for the CLI and template consumer."""
+    result: dict[str, Any] = {
+        "schema": REVIEW_SCHEMA,
+        "status": "blocked",
+        "verification_level": "static",
+        "error_code": error.code if isinstance(error, ReviewError) else "read_error",
+        "error": str(error),
+        "supported_contract": {"protocol": PROTOCOL, "version": VERSION},
+    }
+    if isinstance(error, ReviewError) and error.actual_contract is not None:
+        result["actual_contract"] = error.actual_contract
+    return result
 
 
 def _object(value: Any, label: str) -> dict[str, Any]:
@@ -87,14 +111,17 @@ def _implementation_source(root: Path, value: Any, label: str) -> str:
     return selected
 
 
-def _read_contract(path: Path) -> dict[str, Any]:
+def _read_contract(path: Path) -> tuple[dict[str, Any], str]:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        content = path.read_bytes()
+        payload = json.loads(content.decode("utf-8"))
     except FileNotFoundError as error:
         raise ReviewError(f"storage contract not found: {path}") from error
     except json.JSONDecodeError as error:
         raise ReviewError(f"invalid storage contract JSON at {path}: {error}") from error
-    return _object(payload, "storage contract")
+    except UnicodeDecodeError as error:
+        raise ReviewError(f"storage contract must be UTF-8 text: {path}") from error
+    return _object(payload, "storage contract"), hashlib.sha256(content).hexdigest()
 
 
 def _review_producer(root: Path, value: Any, index: int) -> dict[str, Any]:
@@ -182,7 +209,7 @@ def _review_producer(root: Path, value: Any, index: int) -> dict[str, Any]:
         "test_files": test_files,
         "enforcement_file": enforcement_file,
         "enforcement_tokens": tokens,
-        "capacity_evidence": {
+        "capacity_references": {
             "registered_roots_inventory_source": registered_roots_inventory_source,
             "filesystem_allocated_bytes_source": filesystem_allocated_bytes_source,
             "managed_object_identity_source": managed_object_identity_source,
@@ -195,9 +222,18 @@ def review(project: Path, contract_relative: Path = DEFAULT_CONTRACT) -> dict[st
     if not root.is_dir():
         raise ReviewError(f"project directory not found: {root}")
     contract_path = _relative_path(root, contract_relative.as_posix(), "contract path")
-    contract = _read_contract(contract_path)
-    if contract.get("protocol") != PROTOCOL or contract.get("version") != VERSION:
-        raise ReviewError(f"storage contract must use {PROTOCOL} v{VERSION}")
+    contract, contract_digest = _read_contract(contract_path)
+    protocol = contract.get("protocol")
+    version = contract.get("version")
+    if protocol != PROTOCOL or type(version) is not int or version != VERSION:
+        raise ReviewError(
+            f"storage contract must use {PROTOCOL} v{VERSION}; no project files were changed",
+            code="contract_version_mismatch",
+            actual_contract={
+                "protocol": protocol if isinstance(protocol, str) else None,
+                "version": version if type(version) is int else None,
+            },
+        )
     project_id = _identifier(contract.get("project_id"), "project_id")
     policy = _object(contract.get("policy"), "policy")
     for field, expected in REQUIRED_POLICY.items():
@@ -211,8 +247,18 @@ def review(project: Path, contract_relative: Path = DEFAULT_CONTRACT) -> dict[st
     if len(ids) != len(set(ids)):
         raise ReviewError("producer ids must be unique")
     return {
-        "schema": "project-steward-production-storage-review/v1",
-        "status": "passed",
+        "schema": REVIEW_SCHEMA,
+        "status": "static_checks_passed",
+        "verification_level": "static",
+        "supported_contract": {"protocol": PROTOCOL, "version": VERSION},
+        "contract_identity": {
+            "protocol": protocol, "version": version, "sha256": contract_digest,
+        },
+        "runtime_verification": {
+            "status": "not_run",
+            "producer_ids": ids,
+            "required_checks": list(RUNTIME_CHECKS),
+        },
         "project": str(root),
         "project_id": project_id,
         "contract": str(contract_path),
@@ -236,7 +282,7 @@ def main() -> int:
         print(json.dumps(payload, ensure_ascii=False, indent=None if args.compact else 2))
         return 0
     except (OSError, ReviewError) as error:
-        print(json.dumps({"status": "blocked", "error": str(error)}, ensure_ascii=False), file=sys.stderr)
+        print(json.dumps(error_result(error), ensure_ascii=False), file=sys.stderr)
         return 2
 
 

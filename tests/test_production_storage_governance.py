@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -7,13 +8,156 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 REVIEW = SKILL_ROOT / "scripts" / "production_storage_review.py"
 TEMPLATES = SKILL_ROOT / "scripts" / "project_templates.py"
 
 
+def write_storage_fixture(project: Path) -> dict:
+    """Create static declarations, deliberately not a working storage system."""
+    (project / "src").mkdir()
+    (project / "tests").mkdir()
+    (project / ".project-steward").mkdir()
+    (project / "src" / "producer.py").write_text(
+        "raise AssertionError('Static review must not execute project code')\n"
+        "def require_storage_budget():\n    pass\n\n"
+        "def list_storage_roots():\n    pass\n\n"
+        "def allocated_bytes():\n    pass\n\n"
+        "def file_identity():\n    pass\n\n"
+        "def write_storage_inventory():\n    pass\n",
+        encoding="utf-8",
+    )
+    (project / "tests" / "test_storage.py").write_text(
+        "raise AssertionError('Static review must not run project tests')\n"
+        "def test_budget():\n    pass\n", encoding="utf-8"
+    )
+    contract = {
+        "protocol": "project-steward-production-storage-contract",
+        "version": 2,
+        "project_id": "fixture",
+        "policy": {
+            "unknown_peak": "block",
+            "outside_owned_roots": "block",
+            "over_budget": "block",
+            "cleanup_without_authorization": "report-only",
+        },
+        "producers": [{
+            "id": "fixture-producer",
+            "root_source": {"kind": "runtime-config", "value": "FIXTURE_STORAGE_ROOT"},
+            "artifact_classes": ["cache", "temporary", "evidence"],
+            "peak_estimate": {
+                "source": "src/producer.py:require_storage_budget", "unknown_behavior": "block"
+            },
+            "budget": {
+                "maximum_managed_bytes_source": "runtime-config:max_bytes",
+                "minimum_free_bytes_source": "runtime-config:min_free_bytes",
+                "registered_roots_inventory_source": "src/producer.py:list_storage_roots",
+                "filesystem_allocated_bytes_source": "src/producer.py:allocated_bytes",
+                "managed_object_identity_source": "src/producer.py:file_identity",
+            },
+            "reuse": {"required": True, "identity": "content hash and producer version"},
+            "lifecycle": {
+                "preflight": "require_storage_budget",
+                "finalization": "write_storage_inventory",
+                "interruption": "retain owned manifest and report exact candidates",
+            },
+            "implementation_files": ["src/producer.py"],
+            "test_files": ["tests/test_storage.py"],
+            "enforcement": {
+                "file": "src/producer.py",
+                "tokens": ["require_storage_budget", "write_storage_inventory"],
+            },
+        }],
+    }
+    (project / ".project-steward" / "storage-contract.json").write_text(
+        json.dumps(contract, indent=2), encoding="utf-8"
+    )
+    return contract
+
+
 class ProductionStorageGovernanceTests(unittest.TestCase):
+    def test_template_plan_adopt_verify_and_upgrade_keep_runtime_pending(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="project-steward-storage-lifecycle-") as temporary:
+            project = Path(temporary)
+            contract = write_storage_fixture(project)
+            contract_path = project / ".project-steward" / "storage-contract.json"
+            profile_path = project / ".project-steward" / "project.json"
+
+            def call(command: str) -> tuple[subprocess.CompletedProcess, dict]:
+                args = [sys.executable, str(TEMPLATES), command, str(project), "--compact"]
+                if command in {"plan", "adopt"}:
+                    args += ["--template", "managed-runtime-artifacts"]
+                completed = subprocess.run(
+                    args, cwd=SKILL_ROOT, check=False, capture_output=True, text=True, encoding="utf-8"
+                )
+                self.assertTrue(completed.stdout, completed.stderr)
+                return completed, json.loads(completed.stdout)
+
+            def storage_check(verification: dict) -> dict:
+                return next(
+                    item for item in verification["checks"]
+                    if item["id"] == "runtime-artifact-contract-present"
+                )
+
+            planned, plan = call("plan")
+            self.assertEqual(0, planned.returncode)
+            self.assertEqual("passed", plan["preflight"]["status"])
+            self.assertFalse(profile_path.exists())
+            adopted, result = call("adopt")
+            self.assertEqual(0, adopted.returncode)
+            self.assertEqual("adopted", result["status"])
+            verified, result = call("verify")
+            self.assertEqual(0, verified.returncode)
+            verification = result["verification"]
+            self.assertEqual("static", verification["verification_level"])
+            evidence = storage_check(verification)["evidence"]
+            self.assertEqual("static_checks_passed", evidence["status"])
+            self.assertEqual("not_run", evidence["runtime_verification"]["status"])
+            self.assertTrue(verification["manual_verification_required"])
+            self.assertTrue({
+                "runtime-artifact-real-producer-chain", "runtime-artifact-interruption-chain"
+            }.issubset({item["id"] for item in verification["manual_verification"]}))
+
+            profile = json.loads(profile_path.read_text(encoding="utf-8"))
+            pin = next(item for item in profile["templates"] if item["id"] == "managed-runtime-artifacts")
+            pin["version"] = "0.9.0"
+            pin["sha256"] = "0" * 64
+            profile_path.write_text(json.dumps(profile), encoding="utf-8")
+            previous_profile = profile_path.read_bytes()
+            contract["version"] = 1
+            contract_path.write_text(json.dumps(contract), encoding="utf-8")
+            previous_contract = contract_path.read_bytes()
+            verified, result = call("verify")
+            self.assertEqual(1, verified.returncode)
+            self.assertIn("version", {item["kind"] for item in result["verification"]["drift"]})
+            self.assertEqual(
+                "contract_version_mismatch",
+                storage_check(result["verification"])["evidence"]["error_code"],
+            )
+            _, plan = call("plan")
+            self.assertEqual("failed", plan["preflight"]["status"])
+            blocked, result = call("upgrade")
+            self.assertEqual(1, blocked.returncode)
+            self.assertEqual("blocked", result["status"])
+            self.assertEqual(previous_profile, profile_path.read_bytes())
+            self.assertEqual(previous_contract, contract_path.read_bytes())
+
+            contract["version"] = 2
+            contract_path.write_text(json.dumps(contract), encoding="utf-8")
+            _, plan = call("plan")
+            self.assertEqual("passed", plan["preflight"]["status"])
+            upgraded, result = call("upgrade")
+            self.assertEqual(0, upgraded.returncode)
+            self.assertEqual("upgraded", result["status"])
+            self.assertTrue(result["verification"]["manual_verification_required"])
+            self.assertEqual(
+                "not_run",
+                storage_check(result["verification"])["evidence"]["runtime_verification"]["status"],
+            )
+            verified, result = call("verify")
+            self.assertEqual(0, verified.returncode)
+            self.assertEqual([], result["verification"]["drift"])
+
     def test_skill_routes_storage_prevention_to_one_method(self) -> None:
         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
         reference = (SKILL_ROOT / "references" / "production-storage-governance.md").read_text(
@@ -62,10 +206,7 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory(prefix="project-steward-storage-template-") as temporary:
             project = Path(temporary)
-            (project / ".project-steward").mkdir()
-            (project / ".project-steward" / "storage-contract.json").write_text(
-                "{}\n", encoding="utf-8"
-            )
+            write_storage_fixture(project)
             adopted = subprocess.run(
                 [
                     sys.executable,
@@ -87,66 +228,17 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
                 (project / ".project-steward" / "project.json").read_text(encoding="utf-8")
             )
             selected = {item["id"]: item["version"] for item in profile["templates"]}
-            self.assertEqual("1.1.0", selected["managed-runtime-artifacts"])
-            self.assertEqual("2.4.0", profile["catalog_version"])
+            self.assertEqual("1.2.0", selected["managed-runtime-artifacts"])
+            self.assertEqual("2.5.0", profile["catalog_version"])
             self.assertEqual(
                 "required-and-blocking",
                 profile["decisions"]["runtime_artifact_preflight"],
             )
 
-    def test_review_requires_real_enforcement_and_tests(self) -> None:
+    def test_review_reports_static_references_without_running_project(self) -> None:
         with tempfile.TemporaryDirectory(prefix="project-steward-storage-") as temporary:
             project = Path(temporary)
-            (project / "src").mkdir()
-            (project / "tests").mkdir()
-            (project / ".project-steward").mkdir()
-            (project / "src" / "producer.py").write_text(
-                "def require_storage_budget():\n    pass\n\n"
-                "def list_storage_roots():\n    pass\n\n"
-                "def allocated_bytes():\n    pass\n\n"
-                "def file_identity():\n    pass\n\n"
-                "def write_storage_inventory():\n    pass\n",
-                encoding="utf-8",
-            )
-            (project / "tests" / "test_storage.py").write_text("def test_budget():\n    pass\n", encoding="utf-8")
-            contract = {
-                "protocol": "project-steward-production-storage-contract",
-                "version": 2,
-                "project_id": "fixture",
-                "policy": {
-                    "unknown_peak": "block",
-                    "outside_owned_roots": "block",
-                    "over_budget": "block",
-                    "cleanup_without_authorization": "report-only",
-                },
-                "producers": [
-                    {
-                        "id": "fixture-producer",
-                        "root_source": {"kind": "runtime-config", "value": "FIXTURE_STORAGE_ROOT"},
-                        "artifact_classes": ["cache", "temporary", "evidence"],
-                        "peak_estimate": {"source": "src/producer.py:require_storage_budget", "unknown_behavior": "block"},
-                        "budget": {
-                            "maximum_managed_bytes_source": "runtime-config:max_bytes",
-                            "minimum_free_bytes_source": "runtime-config:min_free_bytes",
-                            "registered_roots_inventory_source": "src/producer.py:list_storage_roots",
-                            "filesystem_allocated_bytes_source": "src/producer.py:allocated_bytes",
-                            "managed_object_identity_source": "src/producer.py:file_identity",
-                        },
-                        "reuse": {"required": True, "identity": "content hash and producer version"},
-                        "lifecycle": {
-                            "preflight": "require_storage_budget",
-                            "finalization": "write_storage_inventory",
-                            "interruption": "retain owned manifest and report exact candidates",
-                        },
-                        "implementation_files": ["src/producer.py"],
-                        "test_files": ["tests/test_storage.py"],
-                        "enforcement": {
-                            "file": "src/producer.py",
-                            "tokens": ["require_storage_budget", "write_storage_inventory"],
-                        },
-                    }
-                ],
-            }
+            contract = write_storage_fixture(project)
             contract_path = project / ".project-steward" / "storage-contract.json"
             contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
 
@@ -160,10 +252,21 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             )
             self.assertEqual(0, passed.returncode, passed.stderr)
             payload = json.loads(passed.stdout)
-            self.assertEqual("passed", payload["status"])
+            self.assertEqual("project-steward-production-storage-review/v2", payload["schema"])
+            self.assertEqual("static_checks_passed", payload["status"])
+            self.assertEqual("static", payload["verification_level"])
+            self.assertEqual("not_run", payload["runtime_verification"]["status"])
+            self.assertEqual(
+                {"first-production", "same-input-reuse", "budget-rejection", "interruption-recovery"},
+                set(payload["runtime_verification"]["required_checks"]),
+            )
+            self.assertEqual(
+                hashlib.sha256(contract_path.read_bytes()).hexdigest(),
+                payload["contract_identity"]["sha256"],
+            )
             self.assertEqual(
                 "src/producer.py:allocated_bytes",
-                payload["producers"][0]["capacity_evidence"]["filesystem_allocated_bytes_source"],
+                payload["producers"][0]["capacity_references"]["filesystem_allocated_bytes_source"],
             )
 
             contract["version"] = 1
@@ -177,7 +280,11 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertEqual(2, legacy.returncode)
-            self.assertIn("v2", legacy.stderr)
+            legacy_result = json.loads(legacy.stderr)
+            self.assertEqual("contract_version_mismatch", legacy_result["error_code"])
+            self.assertEqual(1, legacy_result["actual_contract"]["version"])
+            self.assertEqual(2, legacy_result["supported_contract"]["version"])
+            self.assertEqual(1, json.loads(contract_path.read_text(encoding="utf-8"))["version"])
 
             contract["version"] = 2
             del contract["producers"][0]["budget"]["filesystem_allocated_bytes_source"]

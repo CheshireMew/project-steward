@@ -10,6 +10,9 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from production_storage_review import ReviewError as StorageReviewError
+from production_storage_review import error_result as storage_error_result
+from production_storage_review import review as review_storage_contract
 from project_template_core import (
     FRONTEND_EXCLUDED_DIRECTORIES,
     FRONTEND_SUFFIXES,
@@ -390,6 +393,18 @@ def evaluate_check(
         evidence = {"name": name, "present": present}
     elif check_type == "tauri_window_shell":
         status, detail, evidence = tauri_window_shell_check(root, profile)
+    elif check_type == "production_storage_contract":
+        relative = check.get("path")
+        if not isinstance(relative, str) or not relative:
+            fail(f"check {check_id} production_storage_contract needs path")
+        try:
+            evidence = review_storage_contract(root, Path(relative))
+        except (OSError, StorageReviewError) as error:
+            evidence = storage_error_result(error)
+        status = "pass" if evidence["status"] == "static_checks_passed" else "fail"
+        detail = evidence.get(
+            "error", "Storage declarations passed static checks; runtime verification was not run."
+        )
     else:
         fail(f"unsupported check type {check_type!r} in {check_id}")
 
@@ -523,6 +538,7 @@ def verify_profile_data(
     status = "failed" if drift or failed else "passed"
     return {
         "status": status,
+        "verification_level": "static",
         "profile_mode": "preview" if virtual_profile else "on-disk",
         "templates": selected,
         "drift": drift,

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "managed-runtime-artifacts",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "layer": "capability",
   "name": "Managed runtime artifacts",
   "description": "Preflight, ownership, reuse, budget, and finalization contracts for storage-intensive production projects.",
@@ -52,10 +52,10 @@
   "checks": [
     {
       "id": "runtime-artifact-contract-present",
-      "type": "path_exists",
+      "type": "production_storage_contract",
       "path": ".project-steward/storage-contract.json",
       "severity": "error",
-      "message": "Storage-intensive projects must own a reviewed storage contract."
+      "message": "Storage contract declarations must pass static review before adoption; runtime verification remains separate."
     },
     {
       "id": "runtime-artifact-preflight-decision",

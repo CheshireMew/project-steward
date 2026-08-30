@@ -10,7 +10,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = Path(
     os.environ.get(
@@ -138,6 +137,33 @@ def write_tauri_vue_fixture(
 
 
 class ProjectTemplateTests(unittest.TestCase):
+    def test_invalid_storage_contract_blocks_adoption_before_profile_write(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="project-steward-storage-invalid-") as temporary:
+            root = Path(temporary)
+            for label, content in (("missing", None), ("empty", "{}"), ("invalid-json", "{")):
+                with self.subTest(label=label):
+                    project = root / label
+                    project.mkdir()
+                    if content is not None:
+                        (project / ".project-steward").mkdir()
+                        (project / ".project-steward" / "storage-contract.json").write_text(
+                            content, encoding="utf-8"
+                        )
+                    completed, payload = run_tool(
+                        "adopt", project,
+                        extra=["--template", "managed-runtime-artifacts"], check=False,
+                    )
+                    self.assertEqual(1, completed.returncode)
+                    assert payload is not None
+                    self.assertEqual("blocked", payload["status"])
+                    self.assertFalse((project / ".project-steward" / "project.json").exists())
+                    check = next(
+                        item for item in payload["plan"]["preflight"]["checks"]
+                        if item["id"] == "runtime-artifact-contract-present"
+                    )
+                    self.assertEqual("production_storage_contract", check["type"])
+                    self.assertEqual("blocked", check["evidence"]["status"])
+
     def test_unknown_template_field_is_rejected_and_not_listed(
         self,
     ) -> None:
@@ -670,7 +696,8 @@ class ProjectTemplateTests(unittest.TestCase):
                 encoding="utf-8",
             )
             digest = hashlib.sha256(base_path.read_bytes()).hexdigest()
-            catalog["catalog_version"] = "2.5.0"
+            major, minor, patch = map(int, catalog["catalog_version"].split("."))
+            catalog["catalog_version"] = f"{major}.{minor}.{patch + 1}"
             catalog["templates"]["base"]["version"] = "1.2.0"
             catalog["templates"]["base"]["sha256"] = digest
             copied_catalog.write_text(
@@ -719,7 +746,7 @@ class ProjectTemplateTests(unittest.TestCase):
                     encoding="utf-8"
                 )
             )
-            self.assertEqual("2.5.0", profile["catalog_version"])
+            self.assertEqual(catalog["catalog_version"], profile["catalog_version"])
             self.assertEqual("1.2.0", profile["templates"][0]["version"])
             self.assertEqual(
                 "evidence-classified",
