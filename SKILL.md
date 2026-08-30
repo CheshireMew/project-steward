@@ -95,14 +95,14 @@ description: "从项目过程与结果提炼治理方法并在明确要求时自
 - 持久操作、队列或调度器的有界批次与积压排空、恢复，或常驻有状态服务的会话准入与释放竞争：`references/durable-operation-governance.md`
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
-- 返工来自多份产物关系不明、理由在重新生成时丢失、全量重算、错误缓存失效、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
+- 产物关系不明、再生成时丢失理由、全量重算、缓存失效、旧产物回流或自引用、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
 - 性能、资源或规模项：`references/project-performance-governance.md`；写前生成适用矩阵，末改经直接因果检查、二次复审再冻结；无当前平台用户链则证据面未验证。
 - 多发现审计修复直接读 `references/ci-execution-governance.md`；审计修复或项目级改动会使用完整套件，或触及验证控制面、分类、资源、分片、成本与重试时同样读取，第一条测试前完成运行资格、累计预算和套件次数账本。
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
 - 结构化 JSON 的编码、资源预算、逻辑消息容量、原子分片、重放游标、数值、schema 或错误语义分叉：`references/structured-data-boundary.md`
 - 模型回复、任务状态或结果呈现与真实运行时不一致，或需要定位实际发送给模型的请求：`references/model-mediated-operation-governance.md`
-- 可视层级、变换或动效所有权：`references/interaction-motion.md` 和 `references/interaction-navigation-and-media-lifecycle.md`；需要实际运行画面验收时再读 `references/implementation-review.md` 与 `references/implementation-review-visual-evidence.md`
+- 可视层级、变换、动效所有权或输入能力：`references/interaction-motion.md` 和 `references/interaction-navigation-and-media-lifecycle.md`；运行画面或浏览器验收读 `references/implementation-review.md` 与 `references/implementation-review-visual-evidence.md`
 - 后台、跨观察窗口任务、路径或执行环境，以及并行验证：启动前读 `references/user-environment-governance.md`；长命令无可回读身份和独立终态便不成批启动
 - 大型媒体、缓存、测试证据、下载、模型或中间产物造成容量增长、跨根散落或无主残留：`references/production-storage-governance.md`
 - 事件、版本、历史或缓存把计划影响范围误当成实际变更事实：`references/change-prevention.md` 的“计划范围与实际变更事实分离”合同

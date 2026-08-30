@@ -374,6 +374,58 @@ class DerivedArtifactGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DERIVED_TEXT)
 
+    def test_repeatable_generation_has_one_owner_and_a_root_cause_route(self):
+        heading = "### 重复生成隔离输入、当前产物与旧产物"
+        owners = [
+            path.name for path in (SKILL_ROOT / "references").glob("*.md")
+            if heading in path.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(owners, ["derived-artifact-governance.md"])
+        route = MAIN_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        lines = [line for line in route.splitlines() if "旧产物回流或自引用" in line]
+        self.assertEqual(len(lines), 1)
+        self.assertIn("references/derived-artifact-governance.md", lines[0])
+        self.assertNotIn(heading, MAIN_TEXT)
+
+    def test_repeatable_generation_preserves_input_and_file_ownership(self):
+        contract = DERIVED_TEXT.split(
+            "### 重复生成隔离输入、当前产物与旧产物", 1
+        )[1].split("## 10. 真实验证矩阵", 1)[0]
+        for detail in (
+            "权威输入、本轮有效产物、描述产物的生成元数据",
+            "不得参与一个会重写自身的输入摘要循环",
+            "本轮正式入口清单或等价生产结果",
+            "构建、交付检查和服务消费者共享这份身份与选择规则",
+            "没有删除授权不删除", "未知文件和用户拥有文件",
+            "production-storage-governance.md", "repository-directory-governance.md",
+            "只追加不可变历史", "普通一次性输出不因此增加",
+        ):
+            with self.subTest(detail=detail):
+                self.assertIn(detail, contract)
+
+    def test_repeatable_generation_acceptance_uses_one_root_without_manual_cleanup(self):
+        contract = DERIVED_TEXT.split(
+            "### 重复生成隔离输入、当前产物与旧产物", 1
+        )[1].split("## 10. 真实验证矩阵", 1)[0]
+        steps = ("先首次生成", "再以相同输入重复生成", "最后修改一项真实输入")
+        positions = [contract.index(step) for step in steps]
+        self.assertEqual(positions, sorted(positions))
+        matrix = DERIVED_TEXT.split("## 10. 真实验证矩阵", 1)[1].split(
+            "## 11. 输出合同", 1
+        )[0]
+        self.assertIn("只处理重复输出时执行上一节的同根验收", matrix)
+        self.assertIn("原合同已经要求的检查继续保留", matrix)
+        for detail in (
+            "同一正式入口和同一输出根", "先首次生成",
+            "再以相同输入重复生成", "最后修改一项真实输入",
+            "每次选中的输入、当前清单、摘要和消费者结果",
+            "不得在两轮之间手工清场", "每次换空目录",
+        ):
+            with self.subTest(detail=detail):
+                self.assertIn(detail, contract)
+
     def test_validation_does_not_fake_cache_or_producer_results(self) -> None:
         for fragment in (
             "代码生成任务只改变一个模块的规范输入",

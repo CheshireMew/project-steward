@@ -649,7 +649,7 @@ class DesktopAndInteractionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
-        self.assertIn("可视层级、变换或动效所有权", MAIN_TEXT)
+        self.assertIn("可视层级、变换、动效所有权", MAIN_TEXT)
 
     def test_shared_visual_anchor_governs_surface_different_asset_batches(
         self,
