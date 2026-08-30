@@ -323,6 +323,20 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
 
+    def test_discovered_project_paths_are_reused_by_later_commands(self) -> None:
+        ordered = (
+            "首次项目盘点",
+            "建立本任务的路径清单",
+            "后续读取、搜索、补丁、测试和结项证据必须消费这份清单",
+            "不得重新按框架惯例、常见仓库布局或相似文件名猜测路径",
+            "立即停止依赖它的批次",
+            "从同一正式发现来源更新清单后只补跑受影响项",
+            "不能证明项目中没有对应对象",
+            "与当前清单重新对账",
+        )
+        positions = [USER_ENVIRONMENT_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_shared_executor_does_not_own_subsystem_lifecycle(self) -> None:
         for fragment in (
             "不是子系统的生命周期所有者",

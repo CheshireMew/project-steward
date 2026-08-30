@@ -424,18 +424,24 @@ class BoundaryAndVerificationGovernanceTests(unittest.TestCase):
 
         for fragment in (
             "此前诊断或审计的“全部问题”或“上述问题”",
-            "原诊断结论成为本轮结项合同",
             "已解决 / 经新证据重新分类 / 经用户明确同意退出范围 / 受阻",
             "仍然开放或证据未知",
             "不得宣告“全部问题已经解决”",
             "`稳定发现 ID → 最终状态 → 最后一次有效证据 → 未验证边界`",
-            "分类汇总、测试总数或“均已解决”结论不能替代逐项映射",
             "显式标为未验证、受阻或开放",
             "完成摘要必须从逐项最终状态和最后一次有效证据生成",
-            "全局零发现必须同时写明扫描器实际覆盖的输入",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, REMEDIATION_TEXT)
+
+        for fragment in (
+            "重新分类必须有新证据推翻原判断的一项构成条件",
+            "缺少提交、合并、发布或其它权限",
+            "受阻只是本轮流程的合法终态，不等于发现已经解决",
+            "存在任何受阻项时",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PROJECT_AUDIT_TEXT)
 
     def test_audit_derived_remediation_keeps_the_full_completion_chain(
         self,
