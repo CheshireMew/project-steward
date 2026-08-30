@@ -74,6 +74,7 @@ description: "从项目过程与结果提炼治理方法并在明确要求时自
 - 任务状态、进度或自动续跑：`references/task-progress-governance.md`
 - 高成本结果需要分阶段展示、确认、连续自动执行或按上游变化失效：`references/staged-result-governance.md`
 - 同一结果由多份规格、计划、任务或研究产物表达，或涉及派生产物、语义缓存、工作单元、候选资格、配额、补位、资源池及重复 Agent 编排：`references/derived-artifact-governance.md`
+- 性能计划或提速：`references/project-performance-governance.md`
 - 项目级 CI 的验证计划、执行环境缓存、测试资源分层、耗时分片、早失败和精准重跑：`references/ci-execution-governance.md`
 - 大型媒体、缓存、测试证据、下载、模型或中间产物会持续写盘，或用户要求把预防能力写进生产项目：`references/production-storage-governance.md`
 - 运行中配置会重建共享服务、provider、存储根或组合图：`references/runtime-generation-governance.md`
@@ -96,7 +97,7 @@ description: "从项目过程与结果提炼治理方法并在明确要求时自
 - 任务进度或持续状态：`references/task-progress-governance.md`
 - 返工来自阶段确认缺失、确认对象漂移或变化被错误扩散：`references/staged-result-governance.md`
 - 产物关系不明、再生成时丢失理由、全量重算、缓存失效、旧产物回流或自引用、危险切分、候选硬约束被补位绕过、资源误判或编排往返：`references/derived-artifact-governance.md`
-- 性能、资源或规模项：`references/project-performance-governance.md`；写前生成适用矩阵，末改经直接因果检查、二次复审再冻结；无当前平台用户链则证据面未验证。
+- 性能、资源或规模项：`references/project-performance-governance.md`。
 - 多发现审计修复直接读 `references/ci-execution-governance.md`；审计修复或项目级改动会使用完整套件，或触及验证控制面、分类、资源、分片、成本与重试时同样读取，第一条测试前完成运行资格、累计预算和套件次数账本。
 - 运行时操作跨越服务代次、热配置事务或物理根切换：`references/runtime-generation-governance.md`
 - 难复现或低可观测问题：`references/hard-to-reproduce-diagnostics.md`
@@ -185,7 +186,7 @@ README 不作为每项内部治理规则的第二份活动真源；自我进化�
 - Tauri v2 + Vue：`references/tauri-vue-governance.md`
 - 本地文件工作区：`references/local-file-workspace-governance.md`
 
-这些资源是活动方法，不等于项目已经采用模板；只有明确采用并由正式消费者读取的 .project-steward/project.json 才构成项目模板状态。
+资源是活动方法；只有明确采用并由正式消费者读取的 .project-steward/project.json 才构成项目模板状态。
 
 ## 输出与完成
 

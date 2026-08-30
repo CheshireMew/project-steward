@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Capture a stable snapshot of the current Codex JSONL session record."""
+"""Capture and project a stable Codex JSONL session record."""
 
 from __future__ import annotations
 
 import argparse
+from collections import Counter
+from collections.abc import Iterable, Iterator
 import ctypes
 import hashlib
 import json
@@ -13,7 +15,7 @@ import shutil
 import sys
 import tempfile
 from pathlib import Path
-from typing import BinaryIO, Sequence
+from typing import Any, BinaryIO, Sequence
 
 
 THREAD_ID_PATTERN = re.compile(
@@ -21,6 +23,8 @@ THREAD_ID_PATTERN = re.compile(
     r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )
 CHUNK_SIZE = 1024 * 1024
+PUBLIC_ITEM_TYPES = {"UserMessage", "AgentMessage"}
+CONTEXT_ROLES = {"developer", "system", "user"}
 
 
 class SessionReadError(RuntimeError):
@@ -252,6 +256,249 @@ def validate_snapshot(path: Path) -> tuple[int, str]:
     return complete_records, digest.hexdigest().upper()
 
 
+def read_snapshot_records(path: Path) -> Iterator[tuple[int, dict[str, Any]]]:
+    try:
+        with path.open("r", encoding="utf-8") as snapshot:
+            for line_number, line in enumerate(snapshot, start=1):
+                record = json.loads(line)
+                if not isinstance(record, dict):
+                    raise SessionReadError(
+                        "session_projection_invalid",
+                        f"Codex session record {line_number} is not a JSON object.",
+                    )
+                yield line_number, record
+    except SessionReadError:
+        raise
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise SessionReadError(
+            "snapshot_projection_failed",
+            f"Could not project the captured Codex snapshot: {error}",
+        ) from error
+
+
+def require_mapping(value: object, line_number: int, label: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise SessionReadError(
+            "session_projection_invalid",
+            f"Codex session record {line_number} has no valid {label} object.",
+        )
+    return value
+
+
+def require_identity(value: object, line_number: int, label: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise SessionReadError(
+            "session_projection_invalid",
+            f"Codex session record {line_number} has no stable {label}.",
+        )
+    return value
+
+
+def public_message_ids(path: Path) -> set[str]:
+    identities: set[str] = set()
+    for line_number, record in read_snapshot_records(path):
+        if record.get("type") != "event_msg":
+            continue
+        payload = require_mapping(record.get("payload"), line_number, "event payload")
+        if payload.get("type") != "item_completed":
+            continue
+        item = require_mapping(payload.get("item"), line_number, "completed item")
+        if item.get("type") not in PUBLIC_ITEM_TYPES:
+            continue
+        identity = require_identity(item.get("id"), line_number, "public message identity")
+        if identity in identities:
+            raise SessionReadError(
+                "session_projection_invalid",
+                f"Codex public message identity is duplicated at record {line_number}: {identity}",
+            )
+        if not isinstance(item.get("content"), (dict, list)):
+            raise SessionReadError(
+                "session_projection_invalid",
+                f"Codex public message {identity} has no structured content at record {line_number}.",
+            )
+        identities.add(identity)
+    return identities
+
+
+def project_public_dialogue(
+    path: Path,
+) -> Iterator[dict[str, Any]]:
+    for line_number, record in read_snapshot_records(path):
+        if record.get("type") != "event_msg":
+            continue
+        payload = require_mapping(record.get("payload"), line_number, "event payload")
+        if payload.get("type") != "item_completed":
+            continue
+        item = require_mapping(payload.get("item"), line_number, "completed item")
+        item_type = item.get("type")
+        if item_type not in PUBLIC_ITEM_TYPES:
+            continue
+        identity = require_identity(item.get("id"), line_number, "public message identity")
+        content = item.get("content")
+        if not isinstance(content, (dict, list)):
+            raise SessionReadError(
+                "session_projection_invalid",
+                f"Codex public message {identity} has no structured content at record {line_number}.",
+            )
+        yield {
+            "record_line": line_number,
+            "timestamp": record.get("timestamp"),
+            "message_id": identity,
+            "speaker": "user" if item_type == "UserMessage" else "assistant",
+            "phase": item.get("phase"),
+            "content": content,
+        }
+
+
+def project_context_sources(
+    path: Path,
+    public_ids: set[str],
+) -> Iterator[dict[str, Any]]:
+    for line_number, record in read_snapshot_records(path):
+        if record.get("type") != "response_item":
+            continue
+        payload = require_mapping(record.get("payload"), line_number, "response payload")
+        if payload.get("type") != "message":
+            continue
+        role = payload.get("role")
+        identity = payload.get("id")
+        if role == "user" and isinstance(identity, str) and identity in public_ids:
+            continue
+        if role not in CONTEXT_ROLES:
+            continue
+        if not isinstance(payload.get("content"), list):
+            raise SessionReadError(
+                "session_projection_invalid",
+                f"Codex context message at record {line_number} has no content list.",
+            )
+        yield {
+            "record_line": line_number,
+            "timestamp": record.get("timestamp"),
+            "message_id": identity,
+            "transport_role": role,
+            "classification": "host_context",
+            "content": payload["content"],
+        }
+
+
+def project_process_events(path: Path) -> Iterator[dict[str, Any]]:
+    for line_number, record in read_snapshot_records(path):
+        if record.get("type") != "event_msg":
+            continue
+        payload = require_mapping(record.get("payload"), line_number, "event payload")
+        event_type = payload.get("type")
+        if event_type == "token_count":
+            continue
+        if event_type == "item_completed":
+            item = require_mapping(payload.get("item"), line_number, "completed item")
+            if item.get("type") in PUBLIC_ITEM_TYPES | {"Reasoning"}:
+                continue
+            yield {
+                "record_line": line_number,
+                "timestamp": record.get("timestamp"),
+                "event_type": event_type,
+                "item_type": item.get("type"),
+                "item_id": item.get("id"),
+                "status": item.get("status"),
+                "item": item,
+            }
+            continue
+        yield {
+            "record_line": line_number,
+            "timestamp": record.get("timestamp"),
+            "event_type": event_type,
+            "payload": payload,
+        }
+
+
+def write_projection(
+    path: Path,
+    records: Iterable[dict[str, Any]],
+    *count_fields: str,
+) -> dict[str, object]:
+    digest = hashlib.sha256()
+    count = 0
+    first_record_line: int | None = None
+    last_record_line: int | None = None
+    dimensions = {field: Counter[str]() for field in count_fields}
+    try:
+        with path.open("wb") as output:
+            for record in records:
+                record_line = record.get("record_line")
+                if not isinstance(record_line, int) or record_line < 1:
+                    raise SessionReadError(
+                        "session_projection_invalid",
+                        f"Codex session projection {path.name} has no valid record cursor.",
+                    )
+                if last_record_line is not None and record_line <= last_record_line:
+                    raise SessionReadError(
+                        "session_projection_invalid",
+                        f"Codex session projection {path.name} has an unordered record cursor.",
+                    )
+                if first_record_line is None:
+                    first_record_line = record_line
+                last_record_line = record_line
+                encoded = (
+                    json.dumps(
+                        record,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                    + b"\n"
+                )
+                output.write(encoded)
+                digest.update(encoded)
+                count += 1
+                for field, counter in dimensions.items():
+                    counter[str(record.get(field))] += 1
+    except OSError as error:
+        raise SessionReadError(
+            "session_projection_write_failed",
+            f"Could not write Codex session projection {path.name}: {error}",
+        ) from error
+    result: dict[str, object] = {
+        "path": str(path),
+        "records": count,
+        "sha256": digest.hexdigest().upper(),
+        "source_record_cursor": {
+            "first_line": first_record_line,
+            "last_line": last_record_line,
+        },
+    }
+    for field, counter in dimensions.items():
+        result[f"{field}_counts"] = dict(sorted(counter.items()))
+    return result
+
+
+def project_snapshot(path: Path) -> dict[str, object]:
+    public_ids = public_message_ids(path)
+    root = path.parent
+    public_path = root / "public-dialogue.jsonl"
+    context_path = root / "context-sources.jsonl"
+    process_path = root / "process-events.jsonl"
+    return {
+        "public_dialogue": write_projection(
+            public_path,
+            project_public_dialogue(path),
+            "speaker",
+            "phase",
+        ),
+        "context_sources": write_projection(
+            context_path,
+            project_context_sources(path, public_ids),
+            "transport_role",
+        ),
+        "process_events": write_projection(
+            process_path,
+            project_process_events(path),
+            "event_type",
+            "item_type",
+            "status",
+        ),
+    }
+
+
 def capture_session(
     thread_id: str,
     source: Path,
@@ -277,6 +524,7 @@ def capture_session(
             "trailing_incomplete_bytes": frozen_bytes - complete_bytes,
             "parse_errors": 0,
             "sha256": sha256,
+            "projections": project_snapshot(snapshot_path),
         }
         manifest_path = snapshot_dir / "manifest.json"
         manifest["manifest"] = str(manifest_path)

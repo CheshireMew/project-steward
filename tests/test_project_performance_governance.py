@@ -21,18 +21,73 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
         section = MAIN_TEXT.split("## 根因治理", 1)[1].split(
             "## 外部工具兼容性", 1
         )[0]
-        ordered = (
-            "性能、资源或规模项",
-            "`references/project-performance-governance.md`",
-            "写前生成适用矩阵",
-            "直接因果检查",
-            "二次复审",
-            "再冻结",
-            "无当前平台用户链",
-            "证据面未验证",
+        self.assertEqual(
+            section.count("`references/project-performance-governance.md`"), 1
         )
-        positions = [section.index(fragment) for fragment in ordered]
+        self.assertIn("性能、资源或规模项", section)
+        self.assertIn("再按下文生成适用矩阵", PERFORMANCE_TEXT)
+        closure = PERFORMANCE_TEXT.split("## 6. 修复交接与二次性能复审", 1)[1]
+        ordered = (
+            "直接因果检查",
+            "二次性能复审",
+            "冻结准确候选",
+        )
+        start = closure.index("先完成直接因果检查")
+        positions = [closure.index(fragment, start) for fragment in ordered]
         self.assertEqual(positions, sorted(positions))
+        self.assertIn("同一正式入口、代表性输入和当前目标平台上的用户链证据", closure)
+
+    def test_proactive_performance_changes_route_before_writing_without_scope_growth(
+        self,
+    ) -> None:
+        prevention = MAIN_TEXT.split("## 改动前预防", 1)[1].split(
+            "## 根因治理", 1
+        )[0]
+        route = "性能计划或提速：`references/project-performance-governance.md`"
+        self.assertEqual(prevention.count(route), 1)
+        self.assertLess(prevention.index(route), prevention.index("实施授权才修改"))
+        contract = PERFORMANCE_TEXT.split("## 1. 先冻结性能合同和动作边界", 1)[1].split(
+            "## 2. 建立阶段、规模和生命周期覆盖矩阵", 1
+        )[0]
+        for fragment in (
+            "性能计划写入前先冻结基线、适用范围、正确性合同与收益判据",
+            "缓存、预热、并行、增量处理或加速后端",
+            "即使尚无缺陷也执行这一步",
+            "局部改动只覆盖获准结果，不自动扩成全仓性能审计",
+            "普通解释或只读计划在证据与方案交付后停止，不实施优化",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, contract)
+
+    def test_acceleration_claims_have_three_independent_evidence_layers(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        start = "准备宣称硬件加速、指定设备或零拷贝时"
+        self.assertEqual(PERFORMANCE_TEXT.count(start), 1)
+        evidence = measurement.split(start, 1)[1].split("验收门槛与性能评价分开记录", 1)[0]
+        ordered = (
+            "请求策略、实际后端和数据路径",
+            "配置接受、能力协商成功或偏好硬件参数",
+            "同一次操作的运行时回执、追踪或正式诊断接口",
+            "数据路径从正式生产者追到消费者",
+            "三层证据分别输出已证明、已否定或未知",
+        )
+        positions = [evidence.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "框架或加速接口名称不能替物理编码器、设备型号或厂商背书",
+            "CPU 回读、上传、跨进程搬运",
+            "硬件执行与零拷贝相互独立",
+            "减少一次复制也不能证明全链零拷贝",
+            "计划后端或早期硬件初始化替后续软件执行背书",
+            "没有相关主张时不强制底层追踪",
+            "不自行重编运行时、增加原生桥接或扩大验收",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, evidence)
+        output = PERFORMANCE_TEXT.split("## 7. 输出与停止", 1)[1]
+        self.assertIn("请求策略、实际后端与数据路径各自的证据和未知项", output)
 
     def test_comprehensive_audit_routes_one_performance_owner(self) -> None:
         section = AUDIT_TEXT.split("## 8. 审计性能、资源与规模", 1)[1].split(

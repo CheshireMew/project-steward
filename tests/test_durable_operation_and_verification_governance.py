@@ -416,6 +416,34 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, STRUCTURED_TEXT)
 
+    def test_identity_bearing_structured_objects_are_deeply_stable_and_compatible(
+        self,
+    ) -> None:
+        ordered = (
+            "身份确定后的结构化对象不能继续漂移",
+            "身份覆盖的全部嵌套状态必须保持稳定",
+            "保存规范字节并在消费时从同一字节重建或复验",
+            "防御性复制后递归冻结身份覆盖的内存表示",
+            "冻结是状态稳定策略，不得暗中改写公共数据合同",
+            "正式序列化器、schema 校验器、类型检查器和至少一个真实消费者",
+            "合同允许变化时创建新版本与新身份",
+        )
+        positions = [STRUCTURED_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "外层的 `frozen`、`readonly`、`const`",
+            "不能先按可变对象计算身份，再把原引用继续交给调用方",
+            "JSON array 不能仅为获得哈希能力就变成消费者看见的 tuple",
+            "公共 schema、数组与对象形状",
+            "相等语义、序列化字节和类型合同",
+            "修改原始输入并尝试修改对象内部的每一类嵌套容器",
+            "只验证属性不能重新赋值",
+            "身份后的状态稳定策略",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, STRUCTURED_TEXT)
+
     def test_runtime_authority_precedes_recovery_and_scheduling(self) -> None:
         ordered = (
             "创建不触发持久状态变化的进程外壳",

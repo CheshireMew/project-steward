@@ -25,6 +25,10 @@ def run_reader(*arguments: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def read_jsonl(path: Path) -> list[dict[str, object]]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+
+
 def open_shared_writer(path: Path):
     if os.name != "nt":
         return path.open("r+b")
@@ -86,6 +90,9 @@ class CodexSessionReaderTests(unittest.TestCase):
                     len(incomplete),
                 )
                 self.assertEqual(manifest["parse_errors"], 0)
+                for projection in manifest["projections"].values():
+                    self.assertEqual(projection["records"], 0)
+                    self.assertTrue(Path(projection["path"]).is_file())
 
                 writer.seek(0, os.SEEK_END)
                 writer.write(b'}\n')
@@ -124,6 +131,208 @@ class CodexSessionReaderTests(unittest.TestCase):
             self.assertEqual(ambiguous.returncode, 2)
             error = json.loads(ambiguous.stderr)["error"]
             self.assertEqual(error["code"], "session_record_ambiguous")
+
+    def test_projections_separate_public_context_and_process_without_reasoning(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / f"rollout-projection-{THREAD_ID}.jsonl"
+            records = [
+                {
+                    "type": "response_item",
+                    "timestamp": "2026-01-01T00:00:00Z",
+                    "payload": {
+                        "type": "message",
+                        "id": "public-user",
+                        "role": "user",
+                        "content": [{"type": "input_text", "text": "real request"}],
+                    },
+                },
+                {
+                    "type": "response_item",
+                    "timestamp": "2026-01-01T00:00:01Z",
+                    "payload": {
+                        "type": "message",
+                        "id": "injected-user-role",
+                        "role": "user",
+                        "content": [
+                            {"type": "input_text", "text": "<environment_context>"}
+                        ],
+                    },
+                },
+                {
+                    "type": "response_item",
+                    "timestamp": "2026-01-01T00:00:02Z",
+                    "payload": {
+                        "type": "message",
+                        "id": "developer-context",
+                        "role": "developer",
+                        "content": [{"type": "input_text", "text": "host policy"}],
+                    },
+                },
+                {
+                    "type": "event_msg",
+                    "timestamp": "2026-01-01T00:00:03Z",
+                    "payload": {
+                        "type": "item_completed",
+                        "item": {
+                            "type": "UserMessage",
+                            "id": "public-user",
+                            "client_id": "client-user",
+                            "content": {"type": "text", "text": "real request"},
+                        },
+                    },
+                },
+                {
+                    "type": "event_msg",
+                    "timestamp": "2026-01-01T00:00:04Z",
+                    "payload": {
+                        "type": "item_completed",
+                        "item": {
+                            "type": "AgentMessage",
+                            "id": "public-agent",
+                            "phase": "commentary",
+                            "content": {"type": "Text", "text": "visible update"},
+                        },
+                    },
+                },
+                {
+                    "type": "event_msg",
+                    "timestamp": "2026-01-01T00:00:05Z",
+                    "payload": {
+                        "type": "item_completed",
+                        "item": {
+                            "type": "Reasoning",
+                            "id": "hidden-reasoning",
+                            "raw_content": "must never enter a projection",
+                        },
+                    },
+                },
+                {
+                    "type": "event_msg",
+                    "timestamp": "2026-01-01T00:00:06Z",
+                    "payload": {
+                        "type": "item_completed",
+                        "item": {
+                            "type": "CommandExecution",
+                            "id": "command-1",
+                            "status": "failed",
+                            "exit_code": 1,
+                            "command": "verify target",
+                            "stdout": "failed output",
+                            "stderr": "",
+                        },
+                    },
+                },
+                {
+                    "type": "event_msg",
+                    "timestamp": "2026-01-01T00:00:07Z",
+                    "payload": {
+                        "type": "item_completed",
+                        "item": {
+                            "type": "FileChange",
+                            "id": "change-1",
+                            "status": "completed",
+                            "changes": {"example.py": {"type": "update"}},
+                        },
+                    },
+                },
+                {
+                    "type": "event_msg",
+                    "timestamp": "2026-01-01T00:00:08Z",
+                    "payload": {
+                        "type": "item_completed",
+                        "item": {
+                            "type": "ContextCompaction",
+                            "id": "compaction-1",
+                        },
+                    },
+                },
+            ]
+            source.write_text(
+                "".join(json.dumps(record) + "\n" for record in records),
+                encoding="utf-8",
+            )
+
+            completed = run_reader(
+                "--thread-id",
+                THREAD_ID,
+                "--source",
+                str(source),
+                "--output-dir",
+                str(root / "snapshots"),
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            projections = json.loads(completed.stdout)["projections"]
+            public = read_jsonl(Path(projections["public_dialogue"]["path"]))
+            context = read_jsonl(Path(projections["context_sources"]["path"]))
+            process = read_jsonl(Path(projections["process_events"]["path"]))
+
+            self.assertEqual(
+                [(item["speaker"], item["message_id"]) for item in public],
+                [("user", "public-user"), ("assistant", "public-agent")],
+            )
+            self.assertEqual(
+                {item["message_id"] for item in context},
+                {"injected-user-role", "developer-context"},
+            )
+            self.assertEqual(
+                [item["item_type"] for item in process],
+                ["CommandExecution", "FileChange", "ContextCompaction"],
+            )
+            self.assertEqual(process[0]["record_line"], 7)
+            self.assertEqual(process[0]["status"], "failed")
+            self.assertEqual(process[0]["item"]["exit_code"], 1)
+            combined = "\n".join(
+                Path(projection["path"]).read_text(encoding="utf-8")
+                for projection in projections.values()
+            )
+            self.assertNotIn("must never enter a projection", combined)
+            self.assertEqual(projections["public_dialogue"]["records"], 2)
+            self.assertEqual(projections["context_sources"]["records"], 2)
+            self.assertEqual(projections["process_events"]["records"], 3)
+            self.assertEqual(
+                projections["public_dialogue"]["source_record_cursor"],
+                {"first_line": 4, "last_line": 5},
+            )
+            self.assertEqual(
+                projections["context_sources"]["source_record_cursor"],
+                {"first_line": 2, "last_line": 3},
+            )
+            self.assertEqual(
+                projections["process_events"]["source_record_cursor"],
+                {"first_line": 7, "last_line": 9},
+            )
+
+    def test_malformed_public_message_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / f"rollout-malformed-{THREAD_ID}.jsonl"
+            source.write_text(
+                json.dumps(
+                    {
+                        "type": "event_msg",
+                        "payload": {
+                            "type": "item_completed",
+                            "item": {"type": "UserMessage", "id": "broken"},
+                        },
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            completed = run_reader(
+                "--thread-id",
+                THREAD_ID,
+                "--source",
+                str(source),
+                "--output-dir",
+                str(root / "snapshots"),
+            )
+            self.assertEqual(completed.returncode, 2)
+            error = json.loads(completed.stderr)["error"]
+            self.assertEqual(error["code"], "session_projection_invalid")
 
 
 if __name__ == "__main__":

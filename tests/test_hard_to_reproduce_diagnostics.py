@@ -465,6 +465,47 @@ class HardToReproduceDiagnosticTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, validator)
 
+    def test_sequence_comparator_pairs_content_without_erasing_clock_failures(
+        self,
+    ) -> None:
+        fast_path = DIAGNOSTIC_TEXT.split("### 受验证的高速路径与原子回退", 1)[1].split(
+            "### 环境与外部进程", 1
+        )[0]
+        self.assertIn("先完成本方法“验证器与测试驱动干扰”中的对应关系检查", fast_path)
+        validator = DIAGNOSTIC_TEXT.split("### 验证器与测试驱动干扰", 1)[1].split(
+            "## 4. 输出与停止", 1
+        )[0]
+        start = "比较器对帧、音频样本、事件或其它序列结果评分前"
+        self.assertEqual(DIAGNOSTIC_TEXT.count(start), 1)
+        comparison = validator.split(start, 1)[1].split("验证器通过测试钩子", 1)[0]
+        ordered = (
+            "逻辑单元、对应规则",
+            "证明每一对确实对应同一逻辑内容",
+            "内容对应与数量、顺序、时钟正确性分别验收",
+            "参考自身对照和仅表示精度变化的等价样本",
+            "漏项、重复、乱序、内容错位与累计漂移的坏样本",
+            "相同产品条件下重新比较",
+        )
+        positions = [comparison.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "时间基准、采样间隔和表示精度",
+            "分数只能说明比较无效",
+            "普通单值断言不增加这份序列对应检查",
+            "同一逻辑序号比较",
+            "必须独立检查全部单元的覆盖、漏项、重复与乱序",
+            "时间戳、时长、同步误差和累计漂移",
+            "按序号相似不能证明时间正确",
+            "最近邻配对、删除首尾、排序、重采样或平移时间轴",
+            "不能把累计漂移解释成量化误差",
+            "保留原失败与原始时间、序列证据",
+            "只修正配对不能关闭真实的时序缺陷",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, comparison)
+        output = DIAGNOSTIC_TEXT.split("## 4. 输出与停止", 1)[1]
+        self.assertIn("内容对应关系、覆盖与顺序、时钟及累计漂移的独立结论", output)
+
     def test_reference_is_cross_project_and_remains_a_leaf_method(self) -> None:
         self.assertNotIn("references/", DIAGNOSTIC_TEXT)
         self.assertNotRegex(DIAGNOSTIC_TEXT, r"[A-Za-z]:\\")

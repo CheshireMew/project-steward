@@ -67,11 +67,18 @@ class ConversationHistoryReadingGovernanceTests(unittest.TestCase):
     def test_public_dialogue_and_process_evidence_are_separate_ledgers(self) -> None:
         section = self.history_section()
         for fragment in (
+            "从同一快照确定性生成公开对话、上下文来源和过程事件三份 JSONL 投影",
+            "路径、数量、内容身份与原记录游标写入清单",
+            "公开消息只认 `UserMessage` / `AgentMessage` 事件",
+            "隐藏推理不进入投影",
+            "未知公共消息结构失败关闭",
+            "不得另写 Shell 或行内解释器解析快照",
             "每一条用户可见的用户消息、批注或更正",
             "助手 commentary 和 final",
             "系统与开发者指令、隐藏推理、工具调用和工具输出不是公开对话",
             "事件身份与顺序必须覆盖完整",
             "冗长载荷不整份灌入对话",
+            "按投影的原记录游标",
             "字段、页、行或字节区间读到可核对末尾",
             "不能把“避免输出淹没”执行成删除失败、等待或范围变化",
         ):
