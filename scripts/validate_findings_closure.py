@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import Any
 
 
-INPUT_SCHEMA = "project-steward-findings-closure/v1"
-RESULT_SCHEMA = "project-steward-findings-closure-result/v1"
+LEGACY_SCHEMA = "project-steward-findings-closure/v1"
+INPUT_SCHEMA = "project-steward-findings-closure/v2"
+RESULT_SCHEMA = "project-steward-findings-closure-result/v2"
 CLAIM = "all-findings-resolved"
 STATES = {
     "resolved",
@@ -131,8 +132,7 @@ def _evidence(value: object, label: str) -> dict[str, Any]:
     }
 
 
-def _finding(value: object, index: int) -> dict[str, Any]:
-    label = f"findings[{index}]"
+def _status_record(value: object, label: str) -> dict[str, Any]:
     item = _mapping(value, label)
     _only_keys(
         item,
@@ -214,6 +214,121 @@ def _finding(value: object, index: int) -> dict[str, Any]:
     }
 
 
+def _indexed(values: object, label: str) -> dict[str, dict[str, Any]]:
+    rows = _list(values, label)
+    if not rows:
+        raise ContractError(f"{label} must not be empty")
+    result = {}
+    for index, value in enumerate(rows):
+        item = _mapping(value, f"{label}[{index}]")
+        identity = _string(item.get("id"), f"{label}[{index}].id")
+        if identity in result:
+            raise ContractError(f"{label} must use unique stable IDs")
+        result[identity] = item
+    return result
+
+
+def _original_finding(value: object, label: str) -> dict[str, Any]:
+    item = _mapping(value, label)
+    _only_keys(item, {"id", "title", "source", "conditions"}, label)
+    source = _mapping(item.get("source"), f"{label}.source")
+    _only_keys(source, {"reference", "content_identity"}, f"{label}.source")
+    conditions = []
+    for condition_id, value in _indexed(item.get("conditions"), f"{label}.conditions").items():
+        condition_label = f"{label}.conditions[{condition_id}]"
+        _only_keys(value, {"id", "text", "evidence_scope", "required_evidence_kinds"}, condition_label)
+        kinds = _string_list(value.get("required_evidence_kinds"), f"{condition_label}.required_evidence_kinds")
+        if not kinds or not set(kinds) <= VALIDATION_KINDS:
+            raise ContractError(f"{condition_label} requires non-empty supported verification kinds")
+        conditions.append({
+            "id": condition_id,
+            "text": _string(value.get("text"), f"{condition_label}.text"),
+            "evidence_scope": _string(value.get("evidence_scope"), f"{condition_label}.evidence_scope"),
+            "required_evidence_kinds": kinds,
+        })
+    return {
+        "id": _string(item.get("id"), f"{label}.id"),
+        "title": _string(item.get("title"), f"{label}.title"),
+        "source": {
+            key: _string(source.get(key), f"{label}.source.{key}")
+            for key in ("reference", "content_identity")
+        },
+        "conditions": conditions,
+    }
+
+
+def _condition_result(value: object, original: dict[str, Any], label: str) -> dict[str, Any]:
+    item = _mapping(value, label)
+    _only_keys(item, {
+        "id", "state", "last_evidence", "unverified_boundaries",
+        "disposition", "claims_automated_regression",
+    }, label)
+    result = _status_record({**item, "title": original["text"]}, label)
+    if result["state"] == "resolved":
+        proofs = [proof for proof in result["last_evidence"] if proof["kind"] in VALIDATION_KINDS]
+        if any(proof["scope"] != original["evidence_scope"] for proof in proofs):
+            raise ContractError(f"{label} evidence must match the original condition scope")
+        if not set(original["required_evidence_kinds"]) <= {proof["kind"] for proof in proofs}:
+            raise ContractError(f"{label} is missing required evidence kinds for the original condition")
+    return {**result, **original}
+
+
+def _condition_findings(root: dict[str, Any]) -> list[dict[str, Any]]:
+    originals = [
+        _original_finding(value, f"original_findings[{identity}]")
+        for identity, value in _indexed(root.get("original_findings"), "original_findings").items()
+    ]
+    supplied = _indexed(root.get("findings"), "findings")
+    if set(supplied) != {item["id"] for item in originals}:
+        raise ContractError("findings must match original_findings exactly")
+    findings = []
+    for original in originals:
+        finding_id = original["id"]
+        label = f"findings[{finding_id}]"
+        item = supplied[finding_id]
+        _only_keys(item, {"id", "conditions"}, label)
+        supplied_conditions = _indexed(item.get("conditions"), f"{label}.conditions")
+        if set(supplied_conditions) != {condition["id"] for condition in original["conditions"]}:
+            raise ContractError(f"{label}.conditions must match original conditions exactly")
+        conditions = [
+            _condition_result(supplied_conditions[condition["id"]], condition,
+                              f"{label}.conditions[{condition['id']}]")
+            for condition in original["conditions"]
+        ]
+        states = {condition["state"] for condition in conditions}
+        state = next(iter(states)) if len(states) == 1 else next(
+            (state for state in ("open", "unverified", "blocked") if state in states), "mixed"
+        )
+        findings.append({
+            **original,
+            "conditions": conditions,
+            "state": state,
+            "last_evidence": list({
+                proof["id"]: proof for condition in conditions for proof in condition["last_evidence"]
+            }.values()),
+            "unverified_boundaries": [
+                f"{condition['id']}: {boundary}" for condition in conditions
+                for boundary in condition["unverified_boundaries"]
+            ],
+            "claims_automated_regression": all(c["claims_automated_regression"] for c in conditions),
+            "automated_regression_proven": all(c["automated_regression_proven"] for c in conditions),
+            "disposition": "; ".join(
+                f"{c['id']}: {c['disposition']}" for c in conditions if c["disposition"]
+            ) or None,
+        })
+    return findings
+
+
+def _legacy_findings(root: dict[str, Any]) -> list[dict[str, Any]]:
+    original_ids = _string_list(root.get("original_finding_ids"), "original_finding_ids")
+    if not original_ids:
+        raise ContractError("original_finding_ids must not be empty")
+    supplied = _indexed(root.get("findings"), "findings")
+    if set(supplied) != set(original_ids):
+        raise ContractError("findings must match original_finding_ids exactly")
+    return [_status_record(supplied[identity], f"findings[{identity}]") for identity in original_ids]
+
+
 def _validation_event(value: object, index: int) -> dict[str, Any]:
     label = f"validation_events[{index}]"
     item = _mapping(value, label)
@@ -243,34 +358,24 @@ def _validation_event(value: object, index: int) -> dict[str, Any]:
 
 def close_ledger(payload: object) -> dict[str, Any]:
     root = _mapping(payload, "root")
+    schema = _string(root.get("schema"), "schema")
+    if schema not in {INPUT_SCHEMA, LEGACY_SCHEMA}:
+        raise ContractError(f"schema must be {INPUT_SCHEMA} or {LEGACY_SCHEMA}")
+    legacy = schema == LEGACY_SCHEMA
     _only_keys(
         root,
-        {"schema", "claim", "original_finding_ids", "findings", "validation_events"},
+        {"schema", "claim", "findings", "validation_events",
+         "original_finding_ids" if legacy else "original_findings"},
         "root",
     )
-    schema = _string(root.get("schema"), "schema")
-    if schema != INPUT_SCHEMA:
-        raise ContractError(f"schema must be {INPUT_SCHEMA}")
     claim = _string(root.get("claim"), "claim")
     if claim != CLAIM:
         raise ContractError(f"claim must be {CLAIM}")
-    original_ids = _string_list(root.get("original_finding_ids"), "original_finding_ids")
-    if not original_ids:
-        raise ContractError("original_finding_ids must not be empty")
-
-    findings = [
-        _finding(item, index)
-        for index, item in enumerate(_list(root.get("findings"), "findings"))
+    findings = _legacy_findings(root) if legacy else _condition_findings(root)
+    units = [(finding["id"], finding) for finding in findings] if legacy else [
+        (f"{finding['id']}/{condition['id']}", condition)
+        for finding in findings for condition in finding["conditions"]
     ]
-    if not findings:
-        raise ContractError("findings must contain at least one item")
-    finding_ids = [item["id"] for item in findings]
-    if len(finding_ids) != len(set(finding_ids)):
-        raise ContractError("findings must use unique stable IDs")
-    if set(finding_ids) != set(original_ids):
-        raise ContractError("findings must match original_finding_ids exactly")
-    findings_by_id = {item["id"]: item for item in findings}
-    findings = [findings_by_id[finding_id] for finding_id in original_ids]
 
     events = [
         _validation_event(item, index)
@@ -283,8 +388,8 @@ def close_ledger(payload: object) -> dict[str, Any]:
         raise ContractError("validation_events must use unique IDs")
     events_by_id = {item["id"]: item for item in events}
     evidence_by_id: dict[str, dict[str, Any]] = {}
-    for finding in findings:
-        for evidence in finding["last_evidence"]:
+    for _, unit in units:
+        for evidence in unit["last_evidence"]:
             evidence_id = evidence["id"]
             if evidence_id in evidence_by_id and evidence_by_id[evidence_id] != evidence:
                 raise ContractError(f"evidence ID {evidence_id} has conflicting records")
@@ -301,16 +406,18 @@ def close_ledger(payload: object) -> dict[str, Any]:
 
     non_pass_events = [item for item in events if item["status"] != "pass"]
     blockers = [
-        f"{item['id']}: state is {item['state']}"
-        for item in findings
+        f"{identity}: state is {item['state']}"
+        for identity, item in units
         if item["state"] not in RESOLVED_STATES
     ]
+    if legacy:
+        blockers.append("legacy schema lacks original completion conditions; migrate from the source ledger to v2")
     blockers.extend(
         f"{item['id']}: blocking validation event is {item['status']}"
         for item in non_pass_events
         if item["blocking"]
     )
-    closure_complete = all(item["state"] in TERMINAL_STATES for item in findings)
+    closure_complete = all(item["state"] in TERMINAL_STATES for _, item in units)
     all_findings_resolved = not blockers and all(
         item["state"] in RESOLVED_STATES for item in findings
     )
@@ -320,8 +427,10 @@ def close_ledger(payload: object) -> dict[str, Any]:
         "schema": RESULT_SCHEMA,
         "status": "eligible" if all_findings_resolved else "blocked",
         "claim": claim,
-        "original_finding_ids": original_ids,
+        "input_schema": schema,
+        "original_finding_ids": [finding["id"] for finding in findings],
         "verification_scope": "supplied-ledger-consistency-only",
+        "condition_coverage_verified": not legacy,
         "closure_complete": closure_complete,
         "all_findings_resolved": all_findings_resolved,
         "validation_events_recorded": len(events),
@@ -342,6 +451,8 @@ def _cell(value: object) -> str:
 def render_markdown(result: dict[str, Any]) -> str:
     eligibility = "允许" if result["all_findings_resolved"] else "不允许"
     closure = "完整" if result["closure_complete"] else "未闭环"
+    if not result["condition_coverage_verified"]:
+        closure = "旧格式声明，不证明原始完成条件覆盖"
     if not result["validation_events_recorded"]:
         checks = "无验证事件记录"
     else:
@@ -385,6 +496,26 @@ def render_markdown(result: dict[str, Any]) -> str:
             )
             + " |"
         )
+    for finding in result["findings"]:
+        if "conditions" not in finding:
+            continue
+        source = finding["source"]
+        lines.extend([
+            "", f"## {_cell(finding['id'])} 完成条件", "",
+            f"来源：{_cell(source['reference'])}；内容身份：{_cell(source['content_identity'])}", "",
+            "| 条件 ID | 原完成条件 | 必需证据种类与范围 | 状态 | 最后有效证据 | 未验证边界 | 处置说明 |",
+            "| --- | --- | --- | --- | --- | --- | --- |",
+        ])
+        for condition in finding["conditions"]:
+            proofs = "; ".join(
+                f"{p['id']} [{p['kind']}/{p['status']}]" for p in condition["last_evidence"]
+            ) or "无"
+            lines.append("| " + " | ".join(_cell(value) for value in (
+                condition["id"], condition["text"],
+                f"{', '.join(condition['required_evidence_kinds'])}: {condition['evidence_scope']}",
+                condition["state"], proofs, "; ".join(condition["unverified_boundaries"]) or "无",
+                condition["disposition"] or "无",
+            )) + " |")
     lines.extend(["", "## 非通过验证事件", ""])
     if result["non_pass_validation_events"]:
         lines.extend(

@@ -72,25 +72,39 @@ Goal、计划、任务计时器和用量记录只证明它们从实际创建或�
 
 承接既有诊断或审计账本，并准备回答“全部问题已经解决”“上述问题都做完了”或同义全称结论时，先把本节已经建立的逐项终态、最后有效证据、未验证边界和全部实际验证事件交给 `scripts/validate_findings_closure.py`。验证器只消费已经取得的结构化证据，不替代原账本、根因判断、测试收集或用户链，也不能为缺失证据补造通过；未承接既有发现账本的单点修复不调用它，继续按实际受影响链结项。
 
-输入使用 `project-steward-findings-closure/v1`：每项发现必须声明唯一 ID、标题、终态、最后有效证据、未验证边界，以及是否声称已有自动回归保护；每条实际验证事件必须保留唯一身份、状态、覆盖范围、产品 / 验证器 / 环境等分类、是否阻塞和与当前结果的相关性。自动回归声明只能由状态为通过、预期身份与测试框架实际收集身份完全相同的自动测试证据成立；真实用户链、测试源码存在、测试总数或计划新增测试都不能代替。验证器生成 `稳定发现 ID → 最终状态 → 最后一次有效证据 → 未验证边界` 投影并单列全部非通过验证事件。
+输入使用 `project-steward-findings-closure/v2`，分开原始合同和当前结果。`original_findings` 从 `project-audit-release-and-evidence.md` 的修复交接账本取得；每项含唯一 `id`、`title`、`source`（`reference` 原文定位与 `content_identity` 来源内容身份），以及非空 `conditions`。每个条件含父发现内唯一 `id`、原条件 `text`、`evidence_scope` 和非空 `required_evidence_kinds`。证据种类表示该条件实际必需的检查集合，不是任取其一，也不是所有问题统一跑一遍的清单；范围和种类在实施前由正式消费者与原合同决定。
 
-`original_finding_ids` 必须从原交接账本取得，逐项结果与其集合完全相等，输出沿用原顺序；不能从准备宣告通过的子集反推原范围。`last_evidence` 除用户授权外必须以同一 ID 引用 `validation_events` 中状态和范围一致的记录，不能一边记录失败一边引用为通过。同一证据被多项发现共享时记录必须一致。脚本只校验传入账本的一致性，不独立检查来源是否真实、事件有无遗漏、证据是否新鲜，也不能判断文字边界是否确实在范围外；这些仍由本节的原账本、最终验证计划与正式证据负责。输入必须在传入前脱敏，不包含日志原文、凭据或私人数据。
+`findings` 每项只含 `id` 与 `conditions`；当前条件只提交 `id`、`state`、`last_evidence`、`unverified_boundaries`、`claims_automated_regression` 及适用的 `disposition`。发现集合和各自条件集合必须与原清单完全相等，不得遗漏、重复、新增或换名；原文、标题、来源、证据要求只从原清单投影，不能由当前结果覆盖。父发现状态由全部条件派生：全部已解决才为 `resolved`；有开放、未验证或受阻条件时分别保留 `open / unverified / blocked`，不同合法终态并存为 `mixed`，不把重新分类或退出范围算作修复。输出沿用原发现与条件顺序，生成 `稳定发现 ID → 最终状态 → 最后一次有效证据 → 未验证边界`，同时展开条件、原文和来源身份。
+
+每条实际验证事件必须保留唯一身份、状态、覆盖范围、产品 / 验证器 / 环境等分类、是否阻塞和与当前结果的相关性；输出单列全部非通过验证事件。`last_evidence` 除用户授权外必须以同一 ID 引用 `validation_events` 中状态和范围一致的记录，不能一边记录失败一边引用为通过。同一证据被多条件或发现共享时记录必须一致。已解决条件的验证证据范围须与原 `evidence_scope` 相同，并覆盖全部必需种类；静态检查不能替代要求的真实运行或用户链。自动回归声明只能由状态为通过、预期身份与测试框架实际收集身份完全相同的自动测试证据成立；真实用户链、测试源码存在、测试总数或计划新增测试都不能代替。只有全部条件都声明并证明自动回归时，父发现才能作同一声明。
+
+脚本只校验传入账本的一致性，不独立检查来源是否真实、事件有无遗漏、证据是否新鲜，也不能判断自然语言条件是否被忠实提取、文字边界是否确实在范围外，或标为真实运行的测试是否绕过核心边界；这些仍由原账本、最终验证计划与正式证据负责。来源身份不是自动真实性证明，不能一边改写原清单一边让校验器背书。范围内仍缺的条件保持未验证，不能放进备注后声明已解决。输入必须在传入前脱敏，不包含日志原文、凭据或私人数据。
 
 从标准输入传入 JSON，或用 `--input <既有账本路径>` 读取项目原有记录；不为运行它新建持久经验库。`--format markdown` 直接输出交付表，默认 JSON 同时包含判定和 `markdown` 字段。以下是一次真实用户链已经通过、但没有声称自动回归保护时的最小完整输入结构；示例内容不是实际证据：
 
 ```json
 {
-  "schema": "project-steward-findings-closure/v1",
+  "schema": "project-steward-findings-closure/v2",
   "claim": "all-findings-resolved",
-  "original_finding_ids": ["F-1"],
+  "original_findings": [{
+    "id": "F-1", "title": "保存后能重新读取",
+    "source": {"reference": "review#F-1", "content_identity": "example-review-revision-1"},
+    "conditions": [{
+      "id": "reopen", "text": "正式入口保存后由新消费者重新读取同一对象",
+      "evidence_scope": "当前平台的保存与重开",
+      "required_evidence_kinds": ["user-chain"]
+    }]
+  }],
   "findings": [{
-    "id": "F-1", "title": "保存后能重新读取", "state": "resolved",
-    "last_evidence": [{
-      "id": "save-reopen", "kind": "user-chain", "status": "pass",
-      "scope": "当前平台的保存与重开"
-    }],
-    "unverified_boundaries": ["其它平台不在本次范围"],
-    "claims_automated_regression": false
+    "id": "F-1", "conditions": [{
+      "id": "reopen", "state": "resolved",
+      "last_evidence": [{
+        "id": "save-reopen", "kind": "user-chain", "status": "pass",
+        "scope": "当前平台的保存与重开"
+      }],
+      "unverified_boundaries": ["其它平台不在本次范围"],
+      "claims_automated_regression": false
+    }]
   }],
   "validation_events": [{
     "id": "save-reopen", "status": "pass", "scope": "当前平台的保存与重开",
@@ -100,7 +114,9 @@ Goal、计划、任务计时器和用量记录只证明它们从实际创建或�
 }
 ```
 
-自动测试证据的 `kind` 使用 `automated-test`，同时提供从正式运行取得的 `expected_test_identity` 和 `collected_test_identity`；不能把示例身份填成实际收集结果。发现状态支持 `resolved / reclassified / withdrawn / blocked / unverified / open`；重新分类、退出范围和受阻必须带 `disposition`，退出范围还必须有 `authorization` 证据。证据状态支持 `pass / fail / blocked / unknown / not-run`；证据种类除上述三种外还支持 `static-check / runtime / manual-review / diagnosis`。验证事件分类支持 `product / verifier / environment / scope / other`。`unverified_boundaries` 即使为空也显式给出，范围内仍缺的证据必须使发现保持未验证、开放或受阻，不能靠这份数组把已承诺结果改成范围外。
+自动测试证据的 `kind` 使用 `automated-test`，同时提供从正式运行取得的 `expected_test_identity` 和 `collected_test_identity`；不能把示例身份填成实际收集结果。条件状态支持 `resolved / reclassified / withdrawn / blocked / unverified / open`；重新分类、退出范围和受阻必须带 `disposition`，退出范围还必须有 `authorization` 证据。证据状态支持 `pass / fail / blocked / unknown / not-run`；证据种类除上述三种外还支持 `static-check / runtime / manual-review / diagnosis`。必需验证种类不接受 `authorization`，授权只能证明范围处置而非修复。验证事件分类支持 `product / verifier / environment / scope / other`。`unverified_boundaries` 即使为空也显式给出，范围内仍缺的证据必须使发现保持未验证、开放或受阻，不能靠这份数组把已承诺结果改成范围外。
+
+旧 `project-steward-findings-closure/v1` 仍可从同一 CLI 读取，其字段与一致性检查保留，但有效旧账本一律返回 `1`、`condition_coverage_verified: false` 和迁移提示，不再授予全称结论资格。旧 `original_finding_ids` 和已报告状态不能自动生成完整条件；调用者必须回到原报告恢复来源与条件后提交 v2。两种输入统一返回 `project-steward-findings-closure-result/v2`；`condition_coverage_verified` 只表示相对传入原清单的结构覆盖，`closure_complete` 只表示已表示条目的合法终态，均不独立证明原报告完整或全部修复。
 
 验证器退出状态也是结项门槛：`0` 表示当前声明范围内的每项发现都实际为已解决；`1` 表示输入有效但仍有开放、未验证、受阻发现、阻塞性非通过事件，或存在只能表述为重新分类或退出范围的合法终态；`2` 表示账本结构、唯一身份、证据或自动回归声明自相矛盾。只有状态 `0` 允许生成“全部发现已解决”，但只要存在任何非通过验证事件，就仍不得改写成“所有检查通过”；状态 `1` 或 `2` 时保留验证器输出和原证据，报告准确阻塞，不手工绕过投影。
 

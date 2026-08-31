@@ -111,6 +111,278 @@ def run_validator(
     )
 
 
+def export_ledger() -> dict[str, object]:
+    """Fixed review contract, independent of the supplied completion evidence."""
+    return {
+        "schema": "project-steward-findings-closure/v2",
+        "claim": "all-findings-resolved",
+        "original_findings": [{
+            "id": "EXPORT-1", "title": "Export remains usable after reopening",
+            "source": {"reference": "review#export", "content_identity": "review-revision-1"},
+            "conditions": [
+                {"id": "write", "text": "The formal exporter writes a readable file",
+                 "evidence_scope": "current-host export",
+                 "required_evidence_kinds": ["runtime"]},
+                {"id": "reopen", "text": "A new consumer reopens the exported file",
+                 "evidence_scope": "current-host reopen",
+                 "required_evidence_kinds": ["user-chain"]},
+            ],
+        }],
+        "findings": [{"id": "EXPORT-1", "conditions": [
+            {"id": "write", "state": "resolved", "last_evidence": [
+                {"id": "export-run", "kind": "runtime", "status": "pass",
+                 "scope": "current-host export"}],
+             "unverified_boundaries": [], "claims_automated_regression": False},
+            {"id": "reopen", "state": "unverified", "last_evidence": [],
+             "unverified_boundaries": ["new consumer has not run"],
+             "claims_automated_regression": False},
+        ]}],
+        "validation_events": [{
+            "id": "export-run", "status": "pass", "scope": "current-host export",
+            "classification": "product", "blocking": False,
+            "relevance": "formal exporter produced a readable file",
+        }],
+    }
+
+
+def completed_export_ledger() -> dict[str, object]:
+    payload = export_ledger()
+    condition = payload["findings"][0]["conditions"][1]
+    condition.update(state="resolved", unverified_boundaries=[], last_evidence=[{
+        "id": "reopen-run", "kind": "user-chain", "status": "pass",
+        "scope": "current-host reopen",
+    }])
+    payload["validation_events"].append({
+        "id": "reopen-run", "status": "pass", "scope": "current-host reopen",
+        "classification": "product", "blocking": False,
+        "relevance": "a new formal consumer read the exported file",
+    })
+    return payload
+
+
+class CompletionConditionTests(unittest.TestCase):
+    def test_partial_completion_keeps_the_exact_missing_condition_open(self) -> None:
+        completed = run_validator(export_ledger())
+        self.assertEqual(1, completed.returncode, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertFalse(result["all_findings_resolved"])
+        self.assertFalse(result["closure_complete"])
+        self.assertTrue(result["condition_coverage_verified"])
+        self.assertEqual("unverified", result["findings"][0]["state"])
+        self.assertIn("EXPORT-1/reopen: state is unverified", result["blockers"])
+        self.assertIn("new consumer has not run", result["markdown"])
+
+    def test_legacy_success_cannot_prove_completion_condition_coverage(self) -> None:
+        completed = run_validator(ledger([finding("OLD-1")]))
+        self.assertEqual(1, completed.returncode, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertFalse(result["all_findings_resolved"])
+        self.assertFalse(result["condition_coverage_verified"])
+        self.assertIn("legacy", " ".join(result["blockers"]))
+
+    def test_all_conditions_are_required_and_rendered_in_original_order(self) -> None:
+        payload = completed_export_ledger()
+        payload["findings"][0]["conditions"].reverse()
+        completed = run_validator(payload)
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertEqual("project-steward-findings-closure-result/v2", result["schema"])
+        self.assertTrue(result["all_findings_resolved"])
+        self.assertTrue(result["closure_complete"])
+        parent = result["findings"][0]
+        self.assertEqual("resolved", parent["state"])
+        self.assertEqual(["write", "reopen"], [c["id"] for c in parent["conditions"]])
+        self.assertEqual(payload["original_findings"][0]["source"], parent["source"])
+        self.assertIn("review-revision-1", result["markdown"])
+        self.assertIn("A new consumer reopens the exported file", result["markdown"])
+        markdown = run_validator(payload, output_format="markdown")
+        self.assertEqual(0, markdown.returncode, markdown.stderr)
+        self.assertEqual(result["markdown"], markdown.stdout)
+
+    def test_missing_duplicate_added_or_replaced_condition_is_invalid(self) -> None:
+        for change in ("missing", "duplicate", "added", "replaced", "empty"):
+            with self.subTest(change=change):
+                payload = completed_export_ledger()
+                conditions = payload["findings"][0]["conditions"]
+                if change == "missing":
+                    conditions.pop()
+                elif change == "empty":
+                    conditions.clear()
+                elif change == "replaced":
+                    conditions[1]["id"] = "other"
+                else:
+                    extra = copy.deepcopy(conditions[0])
+                    if change == "added":
+                        extra["id"] = "other"
+                    conditions.append(extra)
+                completed = run_validator(payload)
+                self.assertEqual(2, completed.returncode, completed.stderr)
+                self.assertEqual("", completed.stdout)
+
+    def test_parent_status_and_original_text_cannot_be_overridden(self) -> None:
+        for target, key in (("parent", "state"), ("parent", "title"),
+                            ("condition", "text"), ("condition", "evidence_scope")):
+            with self.subTest(target=target, key=key):
+                payload = export_ledger()
+                record = payload["findings"][0]
+                if target == "condition":
+                    record = record["conditions"][1]
+                record[key] = "resolved"
+                completed = run_validator(payload)
+                self.assertEqual(2, completed.returncode)
+                self.assertIn("unknown fields", completed.stderr)
+
+    def test_scope_or_static_success_cannot_replace_required_consumer_evidence(self) -> None:
+        for change in ("scope", "kind"):
+            with self.subTest(change=change):
+                payload = completed_export_ledger()
+                proof = payload["findings"][0]["conditions"][1]["last_evidence"][0]
+                proof[change] = "current-host export" if change == "scope" else "static-check"
+                if change == "scope":
+                    payload["validation_events"][1]["scope"] = proof["scope"]
+                completed = run_validator(payload)
+                self.assertEqual(2, completed.returncode)
+                self.assertIn("original condition", completed.stderr)
+
+    def test_every_required_kind_must_have_evidence(self) -> None:
+        payload = completed_export_ledger()
+        payload["original_findings"][0]["conditions"][0]["required_evidence_kinds"].append("automated-test")
+        completed = run_validator(payload)
+        self.assertEqual(2, completed.returncode)
+        self.assertIn("missing required evidence kinds", completed.stderr)
+        proof = evidence("export-regression", kind="automated-test")
+        proof["scope"] = "current-host export"
+        condition = payload["findings"][0]["conditions"][0]
+        condition["last_evidence"].append(proof)
+        condition["claims_automated_regression"] = True
+        proof_event = event("export-regression")
+        proof_event["scope"] = proof["scope"]
+        payload["validation_events"].append(proof_event)
+        completed = run_validator(payload)
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        parent = json.loads(completed.stdout)["findings"][0]
+        self.assertTrue(parent["conditions"][0]["automated_regression_proven"])
+        self.assertFalse(parent["claims_automated_regression"])
+        self.assertFalse(parent["automated_regression_proven"])
+
+    def test_mixed_terminal_conditions_are_accounted_for_but_not_all_fixed(self) -> None:
+        for state, kind in (("reclassified", "diagnosis"), ("withdrawn", "authorization")):
+            with self.subTest(state=state):
+                payload = completed_export_ledger()
+                condition = payload["findings"][0]["conditions"][1]
+                condition.update(state=state, disposition="explicit evidence changed this condition")
+                condition["last_evidence"][0]["kind"] = kind
+                completed = run_validator(payload)
+                self.assertEqual(1, completed.returncode, completed.stderr)
+                result = json.loads(completed.stdout)
+                self.assertTrue(result["closure_complete"])
+                self.assertFalse(result["all_findings_resolved"])
+                self.assertEqual("mixed", result["findings"][0]["state"])
+                self.assertIn(f"EXPORT-1/reopen: state is {state}", result["blockers"])
+                self.assertIn("explicit evidence changed", result["markdown"])
+
+    def test_condition_dispositions_still_require_evidence_and_authority(self) -> None:
+        for change in ("no-evidence", "no-disposition", "no-authorization"):
+            with self.subTest(change=change):
+                payload = completed_export_ledger()
+                condition = payload["findings"][0]["conditions"][1]
+                condition.update(state="withdrawn", disposition="user changed the scope")
+                condition["last_evidence"][0]["kind"] = "authorization"
+                if change == "no-evidence":
+                    condition["last_evidence"].clear()
+                elif change == "no-disposition":
+                    del condition["disposition"]
+                else:
+                    condition["last_evidence"][0]["kind"] = "user-chain"
+                self.assertEqual(2, run_validator(payload).returncode)
+
+    def test_original_source_and_condition_contract_are_mandatory(self) -> None:
+        for change in ("source", "identity", "empty", "duplicate", "unknown-kind", "authorization-kind", "no-kinds"):
+            with self.subTest(change=change):
+                payload = export_ledger()
+                original = payload["original_findings"][0]
+                if change == "source":
+                    del original["source"]
+                elif change == "identity":
+                    original["source"]["content_identity"] = " "
+                elif change == "empty":
+                    original["conditions"].clear()
+                elif change == "duplicate":
+                    original["conditions"].append(copy.deepcopy(original["conditions"][0]))
+                else:
+                    kinds = {"unknown-kind": ["green"], "authorization-kind": ["authorization"], "no-kinds": []}
+                    original["conditions"][0]["required_evidence_kinds"] = kinds[change]
+                self.assertEqual(2, run_validator(payload).returncode)
+
+    def test_v2_cannot_change_the_original_finding_set(self) -> None:
+        for change in ("missing", "added", "duplicate"):
+            with self.subTest(change=change):
+                payload = export_ledger()
+                if change == "missing":
+                    payload["findings"].clear()
+                else:
+                    row = copy.deepcopy(payload["findings"][0])
+                    if change == "added":
+                        row["id"] = "UNREVIEWED"
+                    payload["findings"].append(row)
+                self.assertEqual(2, run_validator(payload).returncode)
+
+    def test_v2_preserves_nonpassing_events_and_blocks_required_ones(self) -> None:
+        for blocking in (False, True):
+            with self.subTest(blocking=blocking):
+                payload = completed_export_ledger()
+                payload["validation_events"].append(event(
+                    "environment-probe", status="fail", classification="environment",
+                    blocking=blocking,
+                ))
+                completed = run_validator(payload)
+                self.assertEqual(1 if blocking else 0, completed.returncode, completed.stderr)
+                result = json.loads(completed.stdout)
+                self.assertEqual(not blocking, result["all_findings_resolved"])
+                self.assertFalse(result["all_checks_passed"])
+                self.assertEqual("environment-probe", result["non_pass_validation_events"][0]["id"])
+
+    def test_v2_evidence_must_still_reference_matching_validation_events(self) -> None:
+        for change in ("missing", "status", "scope"):
+            with self.subTest(change=change):
+                payload = completed_export_ledger()
+                if change == "missing":
+                    payload["validation_events"].pop()
+                else:
+                    payload["validation_events"][1][change] = "fail" if change == "status" else "other"
+                self.assertEqual(2, run_validator(payload).returncode)
+
+    def test_shared_evidence_is_checked_before_parent_deduplication(self) -> None:
+        payload = completed_export_ledger()
+        original = payload["original_findings"][0]["conditions"]
+        original[1]["evidence_scope"] = original[0]["evidence_scope"]
+        original[1]["required_evidence_kinds"] = ["runtime"]
+        conditions = payload["findings"][0]["conditions"]
+        conditions[1]["last_evidence"] = copy.deepcopy(conditions[0]["last_evidence"])
+        payload["validation_events"].pop()
+        self.assertEqual(0, run_validator(payload).returncode)
+        conditions[1]["last_evidence"].append({
+            "id": "export-run", "kind": "static-check", "status": "pass",
+            "scope": "current-host export",
+        })
+        conditions[1]["last_evidence"][0]["id"] = "second-runtime"
+        second_event = copy.deepcopy(payload["validation_events"][0])
+        second_event["id"] = "second-runtime"
+        payload["validation_events"].append(second_event)
+        completed = run_validator(payload)
+        self.assertEqual(2, completed.returncode)
+        self.assertIn("conflicting records", completed.stderr)
+
+    def test_method_example_is_consumed_by_the_public_cli(self) -> None:
+        text = REFERENCE.read_text(encoding="utf-8")
+        section = text.split("### 全称结论经过确定性发现账本", 1)[1].split("### ", 1)[0]
+        payload = json.loads(section.split("```json\n", 1)[1].split("```", 1)[0])
+        self.assertEqual("project-steward-findings-closure/v2", payload["schema"])
+        completed = run_validator(payload)
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        self.assertTrue(json.loads(completed.stdout)["condition_coverage_verified"])
+
+
 class FindingsClosureTests(unittest.TestCase):
     def test_method_routes_only_prior_all_findings_claims_to_the_validator(self) -> None:
         text = REFERENCE.read_text(encoding="utf-8")
@@ -130,6 +402,11 @@ class FindingsClosureTests(unittest.TestCase):
         main_text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
         route = main_text.split("## 根因治理", 1)[1].split("## 外部工具兼容性", 1)[0]
         self.assertEqual(route.count("`references/root-cause-verification-and-closure.md`"), 1)
+        audit = (SKILL_ROOT / "references/project-audit-release-and-evidence.md").read_text(encoding="utf-8")
+        handoff = audit.split("### 综合审计必须交付修复交接账本", 1)[1]
+        self.assertLess(handoff.index("可独立失败的完成条件分开编号"), handoff.index("每项账本至少写清"))
+        self.assertIn("`root-cause-verification-and-closure.md`", handoff)
+        self.assertIn("`original_findings` 从 `project-audit-release-and-evidence.md`", section)
         self.assertTrue(VALIDATOR.is_file())
 
     def test_resolved_ledger_renders_stable_mapping_and_collected_regression(self) -> None:
@@ -147,10 +424,11 @@ class FindingsClosureTests(unittest.TestCase):
 
         completed = run_validator(payload)
 
-        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(completed.returncode, 1, completed.stderr)
         result = json.loads(completed.stdout)
-        self.assertEqual("eligible", result["status"])
-        self.assertTrue(result["all_findings_resolved"])
+        self.assertEqual("blocked", result["status"])
+        self.assertFalse(result["all_findings_resolved"])
+        self.assertFalse(result["condition_coverage_verified"])
         self.assertTrue(result["closure_complete"])
         self.assertTrue(result["all_checks_passed"])
         self.assertEqual(["UX-01", "UX-02"], [item["id"] for item in result["findings"]])
@@ -196,9 +474,9 @@ class FindingsClosureTests(unittest.TestCase):
 
         completed = run_validator(payload)
 
-        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(completed.returncode, 1, completed.stderr)
         result = json.loads(completed.stdout)
-        self.assertTrue(result["all_findings_resolved"])
+        self.assertFalse(result["all_findings_resolved"])
         self.assertFalse(result["all_checks_passed"])
         self.assertEqual(
             ["visual-verifier-2"],
@@ -293,8 +571,8 @@ class FindingsClosureTests(unittest.TestCase):
 
         completed = run_validator(payload, output_format="markdown")
 
-        self.assertEqual(completed.returncode, 0, completed.stderr)
-        self.assertIn("全称结论资格：允许", completed.stdout)
+        self.assertEqual(completed.returncode, 1, completed.stderr)
+        self.assertIn("全称结论资格：不允许", completed.stdout)
         self.assertIn("所有已执行检查均通过：否", completed.stdout)
         self.assertIn("old-infra", completed.stdout)
         self.assertIn("environment", completed.stdout)
