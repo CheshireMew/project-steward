@@ -59,6 +59,41 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, contract)
 
+    def test_performance_runs_keep_identity_and_separate_evidence_statuses(
+        self,
+    ) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        start = "每次性能运行都分配稳定运行身份"
+        self.assertEqual(PERFORMANCE_TEXT.count(start), 1)
+        contract = measurement.split(start, 1)[1].split(
+            "准备宣称硬件加速、指定设备或零拷贝时", 1
+        )[0]
+        ordered = (
+            "基线、候选和比较结果分别保存为不可变记录",
+            "比较记录回指参与比较的两轮身份",
+            "采集执行终态、预算判定、正确性和环境适用性分开记录",
+            "没有权威预算时明确写“未判定”",
+            "每项性能与协议主张分别绑定能够直接证明它的同轮证据",
+            "传输量和资源量保留原始字节值",
+        )
+        positions = [contract.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "不得反复覆盖同一个报告文件",
+            "不能用“性能通过”代替“采集完成”",
+            "Brotli 与 Gzip 分别执行对应的内容协商探针",
+            "其余项保持未执行或未知",
+            "十进制 MB 还是二进制 MiB",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, contract)
+
+        output = PERFORMANCE_TEXT.split("## 7. 输出与停止", 1)[1]
+        self.assertIn("性能运行身份、基线/候选/比较记录", output)
+        self.assertIn("采集终态、预算判定、正确性与环境适用性", output)
+
     def test_acceleration_claims_have_three_independent_evidence_layers(self) -> None:
         measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
             "## 6. 修复交接与二次性能复审", 1
