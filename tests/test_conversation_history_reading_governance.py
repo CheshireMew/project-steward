@@ -69,7 +69,11 @@ class ConversationHistoryReadingGovernanceTests(unittest.TestCase):
         for fragment in (
             "从同一快照确定性生成公开对话、上下文来源和过程事件三份 JSONL 投影",
             "路径、数量、内容身份与原记录游标写入清单",
-            "公开消息只认 `UserMessage` / `AgentMessage` 事件",
+            "兼容新版与旧版公开消息事件",
+            "按身份及邻接去重，不按文字合并",
+            "保留工具调用和结果关联",
+            "格式修复仍读原快照",
+            "漏识别不得报零消息成功",
             "隐藏推理不进入投影",
             "未知公共消息结构失败关闭",
             "不得另写 Shell 或行内解释器解析快照",

@@ -11,7 +11,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -24,6 +23,8 @@ THREAD_ID_PATTERN = re.compile(
 )
 CHUNK_SIZE = 1024 * 1024
 PUBLIC_ITEM_TYPES = {"UserMessage", "AgentMessage"}
+LEGACY_PUBLIC_TYPES = {"user_message": "user", "agent_message": "assistant"}
+REASONING_TYPES = {"Reasoning", "reasoning", "agent_reasoning", "agent_reasoning_raw_content"}
 CONTEXT_ROLES = {"developer", "system", "user"}
 
 
@@ -294,65 +295,180 @@ def require_identity(value: object, line_number: int, label: str) -> str:
     return value
 
 
-def public_message_ids(path: Path) -> set[str]:
-    identities: set[str] = set()
-    for line_number, record in read_snapshot_records(path):
-        if record.get("type") != "event_msg":
-            continue
-        payload = require_mapping(record.get("payload"), line_number, "event payload")
-        if payload.get("type") != "item_completed":
-            continue
-        item = require_mapping(payload.get("item"), line_number, "completed item")
-        if item.get("type") not in PUBLIC_ITEM_TYPES:
-            continue
-        identity = require_identity(item.get("id"), line_number, "public message identity")
-        if identity in identities:
-            raise SessionReadError(
-                "session_projection_invalid",
-                f"Codex public message identity is duplicated at record {line_number}: {identity}",
-            )
-        if not isinstance(item.get("content"), (dict, list)):
-            raise SessionReadError(
-                "session_projection_invalid",
-                f"Codex public message {identity} has no structured content at record {line_number}.",
-            )
-        identities.add(identity)
-    return identities
+def content_text(content: object) -> str | None:
+    """Read text blocks without flattening attachments into inferred user text."""
+    if isinstance(content, dict):
+        return content.get("text") if isinstance(content.get("text"), str) else None
+    if isinstance(content, list):
+        parts = [content_text(item) for item in content]
+        return "".join(part for part in parts if part is not None)
+    return None
 
 
-def project_public_dialogue(
-    path: Path,
-) -> Iterator[dict[str, Any]]:
-    for line_number, record in read_snapshot_records(path):
-        if record.get("type") != "event_msg":
-            continue
-        payload = require_mapping(record.get("payload"), line_number, "event payload")
-        if payload.get("type") != "item_completed":
-            continue
+def public_candidate(line_number: int, record: dict[str, Any]) -> dict[str, Any] | None:
+    if record.get("type") != "event_msg":
+        return None
+    payload = require_mapping(record.get("payload"), line_number, "event payload")
+    event_type = payload.get("type")
+    if event_type in REASONING_TYPES:
+        return None
+    item = payload
+    item_type = event_type
+    if event_type == "item_completed":
         item = require_mapping(payload.get("item"), line_number, "completed item")
         item_type = item.get("type")
-        if item_type not in PUBLIC_ITEM_TYPES:
-            continue
+    if item_type in PUBLIC_ITEM_TYPES:
         identity = require_identity(item.get("id"), line_number, "public message identity")
         content = item.get("content")
         if not isinstance(content, (dict, list)):
             raise SessionReadError(
                 "session_projection_invalid",
-                f"Codex public message {identity} has no structured content at record {line_number}.",
+                f"Codex public message at record {line_number} has no structured content.",
             )
-        yield {
-            "record_line": line_number,
-            "timestamp": record.get("timestamp"),
-            "message_id": identity,
-            "speaker": "user" if item_type == "UserMessage" else "assistant",
-            "phase": item.get("phase"),
-            "content": content,
+        speaker = "user" if item_type == "UserMessage" else "assistant"
+        source_format = "item_completed"
+    elif event_type in LEGACY_PUBLIC_TYPES:
+        message = payload.get("message")
+        if not isinstance(message, str):
+            raise SessionReadError(
+                "session_projection_invalid",
+                f"Codex legacy public message at record {line_number} has no message text.",
+            )
+        identity = require_identity(
+            payload.get("id") if payload.get("id") is not None else f"record:{line_number}",
+            line_number, "legacy public message identity",
+        )
+        content = {"type": "text", "text": message}
+        speaker = LEGACY_PUBLIC_TYPES[event_type]
+        source_format = "legacy_event"
+    else:
+        if isinstance(item_type, str) and "message" in item_type.lower():
+            raise SessionReadError(
+                "session_public_format_unsupported",
+                f"Unknown public message format at record {line_number}: {item_type}.",
+            )
+        return None
+    candidate = {
+        "record_line": line_number,
+        "timestamp": record.get("timestamp"),
+        "message_id": identity,
+        "speaker": speaker,
+        "phase": item.get("phase"),
+        "content": content,
+        "source_format": source_format,
+        "source_record_lines": [line_number],
+    }
+    if source_format == "legacy_event":
+        candidate["attachments"] = {
+            key: payload[key]
+            for key in ("images", "local_images", "audio", "local_audio", "text_elements")
+            if payload.get(key)
         }
+    return candidate
+
+
+def collect_public_dialogue(path: Path) -> tuple[list[dict[str, Any]], set[int]]:
+    records = list(read_snapshot_records(path))
+    public: list[dict[str, Any]] = []
+    identities: dict[str, dict[str, Any]] = {}
+    formats: dict[str, set[str]] = {}
+    mirror_lines: set[int] = set()
+    for index, (line_number, record) in enumerate(records):
+        candidate = public_candidate(line_number, record)
+        if candidate is None:
+            continue
+        # Old records mirror the public event directly before/after it. Text alone
+        # elsewhere in the history must never confer public/user authority.
+        if candidate["source_format"] == "legacy_event":
+            mirrors = []
+            for neighbour in (index - 1, index + 1):
+                if not 0 <= neighbour < len(records):
+                    continue
+                mirror_line, mirror_record = records[neighbour]
+                mirror = mirror_record.get("payload", {})
+                if (
+                    mirror_record.get("type") == "response_item"
+                    and isinstance(mirror, dict)
+                    and mirror.get("type") == "message"
+                    and mirror.get("role") == candidate["speaker"]
+                    and content_text(mirror.get("content")) == content_text(candidate["content"])
+                ):
+                    mirrors.append((mirror_line, mirror))
+            if len(mirrors) > 1:
+                raise SessionReadError(
+                    "session_projection_invalid",
+                    f"Ambiguous public message mirror at record {line_number}.",
+                )
+            if mirrors:
+                mirror_line, mirror = mirrors[0]
+                if mirror_line in mirror_lines:
+                    raise SessionReadError(
+                        "session_projection_invalid",
+                        f"Reused public message mirror at record {line_number}.",
+                    )
+                mirror_lines.add(mirror_line)
+                if mirror.get("id") is not None:
+                    mirror_identity = require_identity(
+                        mirror["id"], mirror_line, "public mirror identity",
+                    )
+                    if record["payload"].get("id") is not None and mirror_identity != candidate["message_id"]:
+                        raise SessionReadError(
+                            "session_projection_invalid",
+                            f"Public message and mirror identities disagree at record {line_number}.",
+                        )
+                    candidate["message_id"] = mirror_identity
+                candidate["mirror_record_line"] = mirror_line
+        identity = candidate["message_id"]
+        previous = identities.get(identity)
+        if previous is not None:
+            equivalent = (
+                candidate["source_format"] not in formats[identity]
+                and previous["speaker"] == candidate["speaker"]
+                and content_text(previous["content"]) == content_text(candidate["content"])
+            )
+            if not equivalent:
+                raise SessionReadError(
+                    "session_projection_invalid",
+                    f"Conflicting or duplicate public message identity at record {line_number}.",
+                )
+            previous["source_record_lines"].append(line_number)
+            formats[identity].add(candidate["source_format"])
+            # Prefer the richer modern content, without changing chronological identity.
+            if candidate["source_format"] == "item_completed":
+                previous["content"] = candidate["content"]
+                previous["phase"] = candidate["phase"] or previous["phase"]
+            continue
+        identities[identity] = candidate
+        formats[identity] = {candidate["source_format"]}
+        public.append(candidate)
+    for line_number, record in records:
+        payload = record.get("payload", {})
+        if (
+            record.get("type") == "response_item"
+            and isinstance(payload, dict)
+            and payload.get("type") == "message"
+            and payload.get("id") in identities
+        ):
+            event = identities[payload["id"]]
+            if (payload.get("role") != event["speaker"] or
+                    content_text(payload.get("content")) != content_text(event["content"])):
+                raise SessionReadError(
+                    "session_projection_invalid",
+                    f"Public message mirror disagrees at record {line_number}.",
+                )
+            mirror_lines.add(line_number)
+    return public, mirror_lines
+
+
+def project_public_dialogue(
+    path: Path,
+) -> Iterator[dict[str, Any]]:
+    yield from collect_public_dialogue(path)[0]
 
 
 def project_context_sources(
     path: Path,
-    public_ids: set[str],
+    mirror_lines: set[int],
 ) -> Iterator[dict[str, Any]]:
     for line_number, record in read_snapshot_records(path):
         if record.get("type") != "response_item":
@@ -362,7 +478,7 @@ def project_context_sources(
             continue
         role = payload.get("role")
         identity = payload.get("id")
-        if role == "user" and isinstance(identity, str) and identity in public_ids:
+        if line_number in mirror_lines:
             continue
         if role not in CONTEXT_ROLES:
             continue
@@ -383,15 +499,31 @@ def project_context_sources(
 
 def project_process_events(path: Path) -> Iterator[dict[str, Any]]:
     for line_number, record in read_snapshot_records(path):
+        if record.get("type") == "response_item":
+            payload = require_mapping(record.get("payload"), line_number, "response payload")
+            item_type = payload.get("type")
+            if isinstance(item_type, str) and (
+                item_type.endswith("_call") or item_type.endswith("_call_output")
+            ):
+                yield {
+                    "record_line": line_number,
+                    "timestamp": record.get("timestamp"),
+                    "event_type": "response_item",
+                    "item_type": item_type,
+                    "item_id": payload.get("call_id") or payload.get("id"),
+                    "status": payload.get("status"),
+                    "item": payload,
+                }
+            continue
         if record.get("type") != "event_msg":
             continue
         payload = require_mapping(record.get("payload"), line_number, "event payload")
         event_type = payload.get("type")
-        if event_type == "token_count":
+        if event_type in {"token_count", *LEGACY_PUBLIC_TYPES, *REASONING_TYPES}:
             continue
         if event_type == "item_completed":
             item = require_mapping(payload.get("item"), line_number, "completed item")
-            if item.get("type") in PUBLIC_ITEM_TYPES | {"Reasoning"}:
+            if item.get("type") in PUBLIC_ITEM_TYPES | REASONING_TYPES:
                 continue
             yield {
                 "record_line": line_number,
@@ -472,7 +604,7 @@ def write_projection(
 
 
 def project_snapshot(path: Path) -> dict[str, object]:
-    public_ids = public_message_ids(path)
+    public, mirror_lines = collect_public_dialogue(path)
     root = path.parent
     public_path = root / "public-dialogue.jsonl"
     context_path = root / "context-sources.jsonl"
@@ -480,13 +612,13 @@ def project_snapshot(path: Path) -> dict[str, object]:
     return {
         "public_dialogue": write_projection(
             public_path,
-            project_public_dialogue(path),
+            public,
             "speaker",
             "phase",
         ),
         "context_sources": write_projection(
             context_path,
-            project_context_sources(path, public_ids),
+            project_context_sources(path, mirror_lines),
             "transport_role",
         ),
         "process_events": write_projection(
@@ -533,8 +665,9 @@ def capture_session(
             encoding="utf-8",
         )
         return manifest
-    except Exception:
-        shutil.rmtree(snapshot_dir, ignore_errors=True)
+    except SessionReadError as error:
+        # A failed projection must not destroy the captured source evidence.
+        error.evidence_dir = str(snapshot_dir)
         raise
 
 
@@ -549,9 +682,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         manifest = capture_session(thread_id, source, arguments.output_dir)
     except SessionReadError as error:
+        failure = {"code": error.code, "message": str(error)}
+        if hasattr(error, "evidence_dir"):
+            failure["evidence_dir"] = error.evidence_dir
         print(
             json.dumps(
-                {"error": {"code": error.code, "message": str(error)}},
+                {"error": failure},
                 ensure_ascii=False,
             ),
             file=sys.stderr,

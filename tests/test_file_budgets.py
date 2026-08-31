@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import os
 import sys
 import unittest
-from contextlib import redirect_stdout
+from contextlib import nullcontext, redirect_stdout
 from io import StringIO
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, mkdtemp
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 SKILL_ROOT = SCRIPTS.parent
@@ -27,6 +28,16 @@ from check_file_budgets import (
 )
 
 
+def budget_test_directory():
+    """Keep generated evidence when the runner forbids automatic deletion."""
+    evidence_root = os.environ.get("PROJECT_STEWARD_TEST_ARTIFACTS")
+    if evidence_root:
+        root = Path(evidence_root)
+        root.mkdir(parents=True, exist_ok=True)
+        return nullcontext(mkdtemp(prefix="file-budget-", dir=root))
+    return TemporaryDirectory()
+
+
 class FileBudgetTests(unittest.TestCase):
     def test_estimate_rounds_utf8_bytes_up(self) -> None:
         self.assertEqual(estimate_outer_tool_tokens(0), 0)
@@ -35,7 +46,7 @@ class FileBudgetTests(unittest.TestCase):
         self.assertEqual(estimate_outer_tool_tokens(5), 2)
 
     def test_exact_limit_passes_and_one_more_byte_fails(self) -> None:
-        with TemporaryDirectory() as temporary_directory:
+        with budget_test_directory() as temporary_directory:
             root = Path(temporary_directory)
             exact_size = MAX_OUTER_TOOL_TOKENS * BYTES_PER_OUTER_TOOL_TOKEN
             target = root / "reference.md"
@@ -50,7 +61,7 @@ class FileBudgetTests(unittest.TestCase):
         self.assertIn("9001 estimated tokens", errors[0])
 
     def test_inactive_directories_and_binary_assets_are_excluded(self) -> None:
-        with TemporaryDirectory() as temporary_directory:
+        with budget_test_directory() as temporary_directory:
             root = Path(temporary_directory)
             for relative_path in (
                 "archive/old.md",
@@ -67,7 +78,7 @@ class FileBudgetTests(unittest.TestCase):
         self.assertEqual(records, [])
 
     def test_active_text_and_model_readable_assets_are_budgeted(self) -> None:
-        with TemporaryDirectory() as temporary_directory:
+        with budget_test_directory() as temporary_directory:
             root = Path(temporary_directory)
             expected = (root / "SKILL.md", root / "assets" / "catalog.json")
             for path in expected:
@@ -82,8 +93,54 @@ class FileBudgetTests(unittest.TestCase):
             ["SKILL.md", "assets/catalog.json"],
         )
 
+    def test_only_root_qa_directory_is_excluded(self) -> None:
+        with budget_test_directory() as temporary_directory:
+            root = Path(temporary_directory)
+            expected = [
+                ".qa.md",
+                "references/.hidden.md",
+                "references/.qa/active.md",
+                "references/qa-policy.md",
+            ]
+            for relative in [".qa/capture/session.jsonl", *expected]:
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("fixture", encoding="utf-8")
+
+            records = collect_file_budgets(root)
+
+        self.assertEqual([record.path.as_posix() for record in records], expected)
+
+    def test_cli_skips_large_qa_evidence_without_hiding_active_overflow(self) -> None:
+        with budget_test_directory() as temporary_directory:
+            root = Path(temporary_directory)
+            evidence = root / ".qa" / "capture" / "session.jsonl"
+            evidence.parent.mkdir(parents=True)
+            oversized = b"a" * (MAX_OUTER_TOOL_TOKENS * BYTES_PER_OUTER_TOOL_TOKEN + 1)
+            evidence.write_bytes(oversized)
+            active = root / "reference.md"
+            active.write_bytes(oversized)
+            failed_output = StringIO()
+            with redirect_stdout(failed_output):
+                failed_result = main(["check_file_budgets.py", str(root)])
+
+            active.write_text("active", encoding="utf-8")
+            passed_output = StringIO()
+            with redirect_stdout(passed_output):
+                passed_result = main(["check_file_budgets.py", str(root)])
+
+            self.assertEqual(evidence.read_bytes(), oversized)
+
+        self.assertEqual(failed_result, 1)
+        self.assertIn("reference.md", failed_output.getvalue())
+        self.assertIn("9001 estimated tokens", failed_output.getvalue())
+        self.assertNotIn("session.jsonl", failed_output.getvalue())
+        self.assertEqual(passed_result, 0)
+        self.assertIn("FILE BUDGET PASS", passed_output.getvalue())
+        self.assertNotIn("session.jsonl", passed_output.getvalue())
+
     def test_skill_router_exact_limits_pass_and_overflow_fails(self) -> None:
-        with TemporaryDirectory() as temporary_directory:
+        with budget_test_directory() as temporary_directory:
             root = Path(temporary_directory)
             skill = root / "SKILL.md"
             skill.write_text("a" * MAX_SKILL_CHARACTERS, encoding="utf-8")
@@ -110,7 +167,7 @@ class FileBudgetTests(unittest.TestCase):
         self.assertIn("221 lines", line_errors[0])
 
     def test_skill_router_limits_do_not_apply_to_references(self) -> None:
-        with TemporaryDirectory() as temporary_directory:
+        with budget_test_directory() as temporary_directory:
             root = Path(temporary_directory)
             (root / "reference.md").write_text(
                 "a" * (MAX_SKILL_CHARACTERS + 1),
@@ -122,7 +179,7 @@ class FileBudgetTests(unittest.TestCase):
         self.assertEqual(errors, [])
 
     def test_cli_reports_skill_usage_and_remaining_headroom(self) -> None:
-        with TemporaryDirectory() as temporary_directory:
+        with budget_test_directory() as temporary_directory:
             root = Path(temporary_directory)
             (root / "SKILL.md").write_text("alpha\nbeta", encoding="utf-8")
             output = StringIO()

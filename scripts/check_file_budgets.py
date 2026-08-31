@@ -14,6 +14,8 @@ BYTES_PER_OUTER_TOOL_TOKEN = 4
 MAX_SKILL_LINES = 220
 MAX_SKILL_CHARACTERS = 14_000
 SKILL_ROUTER_PATH = Path("SKILL.md")
+# Repository-local diagnostic evidence, matching the root-only .gitignore entry.
+IGNORED_ROOT_DIRECTORY_NAMES = {".qa"}
 IGNORED_DIRECTORY_NAMES = {
     ".git",
     ".pytest_cache",
@@ -65,6 +67,8 @@ def estimate_outer_tool_tokens(byte_count: int) -> int:
 
 def _is_budgeted_path(root: Path, path: Path) -> bool:
     relative = path.relative_to(root)
+    if len(relative.parts) > 1 and relative.parts[0] in IGNORED_ROOT_DIRECTORY_NAMES:
+        return False
     if any(part in IGNORED_DIRECTORY_NAMES for part in relative.parts[:-1]):
         return False
     if relative.parts and relative.parts[0] == "assets":
@@ -81,10 +85,13 @@ def collect_file_budgets(root: Path) -> list[FileBudget]:
 
     records: list[FileBudget] = []
     for current, directories, files in os.walk(root):
-        directories[:] = sorted(
-            name for name in directories if name not in IGNORED_DIRECTORY_NAMES
-        )
         current_path = Path(current)
+        directories[:] = sorted(
+            name
+            for name in directories
+            if name not in IGNORED_DIRECTORY_NAMES
+            and not (current_path == root and name in IGNORED_ROOT_DIRECTORY_NAMES)
+        )
         for name in sorted(files):
             path = current_path / name
             if not _is_budgeted_path(root, path):
