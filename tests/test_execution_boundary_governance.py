@@ -384,6 +384,10 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         )[1].split("修复请求明确指向", 1)[0]
         ordered = (
             "应用补丁前固定准确目标路径",
+            "写入前读取 `change-prevention-delivery-boundaries.md`",
+            "的“工具动作按实际序列受权”",
+            "核对补丁操作与对象授权",
+            "未满足不得写入",
             "相同字面量出现多次时",
             "应用后从磁盘重新读取实际差异和受影响文件",
             "再运行对应解析、编译或正式消费者验证",
@@ -392,6 +396,18 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
         self.assertIn("不能因工具报告“应用成功”", section)
         self.assertIn("后续测试的偶然成功", section)
+
+        route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
+            "## 外部工具兼容性", 1
+        )[0]
+        self.assertIn("先读取 `references/root-cause-remediation.md`", route)
+        heading = "### 工具动作按实际序列受权"
+        owners = [
+            path.name
+            for path in (SKILL_ROOT / "references").glob("*.md")
+            if heading in path.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(owners, ["change-prevention-delivery-boundaries.md"])
 
     def test_non_git_manifests_and_actual_tool_actions_bound_writes(self) -> None:
         for fragment in (
