@@ -110,6 +110,79 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
         self.assertIn("不能把准备新增测试写成已经取得失败证据", section)
         self.assertIn("使用同一发现 ID 和复现身份取得新结果", section)
 
+    def test_acceptance_contracts_have_one_owner_and_both_entry_routes(self) -> None:
+        owner_name = "change-prevention-verification.md"
+        owner = (SKILL_ROOT / "references" / owner_name).read_text(encoding="utf-8")
+        acceptance = owner.split("## 6. 设计真实验收", 1)[1].split(
+            "## 7. 输出合同", 1
+        )[0]
+        references = {
+            path.name: path.read_text(encoding="utf-8")
+            for path in (SKILL_ROOT / "references").glob("*.md")
+        }
+        closure_name = "root-cause-verification-and-closure.md"
+        closure = references[closure_name].split("## 7. 完成证据", 1)[1]
+        gate = closure.split("### 验收前读取适用方法", 1)[1].split(
+            "### 首次生产写入前固定失败证据", 1
+        )[0]
+        for title in ("存储关系与事务终态", "测试副作用与撤回范围"):
+            with self.subTest(contract=title):
+                heading = "### " + title
+                owners = [
+                    name for name, text in references.items()
+                    if heading in text.splitlines()
+                ]
+                self.assertEqual(owners, [owner_name])
+                self.assertEqual(acceptance.splitlines().count(heading), 1)
+                self.assertIn("“" + title + "”", gate)
+        self.assertIn("`" + owner_name + "`", gate)
+        self.assertIn("在构造夹具、启动生产者或修改完成条件前", gate)
+        self.assertIn("不涉及这些条件的检查不追加该专项", gate)
+        for start, end, reference in (
+            ("## 改动前预防", "## 根因治理", owner_name),
+            ("## 根因治理", "## 外部工具兼容性", closure_name),
+        ):
+            with self.subTest(route=start):
+                route = SKILL_TEXT.split(start, 1)[1].split(end, 1)[0]
+                self.assertIn("`references/" + reference + "`", route)
+
+    def test_storage_acceptance_keeps_fixture_and_persistence_evidence_distinct(
+        self,
+    ) -> None:
+        owner = (SKILL_ROOT / "references" / "change-prevention-verification.md")
+        section = owner.read_text(encoding="utf-8").split(
+            "### 存储关系与事务终态", 1
+        )[1].split("### 正式消费者与断言", 1)[0]
+        for boundary in (
+            "哪些必须共享、哪些必须独立",
+            "单存储合同不虚构第二存储或部署矩阵",
+            "请求成功后、提交前中止",
+            "正常路径则在提交后才对外成功",
+            "替身结果只证明调用合同，不证明真实存储提交或回滚",
+        ):
+            with self.subTest(boundary=boundary):
+                self.assertIn(boundary, section)
+
+    def test_withdrawal_keeps_execution_contract_and_code_authority_separate(
+        self,
+    ) -> None:
+        owner = (SKILL_ROOT / "references" / "change-prevention-verification.md")
+        section = owner.read_text(encoding="utf-8").split(
+            "### 测试副作用与撤回范围", 1
+        )[1].split("### 验证输入与证据", 1)[0]
+        ordered = (
+            "立即停止本次准确生产者",
+            "区分撤回的是执行方式、验收要求还是长期测试模式",
+            "只撤回执行方式时",
+            "未取得的证据仍为未验证",
+            "只有明确撤回对应验收要求才更新完成合同",
+            "只有明确授权长期修改",
+            "临时停止不授权修改产品或移除测试",
+            "文件删除仍需单独授权",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_compaction_or_goal_reset_rehydrates_audit_identity_before_status(
         self,
     ) -> None:
