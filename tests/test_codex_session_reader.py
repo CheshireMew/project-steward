@@ -15,7 +15,7 @@ SCRIPT = Path(__file__).parents[1] / "scripts" / "read_codex_session.py"
 THREAD_ID = "11111111-2222-4333-8444-555555555555"
 
 
-def test_directory():
+def session_test_directory():
     """Allow the formal test runner to retain all evidence when deletion is forbidden."""
     evidence_root = os.environ.get("PROJECT_STEWARD_TEST_ARTIFACTS")
     if evidence_root:
@@ -75,7 +75,7 @@ def open_shared_writer(path: Path):
 
 class CodexSessionReaderTests(unittest.TestCase):
     def test_active_writer_is_read_once_at_a_complete_boundary(self) -> None:
-        with test_directory() as temporary:
+        with session_test_directory() as temporary:
             root = Path(temporary)
             source = root / f"rollout-sample-{THREAD_ID}.jsonl"
             complete = b'{"type":"first"}\n{"type":"second"}\n'
@@ -111,7 +111,7 @@ class CodexSessionReaderTests(unittest.TestCase):
                 self.assertEqual(snapshot.read_bytes(), complete)
 
     def test_exact_identity_succeeds_and_duplicate_identity_fails_closed(self) -> None:
-        with test_directory() as temporary:
+        with session_test_directory() as temporary:
             root = Path(temporary)
             codex_home = root / "codex"
             sessions = codex_home / "sessions"
@@ -146,7 +146,7 @@ class CodexSessionReaderTests(unittest.TestCase):
     def test_projections_separate_public_context_and_process_without_reasoning(
         self,
     ) -> None:
-        with test_directory() as temporary:
+        with session_test_directory() as temporary:
             root = Path(temporary)
             source = root / f"rollout-projection-{THREAD_ID}.jsonl"
             records = [
@@ -317,7 +317,7 @@ class CodexSessionReaderTests(unittest.TestCase):
             )
 
     def test_malformed_public_message_fails_closed(self) -> None:
-        with test_directory() as temporary:
+        with session_test_directory() as temporary:
             root = Path(temporary)
             source = root / f"rollout-malformed-{THREAD_ID}.jsonl"
             source.write_text(
@@ -346,7 +346,7 @@ class CodexSessionReaderTests(unittest.TestCase):
             self.assertEqual(error["code"], "session_projection_invalid")
 
     def project_records(self, records):
-        with test_directory() as temporary:
+        with session_test_directory() as temporary:
             root = Path(temporary)
             source = root / f"rollout-fixture-{THREAD_ID}.jsonl"
             source.write_text(
@@ -357,7 +357,14 @@ class CodexSessionReaderTests(unittest.TestCase):
                 "--output-dir", str(root / "snapshots"),
             )
             if completed.returncode:
-                return completed, json.loads(completed.stderr)
+                result = json.loads(completed.stderr)
+                evidence_dir = result.get("error", {}).get("evidence_dir")
+                if evidence_dir:
+                    self.assertTrue(
+                        (Path(evidence_dir) / "session.jsonl").is_file(),
+                        "reader error evidence must exist before the test fixture is cleaned",
+                    )
+                return completed, result
             manifest = json.loads(completed.stdout)
             return completed, {
                 name: read_jsonl(Path(projection["path"]))
@@ -440,7 +447,6 @@ class CodexSessionReaderTests(unittest.TestCase):
                 completed, result = self.project_records([record])
                 self.assertEqual(completed.returncode, 2)
                 self.assertEqual(result["error"]["code"], code)
-                self.assertTrue((Path(result["error"]["evidence_dir"]) / "session.jsonl").is_file())
 
     def test_conflicting_identity_and_repeated_modern_event_fail_closed(self):
         legacy = self.event("user_message", id="shared", message="One")

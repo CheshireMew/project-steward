@@ -118,6 +118,30 @@ class BrowserAcceptanceContractTests(unittest.TestCase):
             with self.subTest(detail=detail):
                 self.assertIn(detail, contract)
 
+    def test_automation_control_binds_to_the_current_runtime_instance(self):
+        text = read("references/implementation-review.md")
+        heading = "### 浏览器自动化控制必须绑定当前运行实例"
+        contract = section(text, heading)
+        owners = [
+            path.name for path in (SKILL_ROOT / "references").glob("*.md")
+            if heading in path.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(["implementation-review.md"], owners)
+        self.assertLess(text.index(heading), text.index("## 2. 走真实链路"))
+        for detail in (
+            "页面实际加载的产物或模块代次",
+            "同一活动实例",
+            "导航、重载、热更新、frame 重建或运行时重新连接后",
+            "重新导入同一源路径不能证明取得页面正在使用的实例",
+            "不同 module graph、frame、worker、bundle 或缓存",
+            "结论是验证器未就绪，不是产品失败或通过",
+            "不能修改产品来迁就这份控制链",
+            "真实界面输入和正式生产边界",
+            "同一活动实例的回读证据",
+        ):
+            with self.subTest(detail=detail):
+                self.assertIn(detail, contract)
+
     def test_fixed_controls_distinguish_position_clipping_and_scroll_owners(self):
         contract = section(read("references/layout-responsive.md"),
                            "### 固定控件先确认实际定位参照")
