@@ -44,6 +44,20 @@ class SimplificationAndEffectivenessGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, CAPABILITY_TEXT)
 
+    def test_upstream_control_requirements_are_bounded_and_verifiable(self) -> None:
+        ordered = (
+            "用户担心上游停更或要求掌控核心路径时",
+            "上游退出后仍成立的结果",
+            "数据、状态与合同所有权",
+            "固定来源的构建修补能力",
+            "免迁移的替换边界",
+            "接管责任及内外边界",
+            "适配、分叉或借鉴足够时不做全量重写",
+            "非核心依赖不触发",
+        )
+        positions = [CAPABILITY_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_overengineering_candidates_require_contract_equivalence(self) -> None:
         for fragment in (
             "只有一个正式实现和一个消费者的接口或工厂",
