@@ -209,12 +209,24 @@ class ExecutionBoundaryGovernanceTests(unittest.TestCase):
     def test_root_cause_route_loads_environment_governance_for_background_work(
         self,
     ) -> None:
-        route = SKILL_TEXT.split("## 根因治理", 1)[1].split(
-            "## 外部工具兼容性",
+        shared = SKILL_TEXT.split("## 共同边界", 1)[1].split(
+            "## 对话学习与自我进化",
             1,
         )[0]
-        self.assertIn("后台、跨观察窗口任务、路径或执行环境", route)
-        self.assertIn("references/user-environment-governance.md", route)
+        gate = next(line for line in shared.splitlines() if line.startswith("- Windows "))
+        ordered = (
+            "后台或跨观察窗口任务、路径、执行环境",
+            "首次执行前进入“用户环境档案与执行环境”",
+            "门槛未满足不启动",
+        )
+        positions = [gate.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertLess(SKILL_TEXT.index("## 共同边界"), SKILL_TEXT.index("## 根因治理"))
+        owner_route = SKILL_TEXT.split("## 用户环境档案与执行环境", 1)[1].split(
+            "## 项目综合审计", 1
+        )[0]
+        self.assertEqual(owner_route.count("`references/user-environment-governance.md`"), 1)
+        self.assertTrue((SKILL_ROOT / "references" / "user-environment-governance.md").is_file())
 
     def test_protection_rejection_cannot_be_bypassed_by_changing_tools(
         self,
