@@ -358,10 +358,10 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
                 self.assertIn(fragment, PREVENTION_TEXT)
 
         for fragment in (
-            "同步命名空间必须直接由规范化资源身份和合同版本确定",
-            "在任何参与者创建侧边锁文件、状态目录或业务副作用之前取得",
-            "不能把“侧边锁文件已经存在”作为其它进程加入同一同步边界的前提",
-            "只读参与者也不能为了协调创建业务状态",
+            "同步命名空间直接由规范资源身份和合同版本确定",
+            "在创建侧边锁、状态目录或业务副作用前取得",
+            "侧边锁只记录诊断或所有者，不得成为其它进程加入同步边界的前提",
+            "只读参与者也不创建业务状态",
             "不存在任何侧边锁文件的状态启动读写进程",
         ):
             with self.subTest(fragment=fragment):
@@ -457,11 +457,34 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
 
         for fragment in (
             "唯一运行权必须先于任何会改变持久状态的初始化",
-            "竞争失败的进程只能关闭自己为竞争创建的端点、句柄和内存对象",
-            "服务 `start` 必须幂等",
+            "竞争失败者只关闭本次竞争资源",
+            "服务 `start` 幂等",
             "任务状态、重试次数和调度游标不变",
             "两个独立进程同时竞争同一权威端点",
             "只有胜者执行一次恢复和调度",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, DURABLE_TEXT)
+
+    def test_service_ownership_survives_launcher_pid_changes(self) -> None:
+        ordered = (
+            "分配不可复用的启动所有者身份",
+            "服务发现记录由实际服务写回同一身份、实际 PID、端点、物理命名空间和 generation",
+            "不能单独证明所有权",
+            "只选择与预期身份及 generation 匹配的实例",
+            "在动作前重读端点与进程事实",
+        )
+        positions = [DURABLE_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+        for fragment in (
+            "经环境、参数或正式握手交给实际服务",
+            "venv、shell、脚本或进程管理器可能更换 PID",
+            "不按进程名、最近记录或 PID 猜测终止",
+            "兼容旧记录仅在另一条正式链能正向证明所有权时关闭",
+            "会改变 PID 的正式包装入口启动两个可区分服务",
+            "另一实例不变",
+            "跨启动器服务身份",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DURABLE_TEXT)
@@ -488,8 +511,8 @@ class DurableOperationAndVerificationGovernanceTests(unittest.TestCase):
             "查表后返回裸对象，再由调用者晚些时候加锁",
             "派生工作必须在原命令释放前取得自己的租约",
             "不能用一把覆盖会话整个生命期的排他锁",
-            "按实际依赖的资源域分类",
-            "读取项目状态的工作必须在项目资源释放前排空",
+            "关闭计划按实际资源域分类",
+            "读取项目状态的工作在项目释放前排空或结束",
             "状态保持 `closing` 且所有权未知",
         ):
             with self.subTest(fragment=fragment):
