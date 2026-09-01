@@ -17,6 +17,30 @@ DESKTOP_TEXT = (
 
 
 class ReleaseArtifactProvenanceGovernanceTests(unittest.TestCase):
+    def test_release_audit_consumes_installable_identity_contract(self) -> None:
+        section = AUDIT_TEXT.split("实际制品组件溯源账本", 1)[1].split(
+            "### GitHub 仓库必须审计实际上传边界", 1
+        )[0]
+        ordered = (
+            "可安装产物先冻结交付与升级身份",
+            "目标平台、构建 profile、包或应用 ID",
+            "版本与构建号",
+            "产物形态与 ABI",
+            "签名证书指纹",
+            "覆盖升级基线",
+            "最终路径与摘要",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "组件闭包通过不能替代这些身份",
+            "与冻结合同不同都使可发布条件失败关闭",
+            "私钥、密钥库、密码和 GitHub Secrets",
+            "不写入账本或诊断输出",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_actual_artifact_inventory_precedes_component_and_rights_closure(self) -> None:
         section = AUDIT_TEXT.split("实际制品组件溯源账本", 1)[1].split(
             "### GitHub 仓库必须审计实际上传边界", 1

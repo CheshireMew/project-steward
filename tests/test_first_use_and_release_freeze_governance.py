@@ -4,6 +4,40 @@ from governance_text_fixtures import *
 
 
 class FirstUseAndReleaseFreezeGovernanceTests(unittest.TestCase):
+    def test_installable_artifact_freezes_identity_before_expensive_build(self) -> None:
+        self.assertIn("迁移、打包、签名或跨层改动", MAIN_TEXT)
+
+        ordered = (
+            "可安装产物先冻结交付与升级身份",
+            "首次昂贵构建前",
+            "构建 profile",
+            "包或应用稳定 ID",
+            "签名证书指纹与覆盖升级关系",
+            "生成新密钥即建立长期升级身份",
+            "不得静默生成、退回 Debug",
+            "不启动打包器",
+        )
+        positions = [PREVENTION_TEXT.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "普通编译或只检查源码能否构建不触发这份合同",
+            "私钥、密钥库与密码由环境或密钥服务拥有",
+            "以后覆盖升级的后果",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
+        for fragment in (
+            "最终制品正式检查器",
+            "版本与构建号",
+            "支持架构与分发形态",
+            "产物身份已验证、安装未验证",
+            "升级兼容仍未验证",
+            "不靠重命名文件修正",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, PREVENTION_TEXT)
+
     def test_first_use_detects_before_consenting_to_install(self) -> None:
         ordered = (
             "只读自动检测与下载、安装、写配置",
