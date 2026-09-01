@@ -150,7 +150,9 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         ordered = (
             "消费 `change-prevention.md` 的受限执行路径合同",
             "以正式消费者确定位置",
-            "项目登记的受控源码、测试或运行根",
+            "项目登记的受控源码或测试根",
+            "项目拥有的外部工作根",
+            "登记批准根来源、稳定项目命名空间、生产者、消费者、预算、清单和生命周期",
             "只被浏览器、调试器、执行器或机器环境消费",
             "用户确认的环境工具或临时根",
             "无关项目不能因为可写而充当中转站",
@@ -181,6 +183,7 @@ class RepositoryDirectoryGovernanceContractTests(unittest.TestCase):
         )
         self.assertNotIn("任何任务产物都必须收在当前项目根", REFERENCE_TEXT)
         self.assertNotIn("项目外存续的任务产物为零", REFERENCE_TEXT)
+        self.assertIn("不能把任意外部路径当成默认落点", REFERENCE_TEXT)
         self.assertIn(
             "产物归位门槛唯一决定",
             STORAGE_TEXT,

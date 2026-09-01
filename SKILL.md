@@ -57,9 +57,9 @@ description: "从项目过程与结果提炼治理方法并在明确要求时自
 
 ## 对话学习与自我进化
 
-先完整读取 `references/conversation-learning-and-self-evolution.md` 和 `references/skill-self-evolution-governance.md`。
+完整读 `references/conversation-learning-and-self-evolution.md`、`references/conversation-source-authority.md`、`references/skill-self-evolution-governance.md`。
 
-任一用户结果有失败、纠正、保护拦截、临时绕行或残留时，再读 `references/root-cause-remediation.md`。顺序固定为：按结果恢复完整过程，沿因果层级确定主要学习主题和独立次级结果，恢复改变未来治理的细节并按共同边界逐项比较目标能力，再提炼共同机制和特殊维度，判断可迁移性、职能边界和正式所有者，最后判断历史责任。绕行与残留不得覆盖更早且证据成立的可控根因；后续纠正改变主要原因时，现有方案与确认失效。只有成功结果且不存在这些信号时，不加载根因方法。
+结果有失败、纠正、保护拦截、临时绕行或残留时，读 `references/root-cause-remediation.md`；按结果恢复完整过程，沿因果层级确定主要学习主题，恢复构成细节并比较具体能力，提炼机制后判断可迁移性、职能边界和正式所有者。绕行和残留不得覆盖较早且成立的可控根因；纠正改变主因时，方案与确认失效。只有成功结果且不存在这些信号时，不加载根因方法。
 
 先区分“方法缺失”和“已有方法没有被路由、执行或验收”。前者原位强化唯一方法所有者；后者只修最早失效的主路由、动作门槛、正式消费者或验证，不在其它文件增加同义规则。方案按所有者和消费链组织，不按对话顺序堆补丁。
 

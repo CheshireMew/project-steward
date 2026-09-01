@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalog_version": "2.5.0",
+  "catalog_version": "2.6.0",
   "profile_path": ".project-steward/project.json",
   "layer_order": [
     "base",
@@ -44,10 +44,10 @@
       "sha256": "583c18a5e12ce1f3a20d71ebb15e8d741eac09aae36621f1a2c444e55ed27dec"
     },
     "managed-runtime-artifacts": {
-      "version": "1.2.0",
+      "version": "1.3.0",
       "layer": "capability",
       "path": "templates/managed-runtime-artifacts.json",
-      "sha256": "af35cbf5eac3c6e3f8247c7b36a1b3b5a568e4ab0ddb835099c4f87e6379734e"
+      "sha256": "a2f44e0057de3184eff60adad5bfc6241d399d9d2b50edb5737965ce16014d28"
     }
   }
 }

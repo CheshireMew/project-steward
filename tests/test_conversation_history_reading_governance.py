@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from governance_text_fixtures import LEARNING_TEXT, MAIN_TEXT, unittest
+from governance_text_fixtures import (
+    LEARNING_TEXT,
+    MAIN_TEXT,
+    SKILL_ROOT,
+    SOURCE_AUTHORITY_TEXT,
+    unittest,
+)
 
 
 class ConversationHistoryReadingGovernanceTests(unittest.TestCase):
@@ -100,6 +106,35 @@ class ConversationHistoryReadingGovernanceTests(unittest.TestCase):
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
+
+    def test_persistent_goal_and_host_continuation_have_distinct_authority(self) -> None:
+        owner = SOURCE_AUTHORITY_TEXT.split(
+            "## 2. 持续目标不等于自动续作授权", 1
+        )[1].split("## 3. 授权决策账本", 1)[0]
+        for fragment in (
+            "稳定会话事件明确记录目标由用户创建或更新",
+            "持续用户目标",
+            "助手创建的计划、目标名称、待办、摘要或状态标签",
+            "宿主为了继续未完成目标而生成的",
+            "不能增加写入、运行、下载、安装、删除、提交、推送、打包、发布",
+            "后续公开用户消息可以保持、收窄、替换或撤回",
+            "提交进入允许动作，打包明确退出",
+            "经用户撤回或仍未验证",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, owner)
+
+    def test_source_authority_is_a_fixed_precondition_with_trigger_and_counterexample(
+        self,
+    ) -> None:
+        learning_file = (
+            SKILL_ROOT / "references" / "conversation-learning-and-self-evolution.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("固定前置完整读取 `conversation-source-authority.md`", learning_file)
+        self.assertIn("代表性判断", SOURCE_AUTHORITY_TEXT)
+        self.assertIn("反例", SOURCE_AUTHORITY_TEXT)
+        self.assertIn("只提交准确候选", SOURCE_AUTHORITY_TEXT)
+        self.assertIn("不能授权提交、推送、打包或发布", SOURCE_AUTHORITY_TEXT)
 
     def test_requested_range_does_not_expand_or_hide_incomplete_sources(self) -> None:
         section = self.history_section()

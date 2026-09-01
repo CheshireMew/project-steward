@@ -12,13 +12,19 @@ from pathlib import Path
 from typing import Any
 
 PROTOCOL = "project-steward-production-storage-contract"
-VERSION = 2
-REVIEW_SCHEMA = "project-steward-production-storage-review/v2"
+VERSION = 3
+REVIEW_SCHEMA = "project-steward-production-storage-review/v3"
 RUNTIME_CHECKS = (
-    "first-production", "same-input-reuse", "budget-rejection", "interruption-recovery"
+    "first-production",
+    "same-input-reuse",
+    "budget-rejection",
+    "interruption-recovery",
+    "external-root-ownership",
+    "manifest-consumer-closure",
 )
 DEFAULT_CONTRACT = Path(".project-steward/storage-contract.json")
 ID_PATTERN = re.compile(r"^[a-z0-9]+(?:[._-][a-z0-9]+)*$")
+SOURCE_TOKEN_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]*$")
 REQUIRED_POLICY = {
     "unknown_peak": "block",
     "outside_owned_roots": "block",
@@ -26,7 +32,10 @@ REQUIRED_POLICY = {
     "cleanup_without_authorization": "report-only",
 }
 ALLOWED_ROOT_KINDS = {"project-relative", "runtime-config", "user-environment-policy"}
+ALLOWED_ROOT_SCOPES = {"project-root", "project-owned-external"}
+CONFIGURED_ROOT_KINDS = {"runtime-config", "user-environment-policy"}
 ALLOWED_ARTIFACT_CLASSES = {"truth", "deliverable", "cache", "temporary", "evidence"}
+REQUIRED_TERMINAL_STATES = {"succeeded", "failed", "interrupted"}
 
 
 class ReviewError(ValueError):
@@ -94,6 +103,24 @@ def _string_list(value: Any, label: str) -> list[str]:
     return result
 
 
+def _source_token(value: Any, label: str) -> str:
+    selected = _string(value, label)
+    if not SOURCE_TOKEN_PATTERN.fullmatch(selected):
+        raise ReviewError(f"{label} must be a stable config token, not a physical path")
+    return selected
+
+
+def _configured_source(value: Any, label: str) -> str:
+    selected = _string(value, label)
+    kind, separator, token = selected.partition(":")
+    if not separator or kind not in CONFIGURED_ROOT_KINDS:
+        raise ReviewError(
+            f"{label} must use runtime-config:token or user-environment-policy:token"
+        )
+    _source_token(token, label)
+    return selected
+
+
 def _implementation_source(root: Path, value: Any, label: str) -> str:
     selected = _string(value, label)
     path_value, separator, token = selected.rpartition(":")
@@ -124,16 +151,57 @@ def _read_contract(path: Path) -> tuple[dict[str, Any], str]:
     return _object(payload, "storage contract"), hashlib.sha256(content).hexdigest()
 
 
-def _review_producer(root: Path, value: Any, index: int) -> dict[str, Any]:
+def _review_producer(
+    root: Path,
+    project_id: str,
+    value: Any,
+    index: int,
+) -> dict[str, Any]:
     producer = _object(value, f"producers[{index}]")
     producer_id = _identifier(producer.get("id"), f"producers[{index}].id")
     root_source = _object(producer.get("root_source"), f"producer {producer_id}.root_source")
     root_kind = _string(root_source.get("kind"), f"producer {producer_id}.root_source.kind")
     if root_kind not in ALLOWED_ROOT_KINDS:
         raise ReviewError(f"producer {producer_id} uses unsupported root kind {root_kind!r}")
-    root_value = _string(root_source.get("value"), f"producer {producer_id}.root_source.value")
-    if re.search(r"(^|[\\/])[A-Za-z]:|^[A-Za-z]:", root_value):
-        raise ReviewError(f"producer {producer_id} stores a machine drive in the project contract")
+    root_value_label = f"producer {producer_id}.root_source.value"
+    if root_kind == "project-relative":
+        root_value = _string(root_source.get("value"), root_value_label)
+        _relative_path(root, root_value, root_value_label)
+    else:
+        root_value = _source_token(root_source.get("value"), root_value_label)
+
+    ownership = _object(
+        root_source.get("ownership"), f"producer {producer_id}.root_source.ownership"
+    )
+    root_scope = _string(
+        ownership.get("scope"), f"producer {producer_id}.root_source.ownership.scope"
+    )
+    if root_scope not in ALLOWED_ROOT_SCOPES:
+        raise ReviewError(f"producer {producer_id} uses unsupported root scope {root_scope!r}")
+    namespace = _identifier(
+        ownership.get("project_namespace"),
+        f"producer {producer_id}.root_source.ownership.project_namespace",
+    )
+    if namespace != project_id:
+        raise ReviewError(
+            f"producer {producer_id} root namespace must equal project_id {project_id!r}"
+        )
+    if ownership.get("fallback") != "block":
+        raise ReviewError(f"producer {producer_id} root fallback must be 'block'")
+    approved_root_source: str | None = None
+    if root_scope == "project-owned-external":
+        if root_kind not in CONFIGURED_ROOT_KINDS:
+            raise ReviewError(
+                f"producer {producer_id} external root must come from runtime config or user environment policy"
+            )
+        approved_root_source = _configured_source(
+            ownership.get("approved_root_source"),
+            f"producer {producer_id}.root_source.ownership.approved_root_source",
+        )
+    elif "approved_root_source" in ownership:
+        raise ReviewError(
+            f"producer {producer_id} project-root scope cannot declare an external approved root"
+        )
 
     artifact_classes = set(
         _string_list(producer.get("artifact_classes"), f"producer {producer_id}.artifact_classes")
@@ -176,6 +244,40 @@ def _review_producer(root: Path, value: Any, index: int) -> dict[str, Any]:
     for field in ("preflight", "finalization", "interruption"):
         _string(lifecycle.get(field), f"producer {producer_id}.lifecycle.{field}")
 
+    consumer_sources = [
+        _implementation_source(
+            root,
+            source,
+            f"producer {producer_id}.consumer_sources[{source_index}]",
+        )
+        for source_index, source in enumerate(
+            _string_list(
+                producer.get("consumer_sources"),
+                f"producer {producer_id}.consumer_sources",
+            )
+        )
+    ]
+    manifest = _object(producer.get("manifest"), f"producer {producer_id}.manifest")
+    manifest_source = _implementation_source(
+        root,
+        manifest.get("source"),
+        f"producer {producer_id}.manifest.source",
+    )
+    terminal_states = set(
+        _string_list(
+            manifest.get("terminal_states"),
+            f"producer {producer_id}.manifest.terminal_states",
+        )
+    )
+    if terminal_states != REQUIRED_TERMINAL_STATES:
+        raise ReviewError(
+            f"producer {producer_id} manifest terminal states must be succeeded, failed, and interrupted"
+        )
+    if manifest.get("cleanup_authorization") != "report-only":
+        raise ReviewError(
+            f"producer {producer_id} manifest cleanup authorization must be 'report-only'"
+        )
+
     implementation_files = _string_list(
         producer.get("implementation_files"), f"producer {producer_id}.implementation_files"
     )
@@ -203,12 +305,25 @@ def _review_producer(root: Path, value: Any, index: int) -> dict[str, Any]:
 
     return {
         "id": producer_id,
-        "root_kind": root_kind,
+        "root_source": {
+            "kind": root_kind,
+            "value": root_value,
+            "scope": root_scope,
+            "project_namespace": namespace,
+            "approved_root_source": approved_root_source,
+            "fallback": "block",
+        },
         "artifact_classes": sorted(artifact_classes),
         "implementation_files": implementation_files,
         "test_files": test_files,
         "enforcement_file": enforcement_file,
         "enforcement_tokens": tokens,
+        "consumer_sources": consumer_sources,
+        "manifest": {
+            "source": manifest_source,
+            "terminal_states": sorted(terminal_states),
+            "cleanup_authorization": "report-only",
+        },
         "capacity_references": {
             "registered_roots_inventory_source": registered_roots_inventory_source,
             "filesystem_allocated_bytes_source": filesystem_allocated_bytes_source,
@@ -242,7 +357,10 @@ def review(project: Path, contract_relative: Path = DEFAULT_CONTRACT) -> dict[st
     producers = contract.get("producers")
     if not isinstance(producers, list) or not producers:
         raise ReviewError("producers must be a non-empty array")
-    reviewed = [_review_producer(root, item, index) for index, item in enumerate(producers)]
+    reviewed = [
+        _review_producer(root, project_id, item, index)
+        for index, item in enumerate(producers)
+    ]
     ids = [item["id"] for item in reviewed]
     if len(ids) != len(set(ids)):
         raise ReviewError("producer ids must be unique")

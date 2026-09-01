@@ -24,6 +24,7 @@ def write_storage_fixture(project: Path) -> dict:
         "def list_storage_roots():\n    pass\n\n"
         "def allocated_bytes():\n    pass\n\n"
         "def file_identity():\n    pass\n\n"
+        "def consume_artifact():\n    pass\n\n"
         "def write_storage_inventory():\n    pass\n",
         encoding="utf-8",
     )
@@ -33,7 +34,7 @@ def write_storage_fixture(project: Path) -> dict:
     )
     contract = {
         "protocol": "project-steward-production-storage-contract",
-        "version": 2,
+        "version": 3,
         "project_id": "fixture",
         "policy": {
             "unknown_peak": "block",
@@ -43,7 +44,16 @@ def write_storage_fixture(project: Path) -> dict:
         },
         "producers": [{
             "id": "fixture-producer",
-            "root_source": {"kind": "runtime-config", "value": "FIXTURE_STORAGE_ROOT"},
+            "root_source": {
+                "kind": "runtime-config",
+                "value": "FIXTURE_STORAGE_ROOT",
+                "ownership": {
+                    "scope": "project-owned-external",
+                    "project_namespace": "fixture",
+                    "approved_root_source": "user-environment-policy:tools_root",
+                    "fallback": "block",
+                },
+            },
             "artifact_classes": ["cache", "temporary", "evidence"],
             "peak_estimate": {
                 "source": "src/producer.py:require_storage_budget", "unknown_behavior": "block"
@@ -60,6 +70,12 @@ def write_storage_fixture(project: Path) -> dict:
                 "preflight": "require_storage_budget",
                 "finalization": "write_storage_inventory",
                 "interruption": "retain owned manifest and report exact candidates",
+            },
+            "consumer_sources": ["src/producer.py:consume_artifact"],
+            "manifest": {
+                "source": "src/producer.py:write_storage_inventory",
+                "terminal_states": ["succeeded", "failed", "interrupted"],
+                "cleanup_authorization": "report-only",
             },
             "implementation_files": ["src/producer.py"],
             "test_files": ["tests/test_storage.py"],
@@ -124,7 +140,7 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             pin["sha256"] = "0" * 64
             profile_path.write_text(json.dumps(profile), encoding="utf-8")
             previous_profile = profile_path.read_bytes()
-            contract["version"] = 1
+            contract["version"] = 2
             contract_path.write_text(json.dumps(contract), encoding="utf-8")
             previous_contract = contract_path.read_bytes()
             verified, result = call("verify")
@@ -142,7 +158,7 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             self.assertEqual(previous_profile, profile_path.read_bytes())
             self.assertEqual(previous_contract, contract_path.read_bytes())
 
-            contract["version"] = 2
+            contract["version"] = 3
             contract_path.write_text(json.dumps(contract), encoding="utf-8")
             _, plan = call("plan")
             self.assertEqual("passed", plan["preflight"]["status"])
@@ -170,9 +186,10 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
         self.assertIn("references/production-storage-governance.md", directory_route)
         for phrase in (
             "产物归位门槛唯一决定",
-            "同时位于当前项目根和登记根内",
-            "普通根和配置根都保持在当前项目根内",
-            "项目外存续的任务产物为零",
+            "项目拥有的外部工作根",
+            "批准根和稳定项目命名空间下",
+            "项目外无所有者的任务产物为零",
+            "旧 v2 又缺少外部根所有权、正式消费者与终态清单来源",
             "事先预防必须发生在首个大文件之前",
             "获准实施时必须写进生产项目",
             ".project-steward/storage-contract.json",
@@ -228,8 +245,8 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
                 (project / ".project-steward" / "project.json").read_text(encoding="utf-8")
             )
             selected = {item["id"]: item["version"] for item in profile["templates"]}
-            self.assertEqual("1.2.0", selected["managed-runtime-artifacts"])
-            self.assertEqual("2.5.0", profile["catalog_version"])
+            self.assertEqual("1.3.0", selected["managed-runtime-artifacts"])
+            self.assertEqual("2.6.0", profile["catalog_version"])
             self.assertEqual(
                 "required-and-blocking",
                 profile["decisions"]["runtime_artifact_preflight"],
@@ -252,12 +269,19 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             )
             self.assertEqual(0, passed.returncode, passed.stderr)
             payload = json.loads(passed.stdout)
-            self.assertEqual("project-steward-production-storage-review/v2", payload["schema"])
+            self.assertEqual("project-steward-production-storage-review/v3", payload["schema"])
             self.assertEqual("static_checks_passed", payload["status"])
             self.assertEqual("static", payload["verification_level"])
             self.assertEqual("not_run", payload["runtime_verification"]["status"])
             self.assertEqual(
-                {"first-production", "same-input-reuse", "budget-rejection", "interruption-recovery"},
+                {
+                    "first-production",
+                    "same-input-reuse",
+                    "budget-rejection",
+                    "interruption-recovery",
+                    "external-root-ownership",
+                    "manifest-consumer-closure",
+                },
                 set(payload["runtime_verification"]["required_checks"]),
             )
             self.assertEqual(
@@ -268,8 +292,20 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
                 "src/producer.py:allocated_bytes",
                 payload["producers"][0]["capacity_references"]["filesystem_allocated_bytes_source"],
             )
+            self.assertEqual(
+                "project-owned-external",
+                payload["producers"][0]["root_source"]["scope"],
+            )
+            self.assertEqual(
+                "user-environment-policy:tools_root",
+                payload["producers"][0]["root_source"]["approved_root_source"],
+            )
+            self.assertEqual(
+                ["src/producer.py:consume_artifact"],
+                payload["producers"][0]["consumer_sources"],
+            )
 
-            contract["version"] = 1
+            contract["version"] = 2
             contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
             legacy = subprocess.run(
                 [sys.executable, str(REVIEW), str(project), "--compact"],
@@ -282,11 +318,11 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
             self.assertEqual(2, legacy.returncode)
             legacy_result = json.loads(legacy.stderr)
             self.assertEqual("contract_version_mismatch", legacy_result["error_code"])
-            self.assertEqual(1, legacy_result["actual_contract"]["version"])
-            self.assertEqual(2, legacy_result["supported_contract"]["version"])
-            self.assertEqual(1, json.loads(contract_path.read_text(encoding="utf-8"))["version"])
+            self.assertEqual(2, legacy_result["actual_contract"]["version"])
+            self.assertEqual(3, legacy_result["supported_contract"]["version"])
+            self.assertEqual(2, json.loads(contract_path.read_text(encoding="utf-8"))["version"])
 
-            contract["version"] = 2
+            contract["version"] = 3
             del contract["producers"][0]["budget"]["filesystem_allocated_bytes_source"]
             contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
             missing_allocation = subprocess.run(
@@ -332,7 +368,7 @@ class ProductionStorageGovernanceTests(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertEqual(2, blocked.returncode)
-            self.assertIn("machine drive", blocked.stderr)
+            self.assertIn("stable config token", blocked.stderr)
 
 
 if __name__ == "__main__":

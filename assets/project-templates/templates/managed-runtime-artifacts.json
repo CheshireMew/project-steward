@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "managed-runtime-artifacts",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "layer": "capability",
   "name": "Managed runtime artifacts",
   "description": "Preflight, ownership, reuse, budget, and finalization contracts for storage-intensive production projects.",
@@ -14,6 +14,7 @@
   "defaults": {
     "decisions": {
       "runtime_artifact_roots": "project-or-environment-owned",
+      "runtime_artifact_external_root_ownership": "approved-root-and-project-namespace",
       "runtime_artifact_preflight": "required-and-blocking",
       "runtime_artifact_reuse": "content-addressed-where-repeatable",
       "runtime_artifact_finalization": "owned-inventory-required",
@@ -24,15 +25,15 @@
     {
       "id": "runtime-artifact-preflight-before-write",
       "title": "Budget before the first large write",
-      "statement": "Every storage-intensive producer enumerates all owned roots, estimates peak allocation, checks filesystem-allocated bytes and free-space headroom, and blocks before creating a large artifact when any input is unknown.",
+      "statement": "Every storage-intensive producer enumerates all owned roots, proves project-root or registered external-root ownership, estimates peak allocation, checks filesystem-allocated bytes and free-space headroom, and blocks before creating a large artifact when any input is unknown.",
       "preflight": [
-        "Name the producer, registered-roots inventory source, artifact classes, estimate, allocated-bytes source, managed-object identity, capacity source, and interruption outcome.",
+        "Name the producer, formal consumers, registered-roots inventory source, root ownership, artifact classes, estimate, allocated-bytes source, managed-object identity, terminal manifest, capacity source, and interruption outcome.",
         "Run the project storage review before executing the producer."
       ],
       "evidence": [
         "An over-budget run or a run with unknown allocated-byte evidence creates no large file.",
         "Sparse or compressed fixtures report logical and filesystem-allocated bytes separately across all registered roots.",
-        "A configured root never causes a sibling drive-root or repository-neighbor scratch directory."
+        "A registered external root resolves below its approved root and stable project namespace; missing or invalid configuration never causes a sibling drive-root, repository-neighbor, or arbitrary-path fallback."
       ]
     },
     {
@@ -84,6 +85,7 @@
       "title": "Real producer storage chain",
       "steps": [
         "Run the real producer once from its public entry and inspect the owned filesystem inventory.",
+        "Prove every configured external root resolves below the approved root and stable project namespace, and that its formal consumer reads the terminal manifest.",
         "Run the same content identity again and prove the large reusable object was not duplicated.",
         "Run with an intentionally insufficient budget and prove rejection occurs before the first large file."
       ]

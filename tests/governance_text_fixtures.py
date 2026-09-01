@@ -15,6 +15,18 @@ LEARNING_TEXT = (
     / "references"
     / "conversation-learning-and-self-evolution.md"
 ).read_text(encoding="utf-8")
+SOURCE_AUTHORITY_TEXT = (
+    SKILL_ROOT / "references" / "conversation-source-authority.md"
+).read_text(encoding="utf-8")
+SOURCE_AUTHORITY_ENTRY = (
+    "公开对话、上下文来源、过程事件及其权限归因，固定前置完整读取 "
+    "`conversation-source-authority.md`；本文件不维护第二套来源权限规则。"
+)
+LEARNING_TEXT = LEARNING_TEXT.replace(
+    SOURCE_AUTHORITY_ENTRY,
+    SOURCE_AUTHORITY_ENTRY + "\n\n" + SOURCE_AUTHORITY_TEXT,
+    1,
+)
 PUBLICATION_TEXT = (
     SKILL_ROOT / "references" / "repository-publication.md"
 ).read_text(encoding="utf-8")
