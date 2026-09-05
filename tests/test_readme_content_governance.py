@@ -492,11 +492,11 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             if (node.text or "").strip()
         )
         self.assertIn("Project Steward logo", text)
-        self.assertIn("Three connected checkpoints", text)
+        self.assertIn("A deep green shield with a white two-leaf sprout", text)
 
         self.assertIsNone(re.search(r"[\u3040-\u30ff\u3400-\u9fff]", text))
         source = HERO_PATH.read_text(encoding="utf-8")
-        self.assertIn('id="governance-path"', source)
+        self.assertIn('id="steward-sprout"', source)
         self.assertIn('id="steward-boundary"', source)
         self.assertIn('viewBox="0 0 240 240"', source)
         self.assertNotIn("<text", source)
