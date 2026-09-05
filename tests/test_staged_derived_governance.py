@@ -329,6 +329,32 @@ class DerivedArtifactGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, DERIVED_TEXT)
 
+    def test_active_read_cache_tracks_authoritative_and_derived_freshness(
+        self,
+    ) -> None:
+        section = DERIVED_TEXT.split(
+            "### 活动读取缓存必须覆盖它实际返回的全部事实",
+            1,
+        )[1].split("## 5. 目标单元与安全上限", 1)[0]
+        ordered = (
+            "独立的版本或内容身份",
+            "缓存键必须覆盖它实际返回的全部依赖身份",
+            "按实际变化精确失效",
+            "推进派生版本或失效受影响缓存",
+            "当前界面读取新派生身份",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        for fragment in (
+            "权威内容修订不变",
+            "持久内容不变量只比较权威字段",
+            "派生就绪、路径和质量由自己的变化与重开测试负责",
+            "不能用整个对象相等把两类职责混为一谈",
+            "关闭重开只能帮助诊断",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, section)
+
     def test_equivalent_state_representations_share_one_canonical_projection(
         self,
     ) -> None:

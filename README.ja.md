@@ -7,7 +7,7 @@
 <h1 align="center">Project Steward</h1>
 
 <p align="center">
-  <strong>プロジェクトを理解し、手戻りを未然に防ぎ、問題を根本原因から修正するためのプロジェクトガバナンス Skill です。</strong>
+  <strong>プロジェクトの調査・監査、手戻りの予防、根本原因の修正、UI デザインと使いやすさの改善を支援する Agent Skill。</strong>
 </p>
 
 <p align="center">
@@ -29,93 +29,80 @@
 
 <!-- readme-header:end -->
 
-Project Steward はプロジェクトガバナンス用の Skill です。プロジェクトの全過程から再利用できる方法を学び、変更前に手戻りの原因となる境界を確認し、不具合発生後は生産者・境界・消費者をまとめて移行して根本原因まで収束させます。
+Project Steward は、対応する Agent が利用するプロジェクトガバナンス用の Skill です。リポジトリ、実装計画、UI の問題、タスクの全履歴を渡すことで、調査、完成度の確認、UI 設計・改善、手戻りの予防、複数層の不具合修正、開発・公開に必要な整理を依頼できます。
 
-リポジトリ全体の成果に向いています。コードベースの理解、安全な変更、複数層にまたがる不具合、ディレクトリ整理、README 改善、ライセンス、公開を扱います。通常の機能実装や単一関数の質問は、通常の開発タスクとして扱います。
-
-> 検査、監査、診断、レビューは既定で読み取り専用です。明示的に実装、自己進化、公開を依頼された場合だけ、対応する状態を変更します。
+> 検査、監査、診断、振り返りは既定で読み取り専用です。実装を明示的に依頼した場合に、該当範囲を変更します。通常の機能実装や単一関数の質問は通常の開発タスクとして扱います。
 
 ## できること
 
-### 実際のプロジェクト作業から学ぶ
+### UI の設計・見た目・使いやすさを改善する
 
-Project Steward は、要求、判断、コマンド、待機、失敗、修正、最終証拠をユーザー成果ごとに整理します。すでに有効だった方法、最初にずれた地点、次回変えるべき行動を見つけます。
+ゼロからの UI 設計、視覚的な方向性の変更、既存製品のレイアウト、書体、配色、情報階層、コンポーネント、操作、アニメーションの調整に対応します。参考 UI の再構築、複数ページのデザインシステム統一、デスクトップウィンドウ、レスポンシブ表示、ローカルファイルを扱う画面の改善も対象です。
 
-内部で学んだ規則を README に追加し続けることはありません。内部動作は SKILL.md、references、tests が保持し、README には安定した役割、利用入口、読者に必要な境界だけを残します。
+関連ページ、ウィンドウ、主要状態を確認し、見た目、理解、操作を妨げる問題を調べます。実装が承認された後は、実際の入口から最終画面と連続操作を確認し、コード変更済み、画面検証済み、使用感確認済みを区別します。[製品体験と UI の方法](./references/product-experience-governance.md)を参照してください。
+
+### プロジェクトを理解し、計画と完成度を照合する
+
+未知のリポジトリの目的、動かし方、主要モジュールの関係を説明します。参考プロジェクトでは、学べる方法と実際に再利用できる内容を区別します。実装計画と照合して完了、漏れ、未検証を明らかにし、総合監査ではプロジェクトに適用される範囲を調べ、証拠に基づいて優先順位を付けます。
 
 ### 実装前に手戻りを防ぐ
 
-- 目標動作、唯一の事実源、影響範囲、停止位置を固定します。
-- 正式な呼び出し元を一度に移行し、旧経路を終了させます。
-- 永続操作、外部 CLI、モデル呼び出し、デスクトップのライフサイクル、複数リポジトリ契約に必要な専用確認を重ねます。
-- 正式な生産者からユーザーが確認できる結果までを通した検証を設計します。
+機能追加、リファクタリング、移行の前に、目標、依存関係、影響する呼び出し元、変更順序、確認方法を整理します。変更に応じて性能、進捗表示、長時間処理、モデルが関与する処理、プロジェクト間のインターフェースを確認します。
 
 ### 根本原因から不具合を収束させる
 
-- 現象、直接原因、正当な保護、最初の制御可能な原因、回避策、残留を分けます。
-- 失敗証拠を保持してから最終境界を移行します。
-- 生成、転送または保存、消費、ユーザー結果、旧経路の終了を確認します。
-- 凝集度、結合、重複、巨大モジュールの指摘を実施可能なプロジェクト成果へ変えます。
+症状から修正すべき原因をたどり、関連モジュール、データ、呼び出し元を変更して、古い実装の終了も確認します。結合、重複実装、責務が多すぎるモジュールを調べ、同じ問題への修正の繰り返しを防ぎます。
 
-### プロジェクトの公開面を整える
+### プロジェクト・実行環境・公開を整える
 
-未知のリポジトリの調査、ディレクトリの棚卸し、プロジェクトテンプレート、製品体験、ログ、実行環境に加え、README、ライセンス、Star History、リポジトリ公開まで一貫して扱えます。
+| 作業 | 得られる結果 | 方法 |
+| --- | --- | --- |
+| ディレクトリ整理 | 使用中のファイル、ローカル状態、履歴を分け、除外・移動・保管案を提示 | [ディレクトリ](./references/repository-directory-governance.md) |
+| 外部互換性 | ツール連携、公式形式、エクスポート経路の不整合を特定・修正 | [互換性](./references/external-tool-compatibility.md) |
+| テンプレート | 基準の作成・採用・更新と、繰り返し適用できる方法の反映 | [テンプレート](./references/project-template-system.md) · [進化](./references/template-evolution.md) |
+| ログと環境 | 実操作の追跡と、ツール、SDK、キャッシュ、長時間処理の条件確認 | [ログ](./references/log-audit-standard.md) · [環境](./references/user-environment-governance.md) |
+| 実行時ストレージ | モデル、ダウンロード、メディア、キャッシュ、テスト出力の配置・増加・残留を管理 | [ストレージ](./references/production-storage-governance.md) |
+| README と公開 | 紹介文、視覚素材、多言語、ライセンス、GitHub 情報の整理 | [README](./references/readme-delivery.md) · [ライセンス](./references/license-governance.md) · [公開](./references/repository-publication.md) |
+
+### 実際のプロジェクト作業から学ぶ
+
+タスクの全過程から有効な方法、失敗原因、ユーザーの修正を読み取り、次回の行動を提案します。確認後に再利用できる方法を Project Steward に反映し、プロジェクト固有の判断は、そのプロジェクトの文書、コード、設定に残します。
 
 ## そのまま依頼できます
 
-### 会話から自己進化する
+対応する Agent で `$project-steward` を指定し、対象プロジェクトや資料を渡してください。確認、提案、実装のどこまで依頼するかを言葉で指定できます。
 
-~~~text
-この会話の全過程を $project-steward で読んでください。
-ユーザー成果ごとに成功した仕組み、能力の不足、根本原因を整理し、
-将来の動作と影響ファイルを先に提示して、確認後に自己進化してください。
-~~~
-
-### 変更前に確認する
-
-~~~text
-この変更を $project-steward で確認してください。
-唯一の事実源、すべての消費者、旧経路の終了、実際の検証を決めてから、
-新しい証拠が十分になるまで実装してください。
-~~~
-
-### 複数層の不具合を修正する
-
-~~~text
-この複数層の不具合を $project-steward で診断して修正してください。
-症状ごとの例外は追加せず、生産者、境界、消費者を一度に移行し、
-旧アーキテクチャが終了したことを証明してください。
-~~~
-
-### リポジトリを理解・統治する
-
-~~~text
-このプロジェクトを $project-steward で説明してください。
-何を解決し、どのように動き、主要な境界がどこにあり、
-何を取り入れられ、何を直接コピーすべきでないかを示してください。
-~~~
-
-### README を改善する
-
-~~~text
-この README を $project-steward で改善してください。
-Git とリポジトリ状態、文章と視覚、多言語、ライセンス、
-Star History、GitHub Topics、リンク、公開を確認し、完成した結果まで届けてください。
-~~~
+| 目的 | 依頼例 |
+| --- | --- |
+| UI 改善 | $project-steward でこのプロジェクトのレイアウト、情報階層、コンポーネント、操作を改善し、実際の画面と主要操作を確認してください。 |
+| 新規設計 | $project-steward でこの製品の UI を設計し、まず構造と視覚的な方向性を選べるように提示してください。 |
+| 参考 UI の再構築 | $project-steward でこの参考 UI を再構築し、実行結果との差を確認してください。 |
+| リポジトリの理解 | $project-steward でこのリポジトリの目的、構造、動かし方を説明し、再利用に値する能力も別途評価してください。 |
+| 計画の確認 | $project-steward で実装計画と照合し、完了、漏れ、未検証の項目を示してください。 |
+| 総合監査 | $project-steward でプロジェクト全体を確認し、利用者への影響とリスク順に改善案を示してください。 |
+| 変更前の確認 | $project-steward でこの変更の影響範囲、依存関係、確認方法を調べ、まず実装案を提示してください。 |
+| 根本原因の修正 | $project-steward でこの問題を診断・修正し、関連する呼び出し元と実際の結果を確認してください。 |
+| ファイル整理 | $project-steward で使用中のファイルとアップロード不要なファイルを調べ、まず整理案を示してください。 |
+| 互換性の確認 | $project-steward でこの外部ツールや公式形式との互換性を調べ、失敗する箇所を示してください。 |
+| テンプレート採用・更新 | $project-steward でプロジェクトの基準を確認し、テンプレートの採用・更新案を示してください。 |
+| テンプレートの進化 | $project-steward でこれらの方法を安定した既定値にできるか判断し、該当テンプレートを更新してください。 |
+| ログ改善 | $project-steward で一度の操作の入力、経過、失敗、結果を追えるようにログを改善してください。 |
+| 環境確認 | $project-steward で必要なツール、SDK、キャッシュの場所を確認し、現在の不足を示してください。 |
+| ストレージ管理 | $project-steward でモデル、メディア、キャッシュ、テスト出力の増加と残留を調べ、まず改善案を示してください。 |
+| README 改善 | $project-steward でこの README の文章、多言語、ホームページ情報、関連する公開作業を改善してください。 |
+| ライセンス確認 | $project-steward でライセンスと第三者ソースを確認し、適用範囲と調整案を示してください。 |
+| 変更の公開 | $project-steward でアップロード内容を確認し、承認済みの変更を既存リモートへコミット・push してください。 |
+| 会話から学ぶ | $project-steward でこのタスクの全履歴を読み、将来の行動と影響ファイルを提示してから、確認後に自己進化してください。 |
 
 ## README の完全な改善内容
 
-完全な README 改善では、リポジトリが初期化済みか、README が存在するか、プロジェクトの役割と読者経路が正しいかを確認してから、新規作成、全面改稿、再構成、圧縮を選びます。
+プロジェクトの事実に基づいて主要用途と利用入口を整理し、文章、視覚素材、多言語、ナビゲーション、ライセンスを扱います。公開 GitHub リポジトリでは Star History、Topics、About Description も対象です。Website は条件を満たす正式な入口だけを使います。
 
-- 文章：内部方法の写しと重複を除き、役割、成果、実際の入口、最初の成功、保守ナビゲーションを残します。
-- 視覚：hero、画像、証拠の適格性を確認し、デスクトップ、狭い画面、GitHub の明暗テーマで検査します。
-- ヘッダー：中文、English、日本語、文書、貢献、フィードバック、個人リンク、Stars、Forks、ライセンスを実際の事実から生成します。
-- ライセンス：正しい既存ライセンスは維持し、存在しない場合は権利と採用目的を確認してから、承認済みの選択を適用します。
-- Star History：公開 GitHub リポジトリで実際のワークフローを実行し、両方の SVG と README の消費を確認します。
-- GitHub Topics：現在のプロジェクトの役割と実証済み能力から最終集合を作り、完全な公開と同時に書き込んで再取得します。Project Steward を使ったことだけでホスト名を追加しません。
-- 公開：承認済みの既存リモートには正確にコミットして push し、リモート HEAD を確認します。リモート作成、公開範囲変更、強制 push、ファイル削除は自動では行いません。
+- 視覚検査は素材ソースの構造と参照を対象とし、見た目の品質を検証したとは扱いません。
+- Star History の実装はワークフロー起動後に停止します。グラフ生成とリモート表示は、別途検証を依頼されるまで未検証です。
+- コミットと push は確認済みの範囲で行い、push 後の新しいリモート検査は待ちません。
 
-詳しい手順は [README 完全配信方法](./references/readme-delivery.md) を参照してください。
+詳しい範囲と実行条件は [README 完全配信方法](./references/readme-delivery.md) を参照してください。
 
 ## 処理の流れ
 
@@ -162,12 +149,10 @@ npx skills add CheshireMew/project-steward
 python -m unittest discover -s tests -v
 ~~~
 
-3 言語の README を監査します。
+この README を確認します。他の言語は各ページに記載されたコマンドを使います。
 
 ~~~powershell
-python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --project-name "Project Steward" --tagline "一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --project-name "Project Steward" --tagline "A project-governance Skill that helps you understand a codebase, prevent rework, and fix problems at their root." --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --project-name "Project Steward" --tagline "プロジェクトを理解し、手戻りを未然に防ぎ、問題を根本原因から修正するためのプロジェクトガバナンス Skill です。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --project-name "Project Steward" --tagline "プロジェクトの調査・監査、手戻りの予防、根本原因の修正、UI デザインと使いやすさの改善を支援する Agent Skill。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
 ~~~
 
 ## Star History

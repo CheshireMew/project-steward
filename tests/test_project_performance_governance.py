@@ -421,6 +421,21 @@ class ProjectPerformanceGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, measurement)
 
+    def test_performance_gate_relation_must_match_the_user_result(self) -> None:
+        measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
+            "## 6. 修复交接与二次性能复审", 1
+        )[0]
+        ordered = (
+            "对应的用户结果、测量边界和判定关系",
+            "吞吐、单项延迟、尾部延迟和资源上限分别成立",
+            "一个目标改善不要求无关子指标同步改善",
+            "验证器判据缺陷",
+            "历史合格样本和反例",
+            "不能修改产品迎合错误指标",
+        )
+        positions = [measurement.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+
     def test_audit_owned_observers_are_terminal_before_timing(self) -> None:
         measurement = PERFORMANCE_TEXT.split("## 5. 建立可比较的测量证据", 1)[1].split(
             "## 6. 修复交接与二次性能复审", 1

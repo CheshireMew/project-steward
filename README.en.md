@@ -7,7 +7,7 @@
 <h1 align="center">Project Steward</h1>
 
 <p align="center">
-  <strong>A project-governance Skill that helps you understand a codebase, prevent rework, and fix problems at their root.</strong>
+  <strong>An Agent Skill for project research and audits, preventing rework, fixing root causes, and improving UI design and usability.</strong>
 </p>
 
 <p align="center">
@@ -29,93 +29,80 @@
 
 <!-- readme-header:end -->
 
-Project Steward is a project-governance Skill. It learns reusable methods from complete project work, checks likely rework boundaries before changes, and closes defects by migrating producers, boundaries, and consumers together.
+Give a compatible Agent this Skill and a repository, plan, UI problem, or task history. Project Steward supports research, delivery audits, UI design, rework prevention, root-cause fixes, and project publication.
 
-Use it for repository-level outcomes: understanding a codebase, preventing unsafe changes, governing cross-layer failures, organizing a repository, improving a README, licensing, and publication. Ordinary feature work and single-function questions remain regular development tasks.
-
-> Inspection, audit, diagnosis, and review are read-only by default. Project Steward changes state only when the request explicitly asks for implementation, self-evolution, or publication.
+> Checks, audits, diagnoses, and reviews are read-only by default. Explicit implementation requests authorize changes to the corresponding scope. Ordinary feature work and single-function questions remain normal development tasks.
 
 ## What it helps you accomplish
 
-### Learn from real project work
+### Design and improve interfaces and usability
 
-Project Steward groups requests, decisions, commands, waits, failures, corrections, and final evidence by user outcome. It identifies proven methods, the earliest point of divergence, and the future action that should change.
+Design or refine layout, typography, color, hierarchy, components, interaction, and motion. Rebuild reference interfaces, align design systems, and improve desktop windows, responsive layouts, and local file workspaces.
 
-It does not append every internal lesson to the README. Internal behavior belongs to SKILL.md, references, and tests; the README keeps only stable identity, usable entry points, and reader-facing boundaries.
+Review relevant pages, windows, and states. After approved implementation, check actual visuals and continuous use; report implementation, visual verification, and usability separately. See [product experience and interface governance](./references/product-experience-governance.md).
+
+### Understand a project and audit delivery
+
+Explain a repository’s purpose, operation, and architecture; distinguish methods worth learning from reusable content. Compare delivery with the plan to find completed, missing, and unverified work. Comprehensive audits prioritize applicable findings with evidence.
 
 ### Prevent rework before implementation
 
-- Freeze target behavior, the source of truth, impact scope, and stopping point.
-- Migrate every formal call site and retire the old path.
-- Add focused checks for durable operations, external CLIs, model calls, desktop lifecycles, and cross-repository contracts.
-- Design verification from the formal producer to the observable user result.
+Plan the result, dependencies, affected callers, migration order, and checks before implementation. Review relevant performance, progress, long-running operations, model workflows, and cross-project interfaces.
 
 ### Close defects at the root cause
 
-- Separate the symptom, direct cause, valid guard, earliest controllable cause, workaround, and residue.
-- Preserve failing evidence before changing the final boundary.
-- Verify production, transport or storage, consumption, user-visible results, and old-path retirement.
-- Turn cohesion, coupling, duplication, and god-module findings into an implementable project result.
+Trace symptoms to their source, repair affected modules and callers, and retire obsolete implementations. Review coupling, duplication, and overloaded modules to prevent recurring patches.
 
-### Govern a project's public surface
+### Organize the project, environment, and publication
 
-Project Steward can also study unfamiliar repositories, inventory directories, maintain project templates, govern product experience and logs, record the user's execution environment, and complete README, licensing, Star History, and repository publication work.
+| Work | Result | Method |
+| --- | --- | --- |
+| Directories | Classify active files, local state, and history; propose ignore, move, or archive decisions | [Directories](./references/repository-directory-governance.md) |
+| External compatibility | Inspect tool integration, official formats, and export chains; locate and repair incompatibilities | [Compatibility](./references/external-tool-compatibility.md) |
+| Project templates | Establish, adopt, and upgrade baselines; capture consistently applicable practices | [Templates](./references/project-template-system.md) · [Evolution](./references/template-evolution.md) |
+| Logs and environment | Trace real operations and check tools, SDKs, caches, and long-running tasks | [Logs](./references/log-audit-standard.md) · [Environment](./references/user-environment-governance.md) |
+| Runtime storage | Govern placement, growth, and leftovers for models, downloads, media, caches, and test outputs | [Storage](./references/production-storage-governance.md) |
+| README and publication | Prepare project introductions, homepage visuals, languages, licenses, and GitHub metadata | [README](./references/readme-delivery.md) · [Licensing](./references/license-governance.md) · [Publication](./references/repository-publication.md) |
+
+### Learn from real project work
+
+Learn from effective practices, failures, and corrections in a complete task. Propose future changes and incorporate approved methods into Project Steward. Project decisions stay in project documentation, code, and configuration.
 
 ## Say it directly
 
-### Evolve from a conversation
+Start each request with **Use $project-steward**, then provide the project or material and an instruction below. Specify review, proposal, or implementation.
 
-~~~text
-Use $project-steward to read this conversation's complete process.
-Group proven mechanisms, capability gaps, and root causes by user outcome.
-Show the future behavior and affected files first, then evolve Project Steward after confirmation.
-~~~
-
-### Check a change before implementation
-
-~~~text
-Use $project-steward to review this change.
-Identify the source of truth, every consumer, old-path retirement, and real verification,
-then implement it through fresh evidence.
-~~~
-
-### Repair a cross-layer defect
-
-~~~text
-Use $project-steward to diagnose and fix this cross-layer failure.
-Do not add symptom-specific exceptions. Migrate producers, boundaries, and consumers together,
-and prove the old architecture is gone.
-~~~
-
-### Understand or govern a repository
-
-~~~text
-Use $project-steward to explain this project.
-Show what it solves, how it runs, where its core boundaries are,
-what is worth adopting, and what must not be copied directly.
-~~~
-
-### Improve a README
-
-~~~text
-Use $project-steward to improve this README.
-Check Git and repository state, content and visuals, languages, licensing,
-Star History, GitHub Topics, links, and publication, then deliver the complete result.
-~~~
+| Intent | Example request |
+| --- | --- |
+| Improve an interface | improve this project's UI and usability, including layout, hierarchy, components, and interactions; check the actual visuals and main operations. |
+| Design from scratch | design this product's interface. Present structure and visual directions for me to choose first. |
+| Rebuild a reference | rebuild this reference interface and compare it with the running result. |
+| Understand or govern a repository | explain this repository's purpose, architecture, and operation, and separately assess which capabilities are worth adopting. |
+| Audit a plan | compare this project with the implementation plan and list completed, missing, and unverified work. |
+| Audit a project | review this project comprehensively and prioritize improvements by user impact and risk. |
+| Check a change | check this change's impact, dependencies, and acceptance criteria. Give me an implementation proposal first. |
+| Fix a root cause | diagnose and fix this failure, update affected callers, and verify the actual result. |
+| Organize directories | identify files still in use and files that should not be uploaded. Propose an organization plan first. |
+| Check compatibility | check compatibility with this external tool or official format and identify the failing boundary. |
+| Adopt or upgrade templates | inspect this project's baseline and propose template adoption or upgrades. |
+| Evolve templates | assess whether these practices qualify as stable defaults and update the relevant templates. |
+| Improve logs | improve this project's logs so one operation's inputs, progress, failures, and result can be traced. |
+| Check the environment | check required tools, SDKs, and cache locations and explain current environment gaps. |
+| Govern storage | inspect growth and leftovers from models, media, caches, and test outputs. Propose storage changes first. |
+| Improve a README | improve this README, including content, languages, homepage information, and related publication work. |
+| Review licensing | inspect this repository's licenses and third-party sources and propose scope corrections. |
+| Publish changes | inspect upload contents, then commit and push the confirmed changes to the existing remote. |
+| Learn from a conversation | read this complete task history and propose future behavior and affected files before approved self-evolution. |
 
 ## What a complete README improvement includes
 
-A complete README task checks whether the repository is initialized, whether a README exists, and whether project identity and reader flow are accurate before choosing to write, rewrite, restructure, or compress.
+Use project facts to explain main uses and entry points, then address content, homepage visuals, languages, navigation, and licensing. Public GitHub repositories also include Star History, Topics, and About Description; Website uses only a qualified official destination.
 
-- Content: remove internal-method mirrors and repetition; retain identity, outcomes, real entry points, first success, and maintainer navigation.
-- Visuals: qualify the hero, images, and evidence, then inspect desktop, narrow viewport, and GitHub light and dark themes.
-- Header: generate 中文, English, 日本語, documentation, contribution, feedback, personal links, Stars, Forks, and license from active facts.
-- License: preserve an accurate existing license; when absent, verify rights and adoption goals before applying the confirmed choice.
-- Star History: run the real workflow for a public GitHub repository and verify both SVGs and the README consumer.
-- GitHub Topics: derive the final set from current project identity and proven capabilities, publish and read it back with the complete result, and never infer host labels merely because Project Steward handled the repository.
-- Publication: for an approved existing remote, commit precisely, push, and verify remote HEAD without silently creating remotes, changing visibility, force-pushing, or deleting files.
+- Visual checks cover source structure and references; they do not establish that the image looks good.
+- Star History implementation stops after workflow dispatch. Generated charts and remote display remain unverified until a separate remote-acceptance request.
+- Commit and push follow the confirmed scope; a push does not start a wait for new remote checks.
 
-See the [complete README delivery method](./references/readme-delivery.md).
+See the [complete README delivery method](./references/readme-delivery.md) for scope and execution conditions.
 
 ## How it works
 
@@ -128,7 +115,7 @@ User outcome
   → old-path retirement and regression
 ~~~
 
-The main Skill file owns routing only. Full methods live in [references](./references/), deterministic tools live in [scripts](./scripts/), and each project's durable facts remain in that project's existing rules, code, configuration, and tests.
+[SKILL.md](./SKILL.md) selects methods in [references](./references/) and tools in [scripts](./scripts/). Project facts stay in the project.
 
 ## Installation
 
@@ -142,7 +129,7 @@ After installation, invoke it directly:
 Use $project-steward to review this project comprehensively and order the governance work by risk.
 ~~~
 
-Writing, running, installing, committing, and publishing remain separately authorized by the request. Project Steward self-evolution uses two-stage confirmation: it shows future behavior and impact first, then modifies itself after approval.
+Authorize writing, execution, installation, commits, and publication through your request. Self-evolution presents behavior and impact for approval before changing the Skill.
 
 ## Repository map
 
@@ -162,12 +149,10 @@ Run all active tests:
 python -m unittest discover -s tests -v
 ~~~
 
-Audit all three README languages:
+Check this README (use the command on each translated page for that language):
 
 ~~~powershell
-python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --project-name "Project Steward" --tagline "一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --project-name "Project Steward" --tagline "A project-governance Skill that helps you understand a codebase, prevent rework, and fix problems at their root." --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --project-name "Project Steward" --tagline "プロジェクトを理解し、手戻りを未然に防ぎ、問題を根本原因から修正するためのプロジェクトガバナンス Skill です。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --project-name "Project Steward" --tagline "An Agent Skill for project research and audits, preventing rework, fixing root causes, and improving UI design and usability." --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
 ~~~
 
 ## Star History

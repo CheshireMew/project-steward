@@ -7,7 +7,7 @@
 <h1 align="center">Project Steward</h1>
 
 <p align="center">
-  <strong>一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。</strong>
+  <strong>一个帮助你研究和审计项目、预防返工、修复根因，并改善界面设计与使用体验的 Agent Skill。</strong>
 </p>
 
 <p align="center">
@@ -29,93 +29,80 @@
 
 <!-- readme-header:end -->
 
-Project Steward 是一个项目治理 Skill。它从完整项目过程提炼可复用方法，在改动前检查容易返工的边界，在缺陷发生后沿根因一次迁移生产者、边界和消费者。
+Project Steward 是一个由兼容 Agent 使用的项目治理 Skill。把仓库、实施计划、界面问题或一次任务的完整过程交给它，可以研究项目、核对完成度、设计和优化界面、预防返工、修复跨层问题，并整理开发与发布所需的配套工作。
 
-它适合仓库级结果：理解项目、预防改坏、治理跨层问题、整理目录、优化 README、处理许可证与发布。单个函数或普通业务功能仍由正常开发任务负责。
-
-> 检查、审计、诊断和复盘默认只读；只有明确要求修改、实施、自我进化或发布时，才改变对应项目。
+> 检查、审计、诊断和复盘默认只读；明确要求实施后才修改对应内容。普通业务功能和单个函数问题仍按正常开发任务处理。
 
 ## 它能帮你完成什么
 
-### 从真实工作中进化
+### 设计、美化和改善界面体验
 
-Project Steward 会把一次任务里的请求、决定、命令、等待、失败、纠正和最终结果按用户目标分组，找出已经有效的方法、最早偏离点和未来应该改变的行动。
+从零设计界面、调整视觉方向，或打磨已有产品的布局、字体、配色、信息层级、组件、交互和动效。它也能依据参考界面重建页面，统一多页面的设计系统，并处理桌面窗口、响应式布局和本地文件工作区的体验问题。
 
-它不会把每项内部经验继续追加到 README。内部方法由 SKILL、reference 和测试维护；README 只保留稳定的项目身份、使用入口和读者需要的边界。
+检查会结合相关页面、窗口和主要状态，找出影响美观、理解和操作的问题。获准实施后，从实际入口核对最终画面和连续操作，区分代码已修改、画面已验收和使用体验已检查。方法见[产品体验与界面治理](./references/product-experience-governance.md)。
+
+### 看懂项目，核对计划与实际完成度
+
+解释陌生仓库解决什么、如何运行、主要模块怎样配合；研究参考项目时，区分值得学习的方法与实际可复用的内容。对照实施计划逐项核对已完成、遗漏和未验证事项；全面审计时按项目类型检查适用范围，并给出有证据的优先级。
 
 ### 在动手前预防返工
 
-- 冻结目标行为、唯一真源、影响范围和停止位置。
-- 一次迁移全部正式调用点，并让旧入口退出。
-- 对持久操作、外部 CLI、模型调用、桌面生命周期和跨仓库合同叠加专项检查。
-- 从正式生产者到最终用户结果设计验收，不用手写假数据绕过核心链。
+功能、重构或迁移开始前，明确目标、依赖和受影响的调用方，安排修改顺序与验收。根据实际改动检查性能、任务进度、长时间操作、模型参与的流程和跨项目接口，提前发现会导致重复修改的问题。
 
 ### 问题发生后沿根因收口
 
-- 区分用户看到的现象、直接原因、合法保护、最早可控根因、绕行和残留。
-- 先保留失败证据，再迁移最终边界。
-- 验证真实生产、传输或存储、消费、用户可见结果和旧路径退出。
-- 对内聚、耦合、重复和上帝模块给出可实施的项目级治理结果。
+从现象追到真正需要修改的位置，修复涉及的模块、数据和调用关系，并核对旧实现是否退出。也可以检查架构耦合、重复实现和职责过多的模块，避免同一问题在不同位置反复修补。
 
-### 处理项目的公共表面
+### 整理项目、运行环境与发布
 
-Project Steward 还可以研究陌生项目、盘点目录、维护项目模板、治理产品体验与日志、记录用户执行环境，并完整处理 README、许可证、Star History 和仓库发布。
+| 工作 | 可以得到什么 | 方法 |
+| --- | --- | --- |
+| 目录整理 | 区分活动文件、本地状态和历史材料，提出忽略、移动或归档方案 | [目录治理](./references/repository-directory-governance.md) |
+| 外部工具兼容 | 检查工具接入、官方格式和导出链，定位并修复兼容问题 | [工具兼容](./references/external-tool-compatibility.md) |
+| 项目模板 | 建立、采用、升级项目基线，把反复适用的做法写进模板 | [模板](./references/project-template-system.md) · [模板演进](./references/template-evolution.md) |
+| 日志与执行环境 | 让日志能追溯实际操作，核对工具、SDK、缓存和长任务的运行条件 | [日志](./references/log-audit-standard.md) · [环境](./references/user-environment-governance.md) |
+| 运行产物存储 | 治理模型、下载、媒体、缓存和测试产物的存放、增长与残留 | [存储治理](./references/production-storage-governance.md) |
+| README 与发布 | 整理项目介绍、主页视觉、多语言、许可证和 GitHub 发布信息 | [README](./references/readme-delivery.md) · [许可证](./references/license-governance.md) · [发布](./references/repository-publication.md) |
+
+### 从真实工作中进化
+
+从一次完整任务中找出有效做法、失败原因和用户纠正，提出下次应该怎样处理。确认后将可复用方法写回 Project Steward；项目自己的决定仍留在该项目的文档、代码和配置中。
 
 ## 直接这样说
 
-### 从一次会话中进化
+在兼容 Agent 中点名 `$project-steward`，附上对应项目或材料即可。请求中的“检查”“给方案”和“实施”决定这次要做到哪一步。
 
-~~~text
-使用 $project-steward 阅读这个会话的完整过程。
-按用户最终结果找出成功机制、能力缺口和根因，
-先给我未来行为与影响文件，确认后再让 Project Steward 自我进化。
-~~~
-
-### 改动前先检查
-
-~~~text
-使用 $project-steward 检查这次改动。
-先确定唯一真源、全部消费者、旧路径退出和真实验收，
-再实施并持续做到证据充分。
-~~~
-
-### 沿根因修复
-
-~~~text
-使用 $project-steward 诊断并修复这个跨层问题。
-不要在症状旁加特判，一次迁移生产者、边界和消费者，
-证明旧架构已经退出。
-~~~
-
-### 看懂或治理一个仓库
-
-~~~text
-使用 $project-steward 看懂这个项目。
-说明它解决什么、怎样运行、核心边界在哪里，
-以及哪些能力值得复用、哪些不能直接复制。
-~~~
-
-### 优化 README
-
-~~~text
-使用 $project-steward 优化这个 README。
-检查 Git 和仓库状态、正文与视觉、多语言、许可证、
-Star History、GitHub Topics、链接和发布，并把真实结果完整交付。
-~~~
+| 你想做什么 | 请求示例 |
+| --- | --- |
+| 优化界面 | 使用 $project-steward 优化这个项目的界面和使用体验，改善布局、视觉层级、组件和交互，并检查实际画面与主要操作。 |
+| 从零设计 | 使用 $project-steward 为这个产品设计界面，先给出结构和视觉方向供我选择。 |
+| 重建参考界面 | 使用 $project-steward 按这个参考界面重建页面，并对照实际运行结果检查差异。 |
+| 看懂或治理一个仓库 | 使用 $project-steward 看懂这个仓库，解释用途、架构和运行方式；另外评估哪些能力值得复用。 |
+| 核对实施计划 | 使用 $project-steward 对照这份计划检查项目，列出已完成、漏做和仍未验证的事项。 |
+| 全面审计 | 使用 $project-steward 全面检查这个项目，按用户影响和风险给出治理方案。 |
+| 改动前先检查 | 使用 $project-steward 检查这次改动的影响范围、依赖和验收方式，先给实施方案。 |
+| 沿根因修复 | 使用 $project-steward 诊断并修复这个问题，处理受影响的调用方，并验证实际结果。 |
+| 整理目录 | 使用 $project-steward 检查哪些文件仍在使用、哪些不应上传，先给整理方案。 |
+| 检查兼容性 | 使用 $project-steward 检查项目与这个外部工具或官方格式的兼容性，指出失效的位置。 |
+| 建立或升级模板 | 使用 $project-steward 检查这个项目的基线，提出模板采用或升级方案。 |
+| 演进模板 | 使用 $project-steward 判断这些做法是否适合作为稳定默认，并更新对应项目模板。 |
+| 整理日志 | 使用 $project-steward 治理这个项目的日志，让一次操作的输入、过程、失败和结果能够查清。 |
+| 核对环境 | 使用 $project-steward 检查这个项目需要的工具、SDK 和缓存位置，说明当前环境的缺口。 |
+| 治理存储 | 使用 $project-steward 检查模型、媒体、缓存和测试产物的增长与残留，先给存储治理方案。 |
+| 优化 README | 使用 $project-steward 优化这个 README，完整处理正文、多语言、主页信息和相关发布事项。 |
+| 处理许可证 | 使用 $project-steward 检查这个仓库的许可证与第三方来源，给出适用范围和调整方案。 |
+| 提交发布 | 使用 $project-steward 检查上传内容，并将确认后的改动提交、推送到现有远端。 |
+| 从一次会话中进化 | 使用 $project-steward 阅读这次会话的完整过程，提出未来行为和影响文件，确认后再自我进化。 |
 
 ## README 完整优化会做什么
 
-一次完整 README 优化会检查仓库是否已经初始化、README 是否存在、项目身份与读者路径是否准确，再决定新写、重写、重组或压缩。
+根据项目事实组织主要用途和使用入口，处理正文、主页视觉、多语言、导航与许可证。公开 GitHub 仓库还包含 Star History、Topics 和 About Description；Website 只使用符合条件的正式入口。
 
-- 正文：删除内部方法镜像和重复说明，保留项目身份、主要结果、真实入口、第一次成功与维护导航。
-- 视觉：核对 hero、图片和证据资格，并检查桌面、窄屏以及 GitHub 深浅主题。
-- 首屏：按活动配置生成中文、English、日本語、文档、贡献、反馈、个人入口、Stars、Forks 与许可证。
-- 许可证：已有且准确时保持；缺失时先核对授权权利和采用目标，再应用确认后的方案。
-- Star History：对公开 GitHub 仓库运行真实工作流，验证输出分支、亮暗 SVG 和 README 消费端。
-- GitHub Topics：从项目当前身份和真实能力生成最终集合，随完整发布写入并回读，不因使用 Project Steward 自动添加宿主标签。
-- 发布：已有远端且确认包含发布时，精确提交、推送并核对远端 HEAD；不会自动创建远端、改变可见性、强推或删除文件。
+- 视觉按素材源码结构和引用关系核对，不把结构检查说成画面美观已经验收。
+- Star History 实施到工作流派发后停止，生成图表和远端展示仍标为未验证；另行要求远端验收时再检查。
+- 提交与推送依照已确认范围执行，推送后不等待新一轮远端检查。
 
-完整编排见 [README 完整交付方法](./references/readme-delivery.md)。
+完整范围和执行条件见 [README 完整交付方法](./references/readme-delivery.md)。
 
 ## 工作方式
 
@@ -162,12 +149,10 @@ npx skills add CheshireMew/project-steward
 python -m unittest discover -s tests -v
 ~~~
 
-审计三种语言的 README：
+检查本页 README（其它语言使用对应页面列出的命令）：
 
 ~~~powershell
-python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --project-name "Project Steward" --tagline "一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.en.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language en --project-name "Project Steward" --tagline "A project-governance Skill that helps you understand a codebase, prevent rework, and fix problems at their root." --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
-python scripts/audit_readme.py README.ja.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language ja --project-name "Project Steward" --tagline "プロジェクトを理解し、手戻りを未然に防ぎ、問題を根本原因から修正するためのプロジェクトガバナンス Skill です。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
+python scripts/audit_readme.py README.md --header-profile assets/readme-profile/profile.json --repository CheshireMew/project-steward --language zh-CN --project-name "Project Steward" --tagline "一个帮助你研究和审计项目、预防返工、修复根因，并改善界面设计与使用体验的 Agent Skill。" --identity-image assets/readme/hero.svg --identity-image-width 160 --branch main --navigation-target docs=SKILL.md
 ~~~
 
 ## Star History

@@ -398,9 +398,9 @@ class ReadmeContentGovernanceTests(unittest.TestCase):
             "ja": ("## できること", "## そのまま依頼できます", "## ライセンスと第三者ソース"),
         }
         locale_taglines = {
-            "zh-CN": "一个帮你看懂项目、提前避免返工，并在出问题后从根因修好的项目治理 Skill。",
-            "en": "A project-governance Skill that helps you understand a codebase, prevent rework, and fix problems at their root.",
-            "ja": "プロジェクトを理解し、手戻りを未然に防ぎ、問題を根本原因から修正するためのプロジェクトガバナンス Skill です。",
+            "zh-CN": "一个帮助你研究和审计项目、预防返工、修复根因，并改善界面设计与使用体验的 Agent Skill。",
+            "en": "An Agent Skill for project research and audits, preventing rework, fixing root causes, and improving UI design and usability.",
+            "ja": "プロジェクトの調査・監査、手戻りの予防、根本原因の修正、UI デザインと使いやすさの改善を支援する Agent Skill。",
         }
 
         for language, text in README_TEXTS.items():

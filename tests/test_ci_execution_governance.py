@@ -394,6 +394,27 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, section)
 
+    def test_formal_runner_proves_nonzero_failure_propagation(self) -> None:
+        section = CI_TEXT.split(
+            "### 正式 runner 先证明失败传播",
+            1,
+        )[1].split("### 正式 runner 的副作用", 1)[0]
+        ordered = (
+            "同一包装入口",
+            "确定返回约定非零码的受控失败哨兵",
+            "等待它结束",
+            "最外层命令保持非零状态",
+            "标准输出、标准错误和子进程身份可回读",
+            "权威进程 API 或等价边界取得真实状态",
+            "成功路径不能替代失败传播证明",
+            "不具备正式运行资格",
+            "只能作为诊断证据",
+        )
+        positions = [section.index(fragment) for fragment in ordered]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("Windows GUI 子进程", section)
+        self.assertIn("`$LASTEXITCODE`", section)
+
     def test_expensive_validator_preflights_and_stops_after_second_drift(
         self,
     ) -> None:
@@ -645,6 +666,9 @@ class CiExecutionGovernanceTests(unittest.TestCase):
             "每条可能并发执行的命令拥有独立的测试、项目、媒体、服务状态",
             "最长合法后缀反推执行根长度",
             "日志与报告证据根和尽量短的执行根分开",
+            "全部后代进程",
+            "兄弟命令的有效资源闭包",
+            "验证器内部串行不能证明",
             "产品并发合同",
             "最窄节点身份移入显式串行通道",
             "参数化测试使用稳定的节点前缀",

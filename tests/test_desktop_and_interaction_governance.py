@@ -616,6 +616,11 @@ class DesktopAndInteractionGovernanceTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, IMPLEMENTATION_TEXT)
 
+    def test_visual_capture_content_boundary(self) -> None:
+        required = ("捕获前固定内容边界与保留责任", "应用拥有的确定性测试表面",
+                    "采集授权不自动授权上传、提交、长期保留或删除")
+        self.assertTrue(all(item in IMPLEMENTATION_TEXT for item in required))
+
 
     def test_editable_visual_deliverables_and_scene_graph_transforms_are_governed(
         self,
